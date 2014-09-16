@@ -22,6 +22,9 @@ func main() {
 
 	conf := NewConfig()
 	conf.DataPath = "/tmp/lablog"
+	conf.SCM = "git"
+	conf.SCMAutoCommit = true
+	conf.SCMAutoPush = true
 
 	command, err := parseCommand(args)
 	if err != nil {

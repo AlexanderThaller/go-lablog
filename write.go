@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func WriteProjectNote(path, project, note string) error {
+func WriteProjectNote(path string, timestamp time.Time, project, note string) error {
 	err := os.MkdirAll(path, 0750)
 	if err != nil {
 		return err
@@ -22,7 +22,7 @@ func WriteProjectNote(path, project, note string) error {
 
 	writer := csv.NewWriter(file)
 	values := []string{
-		time.Now().Format(time.RFC3339Nano),
+		timestamp.Format(time.RFC3339Nano),
 		CommandNoteString,
 		note,
 	}

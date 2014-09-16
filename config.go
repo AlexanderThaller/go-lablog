@@ -1,7 +1,10 @@
 package main
 
 type Config struct {
-	DataPath string
+	DataPath      string
+	SCM           string
+	SCMAutoCommit bool
+	SCMAutoPush   bool
 }
 
 func NewConfig() Config {

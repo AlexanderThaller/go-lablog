@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/AlexanderThaller/logger"
 	"github.com/juju/errgo"
@@ -130,10 +131,34 @@ func (com Command) runNote() error {
 
 	switch len(com.Args) {
 	case 4:
-		project := com.Args[2]
-		note := com.Args[3]
-		return WriteProjectNote(com.DataPath, project, note)
+		return com.runNoteProject()
 	default:
 		return errgo.New("do not know a note command with this parameter count")
 	}
+}
+
+func (com Command) runNoteProject() error {
+	timestamp := time.Now()
+	project := com.Args[2]
+	note := com.Args[3]
+
+	err := WriteProjectNote(com.DataPath, timestamp, project, note)
+	if err != nil {
+		return err
+	}
+
+	if com.Config.SCMAutoCommit {
+		err = scmAdd(com.Config.SCM, com.Config.DataPath)
+		if err != nil {
+			return err
+		}
+
+		message := project + " - Note - " + timestamp.Format(time.RFC3339Nano)
+		err = scmCommit(com.Config.SCM, com.Config.DataPath, message)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
