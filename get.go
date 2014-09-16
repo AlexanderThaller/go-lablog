@@ -2,6 +2,7 @@ package main
 
 import (
 	"io/ioutil"
+	"path/filepath"
 	"sort"
 )
 
@@ -13,7 +14,11 @@ func GetProjects(datapath string) ([]string, error) {
 
 	var out []string
 	for _, d := range dir {
-		out = append(out, d.Name())
+		file := d.Name()
+		ext := filepath.Ext(file)
+		name := file[0 : len(file)-len(ext)]
+
+		out = append(out, name)
 	}
 
 	sort.Strings(out)

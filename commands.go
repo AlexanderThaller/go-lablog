@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/AlexanderThaller/logger"
 	"github.com/juju/errgo"
 )
 
