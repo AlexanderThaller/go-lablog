@@ -1,0 +1,18 @@
+{
+	"ImportPath": "github.com/AlexanderThaller/go-lablog",
+	"GoVersion": "go1.2.1",
+	"Packages": [
+		"./..."
+	],
+	"Deps": [
+		{
+			"ImportPath": "github.com/AlexanderThaller/logger",
+			"Comment": "1.00-27-g28687f9",
+			"Rev": "28687f989d1d6d907ab8e2b278d1eafa6e1abbcc"
+		},
+		{
+			"ImportPath": "github.com/juju/errgo",
+			"Rev": "26caa7d4884f6048c5687fa44c410e5d5d95e554"
+		}
+	]
+}

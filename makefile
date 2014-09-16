@@ -27,3 +27,9 @@ callgraph:
 
 memograph:
 	go tool pprof --pdf "$(NAME)" mem.pprof > memograph.pdf
+
+dependencies_save:
+	godep save ./...
+
+dependencies_restore:
+	godep restore ./...
