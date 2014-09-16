@@ -84,6 +84,8 @@ func (com Command) Run() error {
 	switch com.Type {
 	case CommandList:
 		err = com.runList()
+	case CommandNote:
+		err = com.runNote()
 	default:
 		err = errgo.New("do not implement the command " + com.Type.String())
 	}
@@ -119,4 +121,19 @@ func (com Command) runListProjects() error {
 	}
 
 	return nil
+}
+
+func (com Command) runNote() error {
+	l := logger.New(Name, "Command", "runNote")
+	l.Debug("Args: ", com.Args)
+	l.Debug("Args Len: ", len(com.Args))
+
+	switch len(com.Args) {
+	case 4:
+		project := com.Args[2]
+		note := com.Args[3]
+		return WriteProjectNote(com.DataPath, project, note)
+	default:
+		return errgo.New("do not know a note command with this parameter count")
+	}
 }
