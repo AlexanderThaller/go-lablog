@@ -18,6 +18,8 @@ func init() {
 func main() {
 	l := logger.New(Name, "main")
 	args := os.Args
+	l.Debug("Args: ", args)
+
 	conf := NewConfig()
 	conf.DataPath = "/tmp/lablog"
 

@@ -54,7 +54,7 @@ func NewCommand(typ CommandType, args []string) Command {
 
 func parseCommand(args []string) (Command, error) {
 	if len(args) == 1 {
-		command := NewCommand(CommandList, []string{})
+		command := NewCommand(CommandList, args)
 		return command, nil
 	}
 
@@ -91,8 +91,12 @@ func (com Command) Run() error {
 }
 
 func (com Command) runList() error {
+	l := logger.New(Name, "Command", "runList")
+	l.Debug("Args: ", com.Args)
+	l.Debug("Args Len: ", len(com.Args))
+
 	switch len(com.Args) {
-	case 2:
+	case 1, 2:
 		return com.runListProjects()
 	default:
 		return errgo.New("do not know a list command with this parameter count")
