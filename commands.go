@@ -192,5 +192,12 @@ func (com Command) runNoteProject() error {
 		}
 	}
 
+	if com.Config.SCMAutoPush {
+		err = scmPush(com.Config.SCM, com.Config.DataPath)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }

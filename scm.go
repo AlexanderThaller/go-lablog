@@ -58,3 +58,29 @@ func gitAdd(datapath string) error {
 	time.Sleep(100 * time.Millisecond)
 	return nil
 }
+
+func scmPush(scm, datapath string) error {
+	switch scm {
+	case "git":
+		return gitPush(datapath)
+	default:
+		return errgo.New("do not know the scm " + scm)
+	}
+}
+
+func gitPush(datapath string) error {
+	command := exec.Command("git", "push")
+	command.Dir = datapath
+
+	output, err := command.CombinedOutput()
+	if err != nil {
+		err = errgo.New("problem when pushing to git: " + err.Error() + " - " +
+			string(output))
+
+		return err
+	}
+
+	// Give git time to commit everything and remove the lockfile.
+	time.Sleep(100 * time.Millisecond)
+	return nil
+}
