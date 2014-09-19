@@ -1,4 +1,4 @@
-NAME = guberno
+NAME = go-lablog
 
 all:
 	make format
