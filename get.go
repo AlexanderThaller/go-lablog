@@ -4,9 +4,14 @@ import (
 	"io/ioutil"
 	"path/filepath"
 	"sort"
+	"strings"
+
+	"github.com/AlexanderThaller/logger"
 )
 
 func GetProjects(datapath string) ([]string, error) {
+	l := logger.New(Name, "GetProjects")
+
 	dir, err := ioutil.ReadDir(datapath)
 	if err != nil {
 		return []string{}, err

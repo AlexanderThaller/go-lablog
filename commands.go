@@ -1,8 +1,10 @@
 package main
 
 import (
+	"encoding/csv"
 	"fmt"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/AlexanderThaller/logger"
@@ -102,6 +104,9 @@ func (com Command) runList() error {
 	switch len(com.Args) {
 	case 1, 2:
 		return com.runListProjects()
+	case 3:
+		project := com.Args[2]
+		return com.runListProjectNotes(project)
 	default:
 		return errgo.New("do not know a list command with this parameter count")
 	}
@@ -119,6 +124,33 @@ func (com Command) runListProjects() error {
 
 	for _, d := range projects {
 		fmt.Println(d)
+	}
+
+	return nil
+}
+
+func (com Command) runListProjectNotes(project string) error {
+	path := filepath.Join(com.Config.DataPath, project+".csv")
+	file, err := os.OpenFile(path, os.O_RDONLY, 0640)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	reader := csv.NewReader(file)
+	records, err := reader.ReadAll()
+	if err != nil {
+		return err
+	}
+
+	for _, d := range records {
+		timestamp := d[0]
+		messagetype := d[1]
+		note := d[2]
+
+		fmt.Println("# " + timestamp + " (" + messagetype + ")")
+		fmt.Println(note)
+		fmt.Println("")
 	}
 
 	return nil
