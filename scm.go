@@ -29,7 +29,7 @@ func gitCommit(datapath, message string) error {
 	}
 
 	// Give git time to commit everything and remove the lockfile.
-	time.Sleep(100 * time.Millisecond)
+	time.Sleep(50 * time.Millisecond)
 	return nil
 }
 
@@ -55,7 +55,7 @@ func gitAdd(datapath string) error {
 	}
 
 	// Give git time to commit everything and remove the lockfile.
-	time.Sleep(100 * time.Millisecond)
+	time.Sleep(50 * time.Millisecond)
 	return nil
 }
 
@@ -81,6 +81,6 @@ func gitPush(datapath string) error {
 	}
 
 	// Give git time to commit everything and remove the lockfile.
-	time.Sleep(100 * time.Millisecond)
+	time.Sleep(50 * time.Millisecond)
 	return nil
 }
