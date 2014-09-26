@@ -119,7 +119,78 @@ func (com *Command) getProjects() ([]string, error) {
 }
 
 func (com *Command) runListProjectNotes() error {
-	return errgo.New("not implemented")
+	if com.Project == "" {
+		return errgo.New("project name can not be empty")
+	}
+
+	if !com.checkProjectExists() {
+		return errgo.New("no notes for this project")
+	}
+
+	records, err := com.getProjectRecords()
+	if err != nil {
+		return err
+	}
+
+	for _, record := range records {
+		if record.GetAction() != ActionNote {
+			continue
+		}
+
+		fmt.Println("#", record.GetTimeStamp())
+		fmt.Println(record.GetValue())
+	}
+
+	return nil
+}
+
+func (com *Command) checkProjectExists() bool {
+	projects, err := com.getProjects()
+	if err != nil {
+		return false
+	}
+
+	for _, project := range projects {
+		if project == com.Project {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (com *Command) getProjectRecords() ([]Record, error) {
+	if com.DataPath == "" {
+		return nil, errgo.New("datapath can not be empty")
+	}
+	if com.Project == "" {
+		return nil, errgo.New("project name can not be empty")
+	}
+
+	filepath := filepath.Join(com.DataPath, com.Project+".csv")
+	file, err := os.OpenFile(filepath, os.O_RDONLY, 0640)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	reader := csv.NewReader(file)
+	records, err := reader.ReadAll()
+	if err != nil {
+		return nil, err
+	}
+
+	var out []Record
+	for _, d := range records {
+		record, err := RecordFromCSV(d)
+		if err != nil {
+			return nil, err
+		}
+
+		out = append(out, record)
+	}
+
+	return out, err
 }
 
 func (com *Command) Write(record Record) error {
