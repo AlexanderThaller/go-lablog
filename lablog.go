@@ -4,20 +4,21 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/AlexanderThaller/logger"
 	"github.com/juju/errgo"
 )
 
 var (
+	flagAction        = flag.String("c", "list", "")
 	flagDataPath      = flag.String("datapath", "/home/thalleralexander/.lablog", "")
+	flagEndTime       = flag.String("endtime", "", "EndTime")
+	flagProject       = flag.String("p", "", "")
 	flagSCM           = flag.String("scm", "git", "")
 	flagSCMAutoCommit = flag.Bool("autocommit", true, "")
 	flagSCMAutoPush   = flag.Bool("autopush", false, "")
-	flagAction        = flag.String("c", "list", "")
-	flagProject       = flag.String("p", "", "")
 	flagStartTime     = flag.String("starttime", "", "StartTime")
-	flagEndTime       = flag.String("endtime", "", "EndTime")
 )
 
 const (
@@ -27,22 +28,25 @@ const (
 func init() {
 	flag.Parse()
 	logger.SetLevel(logger.New(Name, "main"), logger.Trace)
+	logger.SetLevel(logger.New(Name, "Command"), logger.Trace)
 }
 
 func main() {
 	l := logger.New(Name, "main")
 
 	command := NewCommand()
+	command.Action = *flagAction
+	command.Args = flag.Args()
 	command.DataPath = *flagDataPath
+	command.EndTime = *flagEndTime
+	command.Project = *flagProject
 	command.SCM = *flagSCM
 	command.SCMAutoCommit = *flagSCMAutoCommit
 	command.SCMAutoPush = *flagSCMAutoPush
-	command.Project = *flagProject
-	command.Action = *flagAction
 	command.StartTime = *flagStartTime
-	command.EndTime = *flagEndTime
+	command.TimeStamp = time.Now()
 
-	l.Trace("Command: ", fmt.Sprintf("%#v", command))
+	l.Trace("Command: ", fmt.Sprintf("%+v", command))
 
 	err := command.Run()
 	if err != nil {
