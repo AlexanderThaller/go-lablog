@@ -19,6 +19,7 @@ var (
 	flagSCMAutoCommit = flag.Bool("autocommit", true, "")
 	flagSCMAutoPush   = flag.Bool("autopush", false, "")
 	flagStartTime     = flag.String("starttime", "", "StartTime")
+	flagValue         = flag.String("v", "", "")
 )
 
 const (
@@ -43,6 +44,7 @@ func main() {
 	command.SCMAutoPush = *flagSCMAutoPush
 	command.StartTime = *flagStartTime
 	command.TimeStamp = time.Now()
+	command.Value = *flagValue
 
 	l.Trace("Command: ", fmt.Sprintf("%+v", command))
 

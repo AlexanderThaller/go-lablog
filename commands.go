@@ -25,6 +25,7 @@ type Command struct {
 	SCMAutoPush   bool
 	StartTime     string
 	TimeStamp     time.Time
+	Value         string
 }
 
 const (
@@ -55,8 +56,8 @@ func (com *Command) runNote() error {
 	l := logger.New(Name, "Command", "run", "Note")
 
 	l.Trace("Args length: ", len(com.Args))
-	if len(com.Args) != 1 {
-		return errgo.New("note command needs one argument")
+	if com.Value == "" {
+		return errgo.New("note command needs a value")
 	}
 	l.Trace("Project: ", com.Project)
 	if com.Project == "" {
@@ -66,7 +67,7 @@ func (com *Command) runNote() error {
 	note := new(Note)
 	note.Project = com.Project
 	note.TimeStamp = com.TimeStamp
-	note.Value = com.Args[0]
+	note.Value = com.Value
 	l.Trace("Note: ", fmt.Sprintf("%+v", note))
 
 	return com.Write(note)
