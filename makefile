@@ -1,4 +1,4 @@
-NAME = go-lablog
+NAME = lablog
 
 all:
 	make format
@@ -12,7 +12,7 @@ test:
 	go test ./...
 
 build:
-	go build -ldflags "-X main.buildtime `date +%s` -X main.version `git describe --always`"
+	go build -ldflags "-X main.buildtime `date +%s` -X main.version `git describe --always`" -o "$(NAME)"
 
 clean:
 	rm "$(NAME)"
@@ -21,6 +21,9 @@ clean:
 
 install:
 	cp "$(NAME)" /usr/local/bin
+
+uninstall:
+	rm "/usr/local/bin/$(NAME)"
 
 callgraph:
 	go tool pprof --pdf "$(NAME)" cpu.pprof > callgraph.pdf
