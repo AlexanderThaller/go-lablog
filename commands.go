@@ -127,7 +127,7 @@ func (com *Command) runListProjectNotes() error {
 		return errgo.New("no notes for this project")
 	}
 
-	records, err := com.getProjectRecords()
+	records, err := com.getProjectRecords(com.Project)
 	if err != nil {
 		return err
 	}
@@ -139,6 +139,7 @@ func (com *Command) runListProjectNotes() error {
 
 		fmt.Println("#", record.GetTimeStamp())
 		fmt.Println(record.GetValue())
+		fmt.Println("")
 	}
 
 	return nil
@@ -159,15 +160,15 @@ func (com *Command) checkProjectExists() bool {
 	return false
 }
 
-func (com *Command) getProjectRecords() ([]Record, error) {
+func (com *Command) getProjectRecords(project string) ([]Record, error) {
 	if com.DataPath == "" {
 		return nil, errgo.New("datapath can not be empty")
 	}
-	if com.Project == "" {
+	if project == "" {
 		return nil, errgo.New("project name can not be empty")
 	}
 
-	filepath := filepath.Join(com.DataPath, com.Project+".csv")
+	filepath := filepath.Join(com.DataPath, project+".csv")
 	file, err := os.OpenFile(filepath, os.O_RDONLY, 0640)
 	if err != nil {
 		return nil, err
@@ -177,7 +178,7 @@ func (com *Command) getProjectRecords() ([]Record, error) {
 	reader := csv.NewReader(file)
 	records, err := reader.ReadAll()
 	if err != nil {
-		return nil, err
+		return nil, errgo.New(err.Error())
 	}
 
 	var out []Record
@@ -186,6 +187,7 @@ func (com *Command) getProjectRecords() ([]Record, error) {
 		if err != nil {
 			return nil, err
 		}
+		record.SetProject(project)
 
 		out = append(out, record)
 	}

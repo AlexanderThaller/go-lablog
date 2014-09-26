@@ -16,11 +16,12 @@ type Record interface {
 	GetProject() string
 	GetTimeStamp() string
 	GetValue() string
+	SetProject(string)
 }
 
 func RecordFromCSV(values []string) (Record, error) {
-	if len(values) < 4 {
-		return nil, errgo.New("we need at least 4 fields for parsing")
+	if len(values) != 3 {
+		return nil, errgo.New("we need three fields for parsing")
 	}
 
 	recordtype := values[1]
@@ -40,8 +41,7 @@ func NoteFromCSV(values []string) (Note, error) {
 	}
 
 	note.TimeStamp = timestamp
-	note.Project = values[2]
-	note.Value = values[3]
+	note.Value = values[2]
 
 	return *note, nil
 }
@@ -56,7 +56,6 @@ func (note Note) CSV() []string {
 	return []string{
 		note.TimeStamp.Format(RecordTimeStampFormat),
 		ActionNote,
-		note.Project,
 		note.Value,
 	}
 }
@@ -75,4 +74,8 @@ func (note Note) GetTimeStamp() string {
 
 func (note Note) GetValue() string {
 	return note.Value
+}
+
+func (note Note) SetProject(project string) {
+	note.Project = project
 }
