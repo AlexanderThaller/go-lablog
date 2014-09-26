@@ -11,20 +11,16 @@ const (
 	Name = "lablog"
 )
 
-func init() {
-	logger.SetLevel(".", logger.Trace)
-}
-
 func main() {
 	l := logger.New(Name, "main")
 	args := os.Args
 	l.Debug("Args: ", args)
 
 	conf := NewConfig()
-	conf.DataPath = "/tmp/lablog"
+	conf.DataPath = "/home/thalleralexander/docs/lablog"
 	conf.SCM = "git"
 	conf.SCMAutoCommit = true
-	conf.SCMAutoPush = true
+	conf.SCMAutoPush = false
 
 	command, err := parseCommand(args)
 	if err != nil {

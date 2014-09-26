@@ -1,10 +1,8 @@
 package main
 
 import (
-	"encoding/csv"
 	"fmt"
 	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/AlexanderThaller/logger"
@@ -24,13 +22,17 @@ const (
 	CommandNote
 	CommandTrack
 	CommandTodo
+	CommandDate
+	CommandRecords
 )
 
 const (
-	CommandListString  = "list"
-	CommandNoteString  = "note"
-	CommandTrackString = "track"
-	CommandTodoString  = "todo"
+	CommandListString    = "list"
+	CommandNoteString    = "note"
+	CommandTrackString   = "track"
+	CommandTodoString    = "todo"
+	CommandDateString    = "date"
+	CommandRecordsString = "records"
 )
 
 func (typ CommandType) String() string {
@@ -43,6 +45,10 @@ func (typ CommandType) String() string {
 		return CommandTrackString
 	case CommandTodo:
 		return CommandTodoString
+	case CommandDate:
+		return CommandDateString
+	case CommandRecords:
+		return CommandRecordsString
 	default:
 		return "Unkown"
 	}
@@ -74,6 +80,10 @@ func parseCommand(args []string) (Command, error) {
 		command = NewCommand(CommandTrack, args)
 	case CommandTodoString:
 		command = NewCommand(CommandTodo, args)
+	case CommandDateString:
+		command = NewCommand(CommandDate, args)
+	case CommandRecordsString:
+		command = NewCommand(CommandRecords, args)
 	default:
 		err = errgo.New("do not know the command " + args[1])
 	}
@@ -89,6 +99,10 @@ func (com Command) Run() error {
 		err = com.runList()
 	case CommandNote:
 		err = com.runNote()
+	case CommandDate:
+		err = com.runDate()
+	case CommandRecords:
+		err = com.runRecords()
 	default:
 		err = errgo.New("do not implement the command " + com.Type.String())
 	}
@@ -130,15 +144,7 @@ func (com Command) runListProjects() error {
 }
 
 func (com Command) runListProjectNotes(project string) error {
-	path := filepath.Join(com.Config.DataPath, project+".csv")
-	file, err := os.OpenFile(path, os.O_RDONLY, 0640)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	reader := csv.NewReader(file)
-	records, err := reader.ReadAll()
+	records, err := GetProjectRecords(com.Config.DataPath, project)
 	if err != nil {
 		return err
 	}
@@ -197,6 +203,72 @@ func (com Command) runNoteProject() error {
 		if err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (com Command) runDate() error {
+	l := logger.New(Name, "Command", "runDate")
+	l.Debug("Args: ", com.Args)
+	l.Debug("Args Len: ", len(com.Args))
+
+	switch len(com.Args) {
+	case 1, 2:
+		return com.runDateList()
+	default:
+		return errgo.New("do not know a date command with this parameter count")
+	}
+}
+
+func (com Command) runDateList() error {
+	l := logger.New(Name, "Command", "runDate", "List")
+	l.Debug("Args: ", com.Args)
+	l.Debug("Args Len: ", len(com.Args))
+
+	dates, err := GetDates(com.Config.DataPath)
+	if err != nil {
+		return err
+	}
+
+	for _, d := range dates {
+		fmt.Println(d)
+	}
+
+	return nil
+}
+
+func (com Command) runRecords() error {
+	l := logger.New(Name, "Command", "runRecords")
+	l.Debug("Args: ", com.Args)
+	l.Debug("Args Len: ", len(com.Args))
+
+	switch len(com.Args) {
+	case 1, 2:
+		return com.runRecordsList()
+	default:
+		return errgo.New("do not know a date command with this parameter count")
+	}
+}
+
+func (com Command) runRecordsList() error {
+	l := logger.New(Name, "Command", "runRecords", "List")
+	l.Debug("Args: ", com.Args)
+	l.Debug("Args Len: ", len(com.Args))
+
+	records, err := GetRecords(com.Config.DataPath)
+	if err != nil {
+		return err
+	}
+
+	for _, record := range records {
+		timestamp := record[0]
+		messagetype := record[1]
+		note := record[2]
+
+		fmt.Println("# " + timestamp + " (" + messagetype + ")")
+		fmt.Println(note)
+		fmt.Println("")
 	}
 
 	return nil
