@@ -78,7 +78,7 @@ func GetRecords(datapath string) ([][]string, error) {
 	return out, nil
 }
 
-func GetTimeStamps(datapath string) ([]time.Time, error) {
+func GetTimeStamps(datapath string, startTime, endTime time.Time) ([]time.Time, error) {
 	records, err := GetRecords(datapath)
 	if err != nil {
 		return nil, err
@@ -92,14 +92,26 @@ func GetTimeStamps(datapath string) ([]time.Time, error) {
 			return nil, err
 		}
 
+		if !startTime.Equal(time.Time{}) {
+			if startTime.After(converted) {
+				continue
+			}
+		}
+
+		if !endTime.Equal(time.Time{}) {
+			if endTime.Before(converted) {
+				continue
+			}
+		}
+
 		out = append(out, converted)
 	}
 
 	return out, nil
 }
 
-func GetDates(datapath string) ([]string, error) {
-	timestamps, err := GetTimeStamps(datapath)
+func GetDates(datapath string, startTime, endTime time.Time) ([]string, error) {
+	timestamps, err := GetTimeStamps(datapath, startTime, endTime)
 	if err != nil {
 		return nil, err
 	}

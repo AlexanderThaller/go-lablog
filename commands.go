@@ -13,6 +13,8 @@ type Command struct {
 	Type CommandType
 	Args []string
 	Config
+	StartTime time.Time
+	EndTime   time.Time
 }
 
 type CommandType uint
@@ -24,6 +26,10 @@ const (
 	CommandTodo
 	CommandDate
 	CommandRecords
+)
+
+const (
+	DateFormatDay = "2006-01-02"
 )
 
 const (
@@ -63,7 +69,7 @@ func NewCommand(typ CommandType, args []string) Command {
 }
 
 func parseCommand(args []string) (Command, error) {
-	if len(args) == 1 {
+	if len(args) == 0 {
 		command := NewCommand(CommandList, args)
 		return command, nil
 	}
@@ -71,7 +77,7 @@ func parseCommand(args []string) (Command, error) {
 	var command Command
 	var err error
 
-	switch args[1] {
+	switch args[0] {
 	case CommandListString:
 		command = NewCommand(CommandList, args)
 	case CommandNoteString:
@@ -173,7 +179,7 @@ func (com Command) runNote() error {
 	l.Debug("Args Len: ", len(com.Args))
 
 	switch len(com.Args) {
-	case 4:
+	case 3:
 		return com.runNoteProject()
 	default:
 		return errgo.New("do not know a note command with this parameter count")
@@ -182,8 +188,8 @@ func (com Command) runNote() error {
 
 func (com Command) runNoteProject() error {
 	timestamp := time.Now()
-	project := com.Args[2]
-	note := com.Args[3]
+	project := com.Args[1]
+	note := com.Args[2]
 
 	err := WriteProjectNote(com.DataPath, timestamp, project, note)
 	if err != nil {
@@ -219,7 +225,7 @@ func (com Command) runDate() error {
 	l.Debug("Args Len: ", len(com.Args))
 
 	switch len(com.Args) {
-	case 1, 2:
+	case 1:
 		return com.runDateList()
 	default:
 		return errgo.New("do not know a date command with this parameter count")
@@ -231,7 +237,7 @@ func (com Command) runDateList() error {
 	l.Debug("Args: ", com.Args)
 	l.Debug("Args Len: ", len(com.Args))
 
-	dates, err := GetDates(com.Config.DataPath)
+	dates, err := GetDates(com.Config.DataPath, com.StartTime, com.EndTime)
 	if err != nil {
 		return err
 	}
@@ -249,7 +255,7 @@ func (com Command) runRecords() error {
 	l.Debug("Args Len: ", len(com.Args))
 
 	switch len(com.Args) {
-	case 1, 2:
+	case 1:
 		return com.runRecordsList()
 	default:
 		return errgo.New("do not know a date command with this parameter count")
