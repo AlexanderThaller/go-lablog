@@ -23,7 +23,7 @@ func WriteProjectNote(path string, timestamp time.Time, project, note string) er
 	writer := csv.NewWriter(file)
 	values := []string{
 		timestamp.Format(time.RFC3339Nano),
-		CommandNoteString,
+		ActionNote,
 		note,
 	}
 
