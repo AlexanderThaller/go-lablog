@@ -55,6 +55,10 @@ var (
 	priorities     map[Priority]string
 	list           loggers
 	formattemplate template.Template
+
+	// SaveLoggerLevels will make the package save loggers which are only defined
+	// by their parents if it is set to true.
+	SaveLoggerLevels = true
 )
 
 func init() {
@@ -83,8 +87,7 @@ func ImportLoggers(lo map[Logger]string) (err error) {
 	for k, v := range lo {
 		p, e := ParsePriority(v)
 		if e != nil {
-			err = errors.New("can not parse priority: " + e.Error())
-			return
+			return e
 		}
 
 		SetLevel(k, p)

@@ -28,7 +28,7 @@ func init() {
 }
 
 func main() {
-  l := logger.New("application.main")
+  l := logger.New("application", "main")
 
   l.Notice("Starting")
 

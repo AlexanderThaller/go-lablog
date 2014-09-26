@@ -75,6 +75,10 @@ func (lo *loggers) GetParentLogger(na Logger) logger {
 	l := lo.GetLogger(n)
 	l.Logger = na
 
+	if SaveLoggerLevels {
+		lo.SetLogger(na, l)
+	}
+
 	return l
 }
 
