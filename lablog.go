@@ -27,8 +27,6 @@ const (
 
 func init() {
 	flag.Parse()
-	logger.SetLevel(logger.New(Name, "main"), logger.Trace)
-	logger.SetLevel(logger.New(Name, "Command"), logger.Trace)
 }
 
 func main() {

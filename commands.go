@@ -3,8 +3,11 @@ package main
 import (
 	"encoding/csv"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sort"
+	"strings"
 	"time"
 
 	"github.com/AlexanderThaller/logger"
@@ -34,6 +37,10 @@ func NewCommand() *Command {
 }
 
 func (com *Command) Run() error {
+	if com.DataPath == "" {
+		return errgo.New("the datapath can not be empty")
+	}
+
 	switch com.Action {
 	case ActionNote:
 		return com.runNote()
@@ -66,7 +73,53 @@ func (com *Command) runNote() error {
 }
 
 func (com *Command) runList() error {
-	return errgo.New("Not implemented")
+	if com.Project == "" {
+		return com.runListProjects()
+	} else {
+		return com.runListProjectNotes()
+	}
+}
+
+func (com *Command) runListProjects() error {
+	projects, err := com.getProjects()
+	if err != nil {
+		return err
+	}
+
+	for _, project := range projects {
+		fmt.Println(project)
+	}
+
+	return nil
+}
+
+func (com *Command) getProjects() ([]string, error) {
+	dir, err := ioutil.ReadDir(com.DataPath)
+	if err != nil {
+		return nil, err
+	}
+
+	var out []string
+	for _, d := range dir {
+		file := d.Name()
+
+		// Skip dotfiles
+		if strings.HasPrefix(file, ".") {
+			continue
+		}
+
+		ext := filepath.Ext(file)
+		name := file[0 : len(file)-len(ext)]
+
+		out = append(out, name)
+	}
+
+	sort.Strings(out)
+	return out, nil
+}
+
+func (com *Command) runListProjectNotes() error {
+	return errgo.New("not implemented")
 }
 
 func (com *Command) Write(record Record) error {
