@@ -149,6 +149,11 @@ func (com Command) runListProjectNotes(project string) error {
 		return err
 	}
 
+	fmt.Println("---")
+	fmt.Println("title: " + project)
+	fmt.Println("...")
+	fmt.Println("")
+
 	for _, d := range records {
 		timestamp := d[0]
 		messagetype := d[1]
