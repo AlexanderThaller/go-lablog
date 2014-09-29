@@ -23,6 +23,7 @@ var (
 	flagSCMAutoPush   = flag.Bool("autopush", false, "")
 	flagStartTime     = flag.String("starttime", "", "StartTime")
 	flagValue         = flag.String("v", "", "")
+	flagLogLevel      = flag.String("loglevel", "Notice", "")
 )
 
 const (
@@ -30,7 +31,15 @@ const (
 )
 
 func init() {
+	l := logger.New(Name, "init")
 	flag.Parse()
+
+	priority, err := logger.ParsePriority(*flagLogLevel)
+	if err != nil {
+		l.Alert("Can not parse loglevel: ", errgo.Details(err))
+		os.Exit(1)
+	}
+	logger.SetLevel(".", priority)
 }
 
 func main() {
