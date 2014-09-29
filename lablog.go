@@ -11,6 +11,9 @@ import (
 )
 
 var (
+	buildVersion string
+	buildTime    string
+
 	flagAction        = flag.String("c", "list", "")
 	flagDataPath      = flag.String("datapath", "/home/thalleralexander/.lablog", "")
 	flagEndTime       = flag.String("endtime", "", "EndTime")
@@ -32,6 +35,8 @@ func init() {
 
 func main() {
 	l := logger.New(Name, "main")
+	l.Info("Version: ", buildVersion)
+	l.Info("Buildtime: ", buildTime)
 
 	command := NewCommand()
 	command.Action = *flagAction
