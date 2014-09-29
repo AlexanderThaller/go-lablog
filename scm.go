@@ -33,17 +33,17 @@ func gitCommit(datapath, message string) error {
 	return nil
 }
 
-func scmAdd(scm, datapath string) error {
+func scmAdd(scm, datapath, filename string) error {
 	switch scm {
 	case "git":
-		return gitAdd(datapath)
+		return gitAdd(datapath, filename)
 	default:
 		return errgo.New("do not know the scm " + scm)
 	}
 }
 
-func gitAdd(datapath string) error {
-	command := exec.Command("git", "add", "--all", ".")
+func gitAdd(datapath, filename string) error {
+	command := exec.Command("git", "add", filename)
 	command.Dir = datapath
 
 	output, err := command.CombinedOutput()

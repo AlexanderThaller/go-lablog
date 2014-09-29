@@ -29,6 +29,10 @@ type Command struct {
 }
 
 const (
+	CommitMessageTimeStampFormat = RecordTimeStampFormat
+)
+
+const (
 	ActionList = "list"
 	ActionNote = "note"
 )
@@ -226,6 +230,37 @@ func (com *Command) Write(record Record) error {
 		return err
 	}
 	writer.Flush()
+
+	err = com.Commit(record)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (com *Command) Commit(record Record) error {
+	if !com.SCMAutoCommit {
+		return nil
+	}
+
+	if com.SCM == "" {
+		return errgo.New("Can not use an empty scm for commiting")
+	}
+
+	filename := record.GetProject() + ".csv"
+	err := scmAdd(com.SCM, com.DataPath, filename)
+	if err != nil {
+		return err
+	}
+
+	message := com.Project + " - "
+	message += record.GetAction() + " - "
+	message += com.TimeStamp.Format(CommitMessageTimeStampFormat)
+	err = scmCommit(com.SCM, com.DataPath, message)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
