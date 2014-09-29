@@ -30,11 +30,13 @@ type Command struct {
 
 const (
 	CommitMessageTimeStampFormat = RecordTimeStampFormat
+	DateFormat                   = "2006-01-02"
 )
 
 const (
-	ActionList = "list"
-	ActionNote = "note"
+	ActionList      = "list"
+	ActionListDates = "listdates"
+	ActionNote      = "note"
 )
 
 func NewCommand() *Command {
@@ -51,6 +53,8 @@ func (com *Command) Run() error {
 		return com.runNote()
 	case ActionList:
 		return com.runList()
+	case ActionListDates:
+		return com.runListDates()
 	default:
 		return errgo.New("Do not recognize the action: " + com.Action)
 	}
@@ -98,6 +102,90 @@ func (com *Command) runListProjects() error {
 	return nil
 }
 
+func (com *Command) runListDates() error {
+	var dates []string
+	var err error
+
+	if com.Project == "" {
+		dates, err = com.getDates()
+	} else {
+		dates, err = com.getProjectDates(com.Project)
+	}
+
+	if err != nil {
+		return err
+	}
+
+	sort.Strings(dates)
+	for _, date := range dates {
+		fmt.Println(date)
+	}
+
+	return nil
+}
+
+func (com *Command) getDates() ([]string, error) {
+	projects, err := com.getProjects()
+	if err != nil {
+		return nil, err
+	}
+
+	datemap := make(map[string]struct{})
+	for _, project := range projects {
+		dates, err := com.getProjectDates(project)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, date := range dates {
+			datemap[date] = struct{}{}
+		}
+	}
+
+	var out []string
+	for date := range datemap {
+		out = append(out, date)
+	}
+
+	return out, nil
+}
+
+func (com *Command) getProjectDates(project string) ([]string, error) {
+	if com.DataPath == "" {
+		return nil, errgo.New("datapath can not be empty")
+	}
+	if project == "" {
+		return nil, errgo.New("project name can not be empty")
+	}
+	if !com.checkProjectExists(project) {
+		return nil, errgo.New("project does not exist")
+	}
+
+	var out []string
+
+	records, err := com.getProjectRecords(project)
+	if err != nil {
+		return nil, err
+	}
+
+	datemap := make(map[string]struct{})
+
+	for _, record := range records {
+		date, err := time.Parse(RecordTimeStampFormat, record.GetTimeStamp())
+		if err != nil {
+			return nil, err
+		}
+
+		datemap[date.Format(DateFormat)] = struct{}{}
+	}
+
+	for date := range datemap {
+		out = append(out, date)
+	}
+
+	return out, nil
+}
+
 func (com *Command) getProjects() ([]string, error) {
 	dir, err := ioutil.ReadDir(com.DataPath)
 	if err != nil {
@@ -127,8 +215,7 @@ func (com *Command) runListProjectNotes() error {
 	if com.Project == "" {
 		return errgo.New("project name can not be empty")
 	}
-
-	if !com.checkProjectExists() {
+	if !com.checkProjectExists(com.Project) {
 		return errgo.New("no notes for this project")
 	}
 
@@ -150,14 +237,14 @@ func (com *Command) runListProjectNotes() error {
 	return nil
 }
 
-func (com *Command) checkProjectExists() bool {
+func (com *Command) checkProjectExists(project string) bool {
 	projects, err := com.getProjects()
 	if err != nil {
 		return false
 	}
 
-	for _, project := range projects {
-		if project == com.Project {
+	for _, d := range projects {
+		if d == project {
 			return true
 		}
 	}
@@ -171,6 +258,9 @@ func (com *Command) getProjectRecords(project string) ([]Record, error) {
 	}
 	if project == "" {
 		return nil, errgo.New("project name can not be empty")
+	}
+	if !com.checkProjectExists(project) {
+		return nil, errgo.New("project does not exist")
 	}
 
 	filepath := filepath.Join(com.DataPath, project+".csv")
