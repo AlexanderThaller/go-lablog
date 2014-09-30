@@ -114,7 +114,7 @@ func (com *Command) runList() error {
 	if com.Project == "" {
 		return com.runListProjects()
 	} else {
-		return com.runListProjectNotes()
+		return com.runListProjectNotes(com.Project)
 	}
 }
 
@@ -179,10 +179,6 @@ func (com *Command) getDates() ([]string, error) {
 	return out, nil
 }
 
-func (com *Command) getTodos() ([]string, error) {
-	return nil, errgo.New("not implemented")
-}
-
 func (com *Command) getProjectDates(project string) ([]string, error) {
 	if com.DataPath == "" {
 		return nil, errgo.New("datapath can not be empty")
@@ -196,7 +192,7 @@ func (com *Command) getProjectDates(project string) ([]string, error) {
 
 	var out []string
 
-	records, err := com.getProjectRecords(project)
+	records, err := com.getProjectNotes(project)
 	if err != nil {
 		return nil, err
 	}
@@ -243,30 +239,48 @@ func (com *Command) getProjects() ([]string, error) {
 	sort.Strings(out)
 	return out, nil
 }
-func (com *Command) runListProjectTodos(project string) error {
-	return errgo.New("not implemented")
-}
 
-func (com *Command) runListProjectNotes() error {
-	if com.Project == "" {
+func (com *Command) runListProjectTodos(project string) error {
+	if project == "" {
 		return errgo.New("project name can not be empty")
 	}
-	if !com.checkProjectExists(com.Project) {
+	if !com.checkProjectExists(project) {
 		return errgo.New("no notes for this project")
 	}
 
-	records, err := com.getProjectRecords(com.Project)
+	todos, err := com.getProjectTodos(project)
 	if err != nil {
 		return err
 	}
 
-	for _, record := range records {
-		if record.GetAction() != ActionNote {
+	fmt.Println("#", project, "- Todos")
+	for _, todo := range todos {
+		if todo.Done {
 			continue
 		}
 
-		fmt.Println("#", record.GetTimeStamp())
-		fmt.Println(record.GetValue())
+		fmt.Println("  *", todo.GetValue())
+	}
+
+	return nil
+}
+
+func (com *Command) runListProjectNotes(project string) error {
+	if project == "" {
+		return errgo.New("project name can not be empty")
+	}
+	if !com.checkProjectExists(project) {
+		return errgo.New("no notes for this project")
+	}
+
+	notes, err := com.getProjectNotes(project)
+	if err != nil {
+		return err
+	}
+
+	for _, note := range notes {
+		fmt.Println("#", note.GetTimeStamp())
+		fmt.Println(note.GetValue())
 		fmt.Println("")
 	}
 
@@ -288,7 +302,7 @@ func (com *Command) checkProjectExists(project string) bool {
 	return false
 }
 
-func (com *Command) getProjectRecords(project string) ([]Record, error) {
+func (com *Command) getProjectNotes(project string) ([]Note, error) {
 	l := logger.New(Name, "Command", "get", "ProjectRecords")
 	l.SetLevel(logger.Debug)
 
@@ -311,9 +325,10 @@ func (com *Command) getProjectRecords(project string) ([]Record, error) {
 
 	reader := csv.NewReader(file)
 	reader.FieldsPerRecord = 3
-	var records [][]string
+
+	var out []Note
 	for {
-		record, err := reader.Read()
+		csv, err := reader.Read()
 		if err != nil {
 			if err == io.EOF {
 				break
@@ -322,28 +337,19 @@ func (com *Command) getProjectRecords(project string) ([]Record, error) {
 			continue
 		}
 
-		if record[1] != "note" {
+		note, err := NoteFromCSV(csv)
+		if err != nil {
 			continue
 		}
+		note.SetProject(project)
 
-		records = append(records, record)
-	}
-
-	var out []Record
-	for _, d := range records {
-		record, err := RecordFromCSV(d)
-		if err != nil {
-			return nil, err
-		}
-		record.SetProject(project)
-
-		out = append(out, record)
+		out = append(out, note)
 	}
 
 	return out, err
 }
 
-func (com *Command) getProjectTodos(project string) ([]Record, error) {
+func (com *Command) getProjectTodos(project string) ([]Todo, error) {
 	l := logger.New(Name, "Command", "get", "ProjectRecords")
 	l.SetLevel(logger.Debug)
 
@@ -366,9 +372,10 @@ func (com *Command) getProjectTodos(project string) ([]Record, error) {
 
 	reader := csv.NewReader(file)
 	reader.FieldsPerRecord = 4
-	var records [][]string
+
+	var out []Todo
 	for {
-		record, err := reader.Read()
+		csv, err := reader.Read()
 		if err != nil {
 			if err == io.EOF {
 				break
@@ -377,22 +384,12 @@ func (com *Command) getProjectTodos(project string) ([]Record, error) {
 			continue
 		}
 
-		if record[1] != "todo" {
+		todo, err := TodoFromCSV(csv)
+		if err != nil {
 			continue
 		}
 
-		records = append(records, record)
-	}
-
-	var out []Record
-	for _, d := range records {
-		record, err := RecordFromCSV(d)
-		if err != nil {
-			return nil, err
-		}
-		record.SetProject(project)
-
-		out = append(out, record)
+		out = append(out, todo)
 	}
 
 	return out, err
