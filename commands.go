@@ -59,7 +59,7 @@ func (com *Command) Run() error {
 	case ActionList:
 		return com.runList()
 	case ActionListTodos:
-		return com.runListProjectTodos(com.Project)
+		return com.runListTodos()
 	case ActionTodo:
 		return com.runTodo()
 	default:
@@ -116,6 +116,26 @@ func (com *Command) runList() error {
 	} else {
 		return com.runListProjectNotes(com.Project)
 	}
+}
+
+func (com *Command) runListTodos() error {
+	if com.Project != "" {
+		return com.runListProjectTodos(com.Project)
+	}
+
+	projects, err := com.getProjects()
+	if err != nil {
+		return err
+	}
+
+	for _, project := range projects {
+		err := com.runListProjectTodos(project)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (com *Command) runListProjects() error {
@@ -253,6 +273,10 @@ func (com *Command) runListProjectTodos(project string) error {
 		return err
 	}
 
+	if len(todos) == 0 {
+		return nil
+	}
+
 	fmt.Println("#", project, "- Todos")
 	for _, todo := range todos {
 		if todo.Done {
@@ -261,6 +285,7 @@ func (com *Command) runListProjectTodos(project string) error {
 
 		fmt.Println("  *", todo.GetValue())
 	}
+	fmt.Println("")
 
 	return nil
 }
