@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/csv"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -34,9 +35,11 @@ const (
 )
 
 const (
-	ActionList      = "list"
 	ActionListDates = "listdates"
+	ActionList      = "list"
+	ActionListTodos = "listtodos"
 	ActionNote      = "note"
+	ActionTodo      = "todo"
 )
 
 func NewCommand() *Command {
@@ -51,10 +54,14 @@ func (com *Command) Run() error {
 	switch com.Action {
 	case ActionNote:
 		return com.runNote()
-	case ActionList:
-		return com.runList()
 	case ActionListDates:
 		return com.runListDates()
+	case ActionList:
+		return com.runList()
+	case ActionListTodos:
+		return com.runListProjectTodos(com.Project)
+	case ActionTodo:
+		return com.runTodo()
 	default:
 		return errgo.New("Do not recognize the action: " + com.Action)
 	}
@@ -79,6 +86,28 @@ func (com *Command) runNote() error {
 	l.Trace("Note: ", fmt.Sprintf("%+v", note))
 
 	return com.Write(note)
+}
+
+func (com *Command) runTodo() error {
+	l := logger.New(Name, "Command", "run", "Todo")
+
+	l.Trace("Args length: ", len(com.Args))
+	if com.Value == "" {
+		return errgo.New("todo command needs a value")
+	}
+	l.Trace("Project: ", com.Project)
+	if com.Project == "" {
+		return errgo.New("todo command needs an project")
+	}
+
+	todo := new(Todo)
+	todo.Project = com.Project
+	todo.TimeStamp = com.TimeStamp
+	todo.Value = com.Value
+	todo.Done = false
+	l.Trace("Todo: ", fmt.Sprintf("%+v", todo))
+
+	return com.Write(todo)
 }
 
 func (com *Command) runList() error {
@@ -150,6 +179,10 @@ func (com *Command) getDates() ([]string, error) {
 	return out, nil
 }
 
+func (com *Command) getTodos() ([]string, error) {
+	return nil, errgo.New("not implemented")
+}
+
 func (com *Command) getProjectDates(project string) ([]string, error) {
 	if com.DataPath == "" {
 		return nil, errgo.New("datapath can not be empty")
@@ -210,6 +243,9 @@ func (com *Command) getProjects() ([]string, error) {
 	sort.Strings(out)
 	return out, nil
 }
+func (com *Command) runListProjectTodos(project string) error {
+	return errgo.New("not implemented")
+}
 
 func (com *Command) runListProjectNotes() error {
 	if com.Project == "" {
@@ -253,6 +289,9 @@ func (com *Command) checkProjectExists(project string) bool {
 }
 
 func (com *Command) getProjectRecords(project string) ([]Record, error) {
+	l := logger.New(Name, "Command", "get", "ProjectRecords")
+	l.SetLevel(logger.Debug)
+
 	if com.DataPath == "" {
 		return nil, errgo.New("datapath can not be empty")
 	}
@@ -271,9 +310,78 @@ func (com *Command) getProjectRecords(project string) ([]Record, error) {
 	defer file.Close()
 
 	reader := csv.NewReader(file)
-	records, err := reader.ReadAll()
+	reader.FieldsPerRecord = 3
+	var records [][]string
+	for {
+		record, err := reader.Read()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+
+			continue
+		}
+
+		if record[1] != "note" {
+			continue
+		}
+
+		records = append(records, record)
+	}
+
+	var out []Record
+	for _, d := range records {
+		record, err := RecordFromCSV(d)
+		if err != nil {
+			return nil, err
+		}
+		record.SetProject(project)
+
+		out = append(out, record)
+	}
+
+	return out, err
+}
+
+func (com *Command) getProjectTodos(project string) ([]Record, error) {
+	l := logger.New(Name, "Command", "get", "ProjectRecords")
+	l.SetLevel(logger.Debug)
+
+	if com.DataPath == "" {
+		return nil, errgo.New("datapath can not be empty")
+	}
+	if project == "" {
+		return nil, errgo.New("project name can not be empty")
+	}
+	if !com.checkProjectExists(project) {
+		return nil, errgo.New("project does not exist")
+	}
+
+	filepath := filepath.Join(com.DataPath, project+".csv")
+	file, err := os.OpenFile(filepath, os.O_RDONLY, 0640)
 	if err != nil {
-		return nil, errgo.New(err.Error())
+		return nil, err
+	}
+	defer file.Close()
+
+	reader := csv.NewReader(file)
+	reader.FieldsPerRecord = 4
+	var records [][]string
+	for {
+		record, err := reader.Read()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+
+			continue
+		}
+
+		if record[1] != "todo" {
+			continue
+		}
+
+		records = append(records, record)
 	}
 
 	var out []Record
