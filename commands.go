@@ -35,8 +35,9 @@ const (
 )
 
 const (
-	ActionListDates = "listdates"
+	ActionDone      = "done"
 	ActionList      = "list"
+	ActionListDates = "listdates"
 	ActionListTodos = "listtodos"
 	ActionNote      = "note"
 	ActionTodo      = "todo"
@@ -52,6 +53,8 @@ func (com *Command) Run() error {
 	}
 
 	switch com.Action {
+	case ActionDone:
+		return com.runDone()
 	case ActionNote:
 		return com.runNote()
 	case ActionListDates:
@@ -65,6 +68,28 @@ func (com *Command) Run() error {
 	default:
 		return errgo.New("Do not recognize the action: " + com.Action)
 	}
+}
+
+func (com *Command) runDone() error {
+	l := logger.New(Name, "Command", "run", "Done")
+
+	l.Trace("Args length: ", len(com.Args))
+	if com.Value == "" {
+		return errgo.New("todo command needs a value")
+	}
+	l.Trace("Project: ", com.Project)
+	if com.Project == "" {
+		return errgo.New("todo command needs an project")
+	}
+
+	done := new(Todo)
+	done.Project = com.Project
+	done.TimeStamp = com.TimeStamp
+	done.Value = com.Value
+	done.Done = true
+	l.Trace("Done: ", fmt.Sprintf("%+v", done))
+
+	return com.Write(done)
 }
 
 func (com *Command) runNote() error {
