@@ -297,6 +297,7 @@ func (com *Command) runListProjectTodos(project string) error {
 	if err != nil {
 		return err
 	}
+	todos = com.filterTodos(todos)
 
 	if len(todos) == 0 {
 		return nil
@@ -313,6 +314,24 @@ func (com *Command) runListProjectTodos(project string) error {
 	fmt.Println("")
 
 	return nil
+}
+
+func (com *Command) filterTodos(todos []Todo) []Todo {
+	filter := make(map[string]Todo)
+	for _, todo := range todos {
+		filter[todo.Value] = todo
+	}
+
+	var out []Todo
+	for _, todo := range filter {
+		if todo.Done {
+			continue
+		}
+
+		out = append(out, todo)
+	}
+
+	return out
 }
 
 func (com *Command) runListProjectNotes(project string) error {
