@@ -304,11 +304,9 @@ func (com *Command) runListProjectTodos(project string) error {
 	}
 
 	fmt.Println("#", project, "- Todos")
-	for _, todo := range todos {
-		if todo.Done {
-			continue
-		}
 
+	sort.Sort(TodoByDate(todos))
+	for _, todo := range todos {
 		fmt.Println("  *", todo.GetValue())
 	}
 	fmt.Println("")
@@ -318,6 +316,8 @@ func (com *Command) runListProjectTodos(project string) error {
 
 func (com *Command) filterTodos(todos []Todo) []Todo {
 	filter := make(map[string]Todo)
+
+	sort.Sort(TodoByDate(todos))
 	for _, todo := range todos {
 		filter[todo.Value] = todo
 	}

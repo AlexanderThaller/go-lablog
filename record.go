@@ -146,3 +146,17 @@ func (todo Todo) GetValue() string {
 func (todo Todo) SetProject(project string) {
 	todo.Project = project
 }
+
+type TodoByDate []Todo
+
+func (todo TodoByDate) Len() int {
+	return len(todo)
+}
+
+func (todo TodoByDate) Swap(i, j int) {
+	todo[i], todo[j] = todo[j], todo[i]
+}
+
+func (todo TodoByDate) Less(i, j int) bool {
+	return todo[j].TimeStamp.After(todo[i].TimeStamp)
+}
