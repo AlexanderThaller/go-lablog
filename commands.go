@@ -347,6 +347,7 @@ func (com *Command) runListProjectNotes(project string) error {
 		return err
 	}
 
+	sort.Sort(NotesByDate(notes))
 	for _, note := range notes {
 		fmt.Println("#", note.GetTimeStamp())
 		fmt.Println(note.GetValue())
