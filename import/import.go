@@ -76,7 +76,6 @@ const (
 
 func main() {
 	l := logger.New("main")
-	l.SetLevel(logger.Trace)
 
 	i, err := ioutil.ReadFile(*flagSourceJSON)
 	if err != nil {
@@ -115,7 +114,7 @@ func main() {
 		for _, note := range project.Notes {
 			message := []string{
 				note.TimeStamp.Format(time.RFC3339Nano),
-				project.Name,
+				"note",
 				note.Value,
 			}
 
