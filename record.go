@@ -17,7 +17,6 @@ type Record interface {
 	GetProject() string
 	GetTimeStamp() string
 	GetValue() string
-	SetProject(string)
 }
 
 func RecordFromCSV(values []string) (Record, error) {
@@ -115,7 +114,7 @@ func (note Note) GetValue() string {
 	return note.Value
 }
 
-func (note Note) SetProject(project string) {
+func (note *Note) SetProject(project string) {
 	note.Project = project
 }
 
