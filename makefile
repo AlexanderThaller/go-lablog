@@ -2,6 +2,7 @@ NAME = lablog
 
 all:
 	make format
+	make test
 	make build
 
 format:
