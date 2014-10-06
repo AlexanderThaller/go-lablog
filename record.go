@@ -41,6 +41,10 @@ func NoteFromCSV(values []string) (Note, error) {
 		return Note{}, errgo.New("we need three fields for parsing a note")
 	}
 
+	if values[1] != "note" {
+		return Note{}, errgo.New("second field has to have the string 'note' in it")
+	}
+
 	timestamp, err := time.Parse(RecordTimeStampFormat, values[0])
 	if err != nil {
 		return Note{}, err
@@ -57,6 +61,10 @@ func NoteFromCSV(values []string) (Note, error) {
 func TodoFromCSV(values []string) (Todo, error) {
 	if len(values) != 4 {
 		return Todo{}, errgo.New("we need three fields for parsing a todo")
+	}
+
+	if values[1] != "todo" {
+		return Todo{}, errgo.New("second field has to have the string 'todo' in it")
 	}
 
 	timestamp, err := time.Parse(RecordTimeStampFormat, values[0])
