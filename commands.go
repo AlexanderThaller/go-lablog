@@ -197,6 +197,15 @@ func (com *Command) runListProjects() error {
 	}
 
 	for _, project := range projects {
+		notes, err := com.getProjectNotes(project)
+		if err != nil {
+			return err
+		}
+
+		if len(notes) == 0 {
+			continue
+		}
+
 		fmt.Println(project)
 	}
 
