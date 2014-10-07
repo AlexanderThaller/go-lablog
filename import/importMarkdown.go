@@ -38,10 +38,12 @@ func init() {
 	now.TimeFormats = append(now.TimeFormats, "Mon, _2 January 2006 15:04:05 MST")
 	now.TimeFormats = append(now.TimeFormats, "Mon, _2 January 2006 15:04:05 -0700")
 	now.TimeFormats = append(now.TimeFormats, "Mon, _2 Jan 06 15:04:05 -0700")
+	now.TimeFormats = append(now.TimeFormats, "Mon _2. Jan 15:04:05 MST 2006")
 	now.TimeFormats = append(now.TimeFormats, "_2 Jan 2006 15:04:05 -0700")
 	now.TimeFormats = append(now.TimeFormats, "2006.01.02-15.04.05")
 	now.TimeFormats = append(now.TimeFormats, "2006.01.02")
 	now.TimeFormats = append(now.TimeFormats, "2006.01.02---- ")
+	now.TimeFormats = append(now.TimeFormats, "2006.01.02 - 15:04:05")
 }
 
 func main() {
@@ -76,6 +78,16 @@ func main() {
 
 		note.Project = match[2]
 		note.Value = match[3]
+
+		if note.Project == "" {
+			l.Alert("Project can not be empty")
+			os.Exit(1)
+		}
+
+		if note.Value == "" {
+			l.Alert("Value can not be empty")
+			os.Exit(1)
+		}
 
 		notes = append(notes, note)
 	}
