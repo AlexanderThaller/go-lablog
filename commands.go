@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/AlexanderThaller/logger"
+	"github.com/jinzhu/now"
 	"github.com/juju/errgo"
 )
 
@@ -19,12 +20,12 @@ type Command struct {
 	Action        string
 	Args          []string
 	DataPath      string
-	EndTime       string
+	EndTime       time.Time
 	Project       string
 	SCM           string
 	SCMAutoCommit bool
 	SCMAutoPush   bool
-	StartTime     string
+	StartTime     time.Time
 	TimeStamp     time.Time
 	Value         string
 }
@@ -36,8 +37,9 @@ const (
 
 const (
 	ActionDone      = "done"
-	ActionList      = "list"
 	ActionListDates = "listdates"
+	ActionList      = "list"
+	ActionListNotes = "listnotes"
 	ActionListTodos = "listtodos"
 	ActionNote      = "note"
 	ActionTodo      = "todo"
@@ -61,6 +63,8 @@ func (com *Command) Run() error {
 		return com.runListDates()
 	case ActionList:
 		return com.runList()
+	case ActionListNotes:
+		return com.runListNotes()
 	case ActionListTodos:
 		return com.runListTodos()
 	case ActionTodo:
@@ -143,6 +147,26 @@ func (com *Command) runList() error {
 	}
 }
 
+func (com *Command) runListNotes() error {
+	if com.Project != "" {
+		return com.runListProjectNotes(com.Project)
+	}
+
+	projects, err := com.getProjects()
+	if err != nil {
+		return err
+	}
+
+	for _, project := range projects {
+		err := com.runListProjectNotes(project)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (com *Command) runListTodos() error {
 	if com.Project != "" {
 		return com.runListProjectTodos(com.Project)
@@ -177,6 +201,8 @@ func (com *Command) runListProjects() error {
 }
 
 func (com *Command) runListDates() error {
+	l := logger.New(Name, "Command", "run", "ListDates")
+
 	var dates []string
 	var err error
 
@@ -192,6 +218,20 @@ func (com *Command) runListDates() error {
 
 	sort.Strings(dates)
 	for _, date := range dates {
+		timestamp, err := now.Parse(date)
+		if err != nil {
+			l.Warning("Can not parse timestamp: ", errgo.Details(err))
+			continue
+		}
+
+		if timestamp.Before(com.StartTime) {
+			continue
+		}
+
+		if timestamp.After(com.EndTime) {
+			continue
+		}
+
 		fmt.Println(date)
 	}
 
@@ -347,9 +387,14 @@ func (com *Command) runListProjectNotes(project string) error {
 		return err
 	}
 
+	if len(notes) == 0 {
+		return nil
+	}
+
+	fmt.Println("#", project)
 	sort.Sort(NotesByDate(notes))
 	for _, note := range notes {
-		fmt.Println("#", note.GetTimeStamp())
+		fmt.Println("##", note.GetTimeStamp())
 		fmt.Println(note.GetValue())
 		fmt.Println("")
 	}
@@ -412,6 +457,14 @@ func (com *Command) getProjectNotes(project string) ([]Note, error) {
 			continue
 		}
 		note.SetProject(project)
+
+		if note.TimeStamp.Before(com.StartTime) {
+			continue
+		}
+
+		if note.TimeStamp.After(com.EndTime) {
+			continue
+		}
 
 		out = append(out, note)
 	}
