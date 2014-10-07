@@ -36,13 +36,14 @@ const (
 )
 
 const (
-	ActionDone      = "done"
-	ActionListDates = "listdates"
-	ActionList      = "list"
-	ActionListNotes = "listnotes"
-	ActionListTodos = "listtodos"
-	ActionNote      = "note"
-	ActionTodo      = "todo"
+	ActionDone         = "done"
+	ActionListDates    = "listdates"
+	ActionList         = "list"
+	ActionListNotes    = "listnotes"
+	ActionListProjects = "listprojects"
+	ActionListTodos    = "listtodos"
+	ActionNote         = "note"
+	ActionTodo         = "todo"
 )
 
 func NewCommand() *Command {
@@ -65,6 +66,8 @@ func (com *Command) Run() error {
 		return com.runList()
 	case ActionListNotes:
 		return com.runListNotes()
+	case ActionListProjects:
+		return com.runListProjects()
 	case ActionListTodos:
 		return com.runListTodos()
 	case ActionTodo:
