@@ -15,16 +15,16 @@ var (
 	buildVersion string
 	buildTime    string
 
-	flagAction        = flag.String("c", "list", "")
-	flagDataPath      = flag.String("datapath", "/home/thalleralexander/.lablog", "")
-	flagEndTime       = flag.String("endtime", time.Now().String(), "EndTime")
-	flagProject       = flag.String("p", "", "")
-	flagSCM           = flag.String("scm", "git", "")
-	flagSCMAutoCommit = flag.Bool("autocommit", true, "")
-	flagSCMAutoPush   = flag.Bool("autopush", false, "")
-	flagStartTime     = flag.String("starttime", time.Time{}.String(), "StartTime")
-	flagValue         = flag.String("v", "", "")
-	flagLogLevel      = flag.String("loglevel", "Notice", "")
+	flagAction        = flag.String("c", "list", "The action to run")
+	flagDataPath      = flag.String("datapath", "/home/thalleralexander/.lablog", "The path to the datafolder")
+	flagEndTime       = flag.String("endtime", time.Now().String(), "The endtime for the timerange filter")
+	flagProject       = flag.String("p", "", "The project to use")
+	flagSCM           = flag.String("scm", "git", "The sourcecode management to use")
+	flagSCMAutoCommit = flag.Bool("autocommit", true, "Auto commit new records to the scm")
+	flagSCMAutoPush   = flag.Bool("autopush", false, "Auto push new records to the remote of the scm")
+	flagStartTime     = flag.String("starttime", time.Time{}.String(), "The starttime for the timerange filter")
+	flagValue         = flag.String("v", "", "The value which is used by certain commands")
+	flagLogLevel      = flag.String("loglevel", "Notice", "The loglevel")
 )
 
 const (
