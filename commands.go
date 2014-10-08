@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 	"time"
@@ -357,9 +358,14 @@ func (com *Command) runListProjectTodos(project string) error {
 
 	fmt.Println("#", project, "- Todos")
 
-	sort.Sort(TodoByDate(todos))
+	var out []string
 	for _, todo := range todos {
-		fmt.Println("  *", todo.GetValue())
+		out = append(out, "  * "+todo.GetValue())
+	}
+	sort.Strings(out)
+
+	for _, todo := range out {
+		fmt.Println(todo)
 	}
 	fmt.Println("")
 
@@ -405,9 +411,17 @@ func (com *Command) runListProjectNotes(project string) error {
 
 	fmt.Println("#", project)
 	sort.Sort(NotesByDate(notes))
+
+	reg, err := regexp.Compile("(?m)^#")
+	if err != nil {
+		return err
+	}
+
 	for _, note := range notes {
 		fmt.Println("##", note.GetTimeStamp())
-		fmt.Println(note.GetValue())
+
+		out := reg.ReplaceAllString(note.GetValue(), "###")
+		fmt.Println(out)
 		fmt.Println("")
 	}
 
