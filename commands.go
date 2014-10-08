@@ -357,9 +357,14 @@ func (com *Command) runListProjectTodos(project string) error {
 
 	fmt.Println("#", project, "- Todos")
 
-	sort.Sort(TodoByDate(todos))
+	var out []string
 	for _, todo := range todos {
-		fmt.Println("  *", todo.GetValue())
+		out = append(out, "  * "+todo.GetValue())
+	}
+	sort.Strings(out)
+
+	for _, todo := range out {
+		fmt.Println(todo)
 	}
 	fmt.Println("")
 
