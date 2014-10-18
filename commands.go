@@ -48,6 +48,7 @@ const (
 	ActionRename       = "rename"
 	ActionTodo         = "todo"
 	ActionMerge        = "merge"
+	ActionTrack        = "track"
 )
 
 func NewCommand() *Command {
@@ -80,9 +81,24 @@ func (com *Command) Run() error {
 		return com.runRename()
 	case ActionMerge:
 		return com.runMerge()
+	case ActionTrack:
+		return com.runTrack()
 	default:
 		return errgo.New("Do not recognize the action: " + com.Action)
 	}
+}
+
+func (com *Command) runTrack() error {
+	if com.Project == "" {
+		return errgo.New("track command needs an project")
+	}
+
+	track := new(Track)
+	track.Project = com.Project
+	track.TimeStamp = com.TimeStamp
+	track.Value = com.Value
+
+	return com.Write(track)
 }
 
 func (com *Command) runMerge() error {

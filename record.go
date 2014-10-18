@@ -181,3 +181,33 @@ func (note NotesByDate) Swap(i, j int) {
 func (note NotesByDate) Less(i, j int) bool {
 	return note[j].TimeStamp.After(note[i].TimeStamp)
 }
+
+type Track struct {
+	Project   string
+	TimeStamp time.Time
+	Value     string
+}
+
+func (track Track) CSV() []string {
+	return []string{
+		track.GetTimeStamp(),
+		track.GetAction(),
+		track.GetValue(),
+	}
+}
+
+func (track Track) GetAction() string {
+	return ActionTrack
+}
+
+func (track Track) GetProject() string {
+	return track.Project
+}
+
+func (track Track) GetTimeStamp() string {
+	return track.TimeStamp.Format(RecordTimeStampFormat)
+}
+
+func (track Track) GetValue() string {
+	return track.Value
+}
