@@ -38,13 +38,14 @@ const (
 
 const (
 	ActionDone         = "done"
-	ActionListDates    = "listdates"
 	ActionList         = "list"
+	ActionListDates    = "listdates"
 	ActionListNotes    = "listnotes"
 	ActionListProjects = "listprojects"
 	ActionListTodos    = "listtodos"
 	ActionNote         = "note"
 	ActionTodo         = "todo"
+	ActionRename       = "rename"
 )
 
 func NewCommand() *Command {
@@ -73,9 +74,43 @@ func (com *Command) Run() error {
 		return com.runListTodos()
 	case ActionTodo:
 		return com.runTodo()
+	case ActionRename:
+		return com.runRename()
 	default:
 		return errgo.New("Do not recognize the action: " + com.Action)
 	}
+}
+
+func (com *Command) runRename() error {
+	if com.Project == "" {
+		return errgo.New("Project name can not be empty")
+	}
+	oldproject := com.Project
+	newproject := com.Value
+
+	if !com.checkProjectExists(oldproject) {
+		return errgo.New("no project with the name " + oldproject)
+	}
+
+	if com.checkProjectExists(newproject) {
+		return errgo.New("the project " + newproject + " already exists")
+	}
+
+	oldpath := oldproject + ".csv"
+	newpath := newproject + ".csv"
+
+	err := scmRename(com.SCM, oldpath, newpath, com.DataPath)
+	if err != nil {
+		return err
+	}
+
+	message := oldproject + " - renamed - " + newproject
+	err = scmCommit(com.SCM, com.DataPath, message)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (com *Command) runDone() error {
