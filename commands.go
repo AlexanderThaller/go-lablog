@@ -339,7 +339,13 @@ func (com *Command) runListProjects() error {
 		out[project] = struct{}{}
 	}
 
+	var outsort []string
 	for project := range out {
+		outsort = append(outsort, project)
+	}
+	sort.Strings(outsort)
+
+	for _, project := range outsort {
 		fmt.Println(project)
 	}
 
