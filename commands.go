@@ -196,6 +196,7 @@ func (com *Command) runListProjects() error {
 		return err
 	}
 
+	out := make(map[string]struct{})
 	for _, project := range projects {
 		notes, err := com.getProjectNotes(project)
 		if err != nil {
@@ -206,6 +207,23 @@ func (com *Command) runListProjects() error {
 			continue
 		}
 
+		out[project] = struct{}{}
+	}
+
+	for _, project := range projects {
+		todos, err := com.getProjectTodos(project)
+		if err != nil {
+			return err
+		}
+
+		if len(todos) == 0 {
+			continue
+		}
+
+		out[project] = struct{}{}
+	}
+
+	for project := range out {
 		fmt.Println(project)
 	}
 
@@ -289,20 +307,30 @@ func (com *Command) getProjectDates(project string) ([]string, error) {
 
 	var out []string
 
-	records, err := com.getProjectNotes(project)
+	notes, err := com.getProjectNotes(project)
 	if err != nil {
 		return nil, err
 	}
 
+	todos, err := com.getProjectTodos(project)
+	if err != nil {
+		return nil, err
+	}
+	todos = com.filterTodos(todos)
+
 	datemap := make(map[string]struct{})
 
-	for _, record := range records {
-		date, err := time.Parse(RecordTimeStampFormat, record.GetTimeStamp())
+	for _, note := range notes {
+		date, err := time.Parse(RecordTimeStampFormat, note.GetTimeStamp())
 		if err != nil {
 			return nil, err
 		}
 
 		datemap[date.Format(DateFormat)] = struct{}{}
+	}
+
+	for _, todo := range todos {
+		datemap[todo.TimeStamp.Format(DateFormat)] = struct{}{}
 	}
 
 	for date := range datemap {
