@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 	"time"
@@ -438,9 +439,17 @@ func (com *Command) runListProjectNotes(project string) error {
 
 	fmt.Println("#", project)
 	sort.Sort(NotesByDate(notes))
+
+	reg, err := regexp.Compile("(?m)^#")
+	if err != nil {
+		return err
+	}
+
 	for _, note := range notes {
 		fmt.Println("##", note.GetTimeStamp())
-		fmt.Println(note.GetValue())
+
+		out := reg.ReplaceAllString(note.GetValue(), "###")
+		fmt.Println(out)
 		fmt.Println("")
 	}
 
