@@ -6,6 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"path"
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -44,8 +45,9 @@ const (
 	ActionListProjects = "listprojects"
 	ActionListTodos    = "listtodos"
 	ActionNote         = "note"
-	ActionTodo         = "todo"
 	ActionRename       = "rename"
+	ActionTodo         = "todo"
+	ActionMerge        = "merge"
 )
 
 func NewCommand() *Command {
@@ -76,9 +78,75 @@ func (com *Command) Run() error {
 		return com.runTodo()
 	case ActionRename:
 		return com.runRename()
+	case ActionMerge:
+		return com.runMerge()
 	default:
 		return errgo.New("Do not recognize the action: " + com.Action)
 	}
+}
+
+func (com *Command) runMerge() error {
+	if com.Project == "" {
+		return errgo.New("Project name can not be empty")
+	}
+	srcproject := com.Project
+	dstproject := com.Value
+
+	if !com.checkProjectExists(srcproject) {
+		return errgo.New("no project with the name " + srcproject)
+	}
+
+	if !com.checkProjectExists(dstproject) {
+		return errgo.New("the project " + dstproject + " already exists")
+	}
+
+	srcpath := path.Join(com.DataPath, srcproject+".csv")
+	dstpath := path.Join(com.DataPath, dstproject+".csv")
+
+	err := com.runMergeFiles(srcpath, dstpath)
+	if err != nil {
+		return err
+	}
+
+	srcfile := srcproject + ".csv"
+	err = scmRemove(com.SCM, srcfile, com.DataPath)
+	if err != nil {
+		return err
+	}
+
+	dstfile := dstproject + ".csv"
+	err = scmAdd(com.SCM, com.DataPath, dstfile)
+	if err != nil {
+		return err
+	}
+
+	message := srcproject + " - merged - " + dstproject
+	err = scmCommit(com.SCM, com.DataPath, message)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (com *Command) runMergeFiles(srcpath, dstpath string) error {
+	srcdata, err := ioutil.ReadFile(srcpath)
+	if err != nil {
+		return errgo.New(err.Error())
+	}
+
+	dstfile, err := os.OpenFile(dstpath, os.O_APPEND|os.O_WRONLY, 0600)
+	if err != nil {
+		return errgo.New(err.Error())
+	}
+	defer dstfile.Close()
+
+	_, err = dstfile.Write(srcdata)
+	if err != nil {
+		return errgo.New(err.Error())
+	}
+
+	return nil
 }
 
 func (com *Command) runRename() error {
