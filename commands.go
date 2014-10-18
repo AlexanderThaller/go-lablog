@@ -370,7 +370,7 @@ func (com *Command) runListProjectTodos(project string) error {
 		return errgo.New("project name can not be empty")
 	}
 	if !com.checkProjectExists(project) {
-		return errgo.New("no notes for this project")
+		return errgo.New("the project does not exist")
 	}
 
 	todos, err := com.getProjectTodos(project)
@@ -424,7 +424,7 @@ func (com *Command) runListProjectNotes(project string) error {
 		return errgo.New("project name can not be empty")
 	}
 	if !com.checkProjectExists(project) {
-		return errgo.New("no notes for this project")
+		return errgo.New("project" + project + " does not exist")
 	}
 
 	notes, err := com.getProjectNotes(project)
