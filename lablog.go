@@ -9,6 +9,7 @@ import (
 	"github.com/AlexanderThaller/logger"
 	"github.com/jinzhu/now"
 	"github.com/juju/errgo"
+	"github.com/mitchellh/go-homedir"
 )
 
 var (
@@ -16,7 +17,7 @@ var (
 	buildTime    string
 
 	flagAction        = flag.String("c", "list", "The action to run")
-	flagDataPath      = flag.String("datapath", "/home/thalleralexander/.lablog", "The path to the datafolder")
+	flagDataPath      *string
 	flagEndTime       = flag.String("endtime", time.Now().String(), "The endtime for the timerange filter")
 	flagProject       = flag.String("p", "", "The project to use")
 	flagSCM           = flag.String("scm", "git", "The sourcecode management to use")
@@ -33,6 +34,14 @@ const (
 
 func init() {
 	l := logger.New(Name, "init")
+
+	home, err := homedir.Dir()
+	if err != nil {
+		home = ""
+		l.Warning("Can not get homedir: ", err)
+	}
+	flagDataPath = flag.String("datapath", home+"/.lablog", "The path to the datafolder")
+
 	flag.Parse()
 
 	priority, err := logger.ParsePriority(*flagLogLevel)
