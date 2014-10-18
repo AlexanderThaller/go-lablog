@@ -146,9 +146,21 @@ func (com *Command) runTodo() error {
 func (com *Command) runList() error {
 	if com.Project == "" {
 		return com.runListProjects()
-	} else {
+	}
+
+	if !com.checkProjectExists(com.Project) {
+		return errgo.New("project " + com.Project + " does not exist")
+	}
+
+	notes, err := com.getProjectNotes(com.Project)
+	if err != nil {
+		return err
+	}
+	if len(notes) != 0 {
 		return com.runListProjectNotes(com.Project)
 	}
+
+	return com.runListProjectTodos(com.Project)
 }
 
 func (com *Command) runListNotes() error {
