@@ -10,7 +10,6 @@ import (
 	"path/filepath"
 	"regexp"
 	"sort"
-	"strings"
 	"time"
 
 	"github.com/AlexanderThaller/logger"
@@ -547,36 +546,6 @@ func (com *Command) getProjectDates(project string) ([]string, error) {
 	return out, nil
 }
 
-func (com *Command) getProjects() ([]string, error) {
-	dir, err := ioutil.ReadDir(com.DataPath)
-	if err != nil {
-		return nil, err
-	}
-
-	var out []string
-	for _, d := range dir {
-		file := d.Name()
-
-		// Skip dotfiles
-		if strings.HasPrefix(file, ".") {
-			continue
-		}
-
-		// Skip files not ending with .csv
-		if !strings.HasSuffix(file, ".csv") {
-			continue
-		}
-
-		ext := filepath.Ext(file)
-		name := file[0 : len(file)-len(ext)]
-
-		out = append(out, name)
-	}
-
-	sort.Strings(out)
-	return out, nil
-}
-
 func (com *Command) runListProjectTodos(project string) error {
 	if project == "" {
 		return errgo.New("project name can not be empty")
@@ -1015,4 +984,8 @@ func (com *Command) getProjectActiveTracks(project string) ([]Track, error) {
 	}
 
 	return out, nil
+}
+
+func (com *Command) getProjects() ([]string, error) {
+	return GetProjects(com.DataPath)
 }
