@@ -233,3 +233,17 @@ func (track Track) GetTimeStamp() string {
 func (track Track) GetValue() string {
 	return track.Value
 }
+
+type TracksByDate []Track
+
+func (track TracksByDate) Len() int {
+	return len(track)
+}
+
+func (track TracksByDate) Swap(i, j int) {
+	track[i], track[j] = track[j], track[i]
+}
+
+func (track TracksByDate) Less(i, j int) bool {
+	return track[j].TimeStamp.After(track[i].TimeStamp)
+}

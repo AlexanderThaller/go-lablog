@@ -38,18 +38,20 @@ const (
 )
 
 const (
-	ActionDone         = "done"
-	ActionList         = "list"
-	ActionListDates    = "listdates"
-	ActionListNotes    = "listnotes"
-	ActionListProjects = "listprojects"
-	ActionListTodos    = "listtodos"
-	ActionListTracks   = "listtracks"
-	ActionNote         = "note"
-	ActionRename       = "rename"
-	ActionTodo         = "todo"
-	ActionMerge        = "merge"
-	ActionTrack        = "track"
+	ActionDone             = "done"
+	ActionList             = "list"
+	ActionListDates        = "listdates"
+	ActionListNotes        = "listnotes"
+	ActionListProjects     = "listprojects"
+	ActionListTodos        = "listtodos"
+	ActionListTracks       = "listtracks"
+	ActionListActiveTracks = "listactivetracks"
+	ActionNote             = "note"
+	ActionRename           = "rename"
+	ActionTodo             = "todo"
+	ActionMerge            = "merge"
+	ActionTrack            = "track"
+	ActionStopTracking     = "stoptrack"
 )
 
 func NewCommand() *Command {
@@ -86,9 +88,33 @@ func (com *Command) Run() error {
 		return com.runMerge()
 	case ActionTrack:
 		return com.runTrack()
+	case ActionStopTracking:
+		return com.runStopTrack()
+	case ActionListActiveTracks:
+		return com.runListActiveTracks()
 	default:
 		return errgo.New("Do not recognize the action: " + com.Action)
 	}
+}
+
+func (com *Command) runStopTrack() error {
+	if com.Project != "" {
+		return com.runStopTrackingProject(com.Project)
+	}
+
+	projects, err := com.getProjects()
+	if err != nil {
+		return err
+	}
+
+	for _, project := range projects {
+		err := com.runStopTrackingProject(project)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (com *Command) runTrack() error {
@@ -345,6 +371,26 @@ func (com *Command) runListTracks() error {
 	return nil
 }
 
+func (com *Command) runListActiveTracks() error {
+	if com.Project != "" {
+		return com.runListProjectActiveTracks(com.Project)
+	}
+
+	projects, err := com.getProjects()
+	if err != nil {
+		return err
+	}
+
+	for _, project := range projects {
+		err := com.runListProjectActiveTracks(project)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (com *Command) runListProjects() error {
 	projects, err := com.getProjects()
 	if err != nil {
@@ -516,6 +562,11 @@ func (com *Command) getProjects() ([]string, error) {
 			continue
 		}
 
+		// Skip files not ending with .csv
+		if !strings.HasSuffix(file, ".csv") {
+			continue
+		}
+
 		ext := filepath.Ext(file)
 		name := file[0 : len(file)-len(ext)]
 
@@ -580,9 +631,47 @@ func (com *Command) runListProjectTracks(project string) error {
 	fmt.Println("#", project, "- Tracks")
 
 	for _, track := range tracks {
-		fmt.Println("  *", track.TimeStamp, "-", track.Value)
+		out := "  * " + track.GetTimeStamp()
+
+		if track.Value != "" {
+			out += " - " + track.Value
+		}
+
+		fmt.Println(out)
 	}
 	fmt.Println("")
+
+	return nil
+}
+
+func (com *Command) runListProjectActiveTracks(project string) error {
+	if project == "" {
+		return errgo.New("project name can not be empty")
+	}
+	if !com.checkProjectExists(project) {
+		return errgo.New("the project does not exist")
+	}
+
+	tracks, err := com.getProjectActiveTracks(project)
+	if err != nil {
+		return err
+	}
+
+	if len(tracks) == 0 {
+		return nil
+	}
+
+	fmt.Println("#", project, "- ActiveTracks")
+
+	for _, track := range tracks {
+		out := "  * " + track.GetTimeStamp()
+
+		if track.Value != "" {
+			out += " - " + track.Value
+		}
+
+		fmt.Println(out)
+	}
 
 	return nil
 }
@@ -659,9 +748,6 @@ func (com *Command) checkProjectExists(project string) bool {
 }
 
 func (com *Command) getProjectNotes(project string) ([]Note, error) {
-	l := logger.New(Name, "Command", "get", "ProjectRecords")
-	l.SetLevel(logger.Debug)
-
 	if com.DataPath == "" {
 		return nil, errgo.New("datapath can not be empty")
 	}
@@ -714,9 +800,6 @@ func (com *Command) getProjectNotes(project string) ([]Note, error) {
 }
 
 func (com *Command) getProjectTodos(project string) ([]Todo, error) {
-	l := logger.New(Name, "Command", "get", "ProjectRecords")
-	l.SetLevel(logger.Debug)
-
 	if com.DataPath == "" {
 		return nil, errgo.New("datapath can not be empty")
 	}
@@ -760,9 +843,6 @@ func (com *Command) getProjectTodos(project string) ([]Todo, error) {
 }
 
 func (com *Command) getProjectTracks(project string) ([]Track, error) {
-	l := logger.New(Name, "Command", "get", "ProjectTracks")
-	l.SetLevel(logger.Debug)
-
 	if com.DataPath == "" {
 		return nil, errgo.New("datapath can not be empty")
 	}
@@ -801,21 +881,24 @@ func (com *Command) getProjectTracks(project string) ([]Track, error) {
 
 		out = append(out, track)
 	}
+	sort.Sort(TracksByDate(out))
 
 	return out, err
 }
 
 func (com *Command) Write(record Record) error {
+	l := logger.New(Name, "Command", "Write")
 	if com.DataPath == "" {
 		return errgo.New("datapath can not be empty")
 	}
 
-	if com.Project == "" {
+	if record.GetProject() == "" {
+		l.Debug("Record: ", record)
 		return errgo.New("project name can not be empty")
 	}
 
 	path := com.DataPath
-	project := com.Project
+	project := record.GetProject()
 
 	err := os.MkdirAll(path, 0750)
 	if err != nil {
@@ -859,7 +942,7 @@ func (com *Command) Commit(record Record) error {
 		return err
 	}
 
-	message := com.Project + " - "
+	message := record.GetProject() + " - "
 	message += record.GetAction() + " - "
 	message += com.TimeStamp.Format(CommitMessageTimeStampFormat)
 	err = scmCommit(com.SCM, com.DataPath, message)
@@ -868,4 +951,68 @@ func (com *Command) Commit(record Record) error {
 	}
 
 	return nil
+}
+
+func (com *Command) runStopTrackingProject(project string) error {
+	active, err := com.getProjectActiveTracks(project)
+	if err != nil {
+		return err
+	}
+
+	if len(active) == 0 {
+		return nil
+	}
+
+	for _, track := range active {
+		track := Track{
+			Project:   project,
+			TimeStamp: com.TimeStamp,
+			Value:     track.Value,
+		}
+
+		err := com.Write(track)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (com *Command) getProjectActiveTracks(project string) ([]Track, error) {
+	l := logger.New(Name, "Command", "Get", "Project", "ActiveTracks")
+
+	tracks, err := com.getProjectTracks(project)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := make(map[string]bool)
+	for _, track := range tracks {
+		value, _ := filter[track.Value]
+
+		if value {
+			filter[track.Value] = false
+		} else {
+			filter[track.Value] = true
+		}
+		l.Debug(track.Value, " is ", filter[track.Value])
+	}
+
+	sort.Sort(TracksByDate(tracks))
+	latesttracks := make(map[string]Track)
+	for _, track := range tracks {
+		latesttracks[track.Value] = track
+	}
+
+	var out []Track
+	for value, track := range latesttracks {
+		if !filter[value] {
+			continue
+		}
+
+		out = append(out, track)
+	}
+
+	return out, nil
 }
