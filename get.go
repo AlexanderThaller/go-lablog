@@ -7,6 +7,28 @@ import (
 	"strings"
 )
 
+func GetProjectSubprojects(project string, projects []string) []string {
+	if len(projects) == 0 {
+		return []string{}
+	}
+
+	var out []string
+	for _, subproject := range projects {
+		if subproject == project {
+			continue
+		}
+
+		if !strings.HasPrefix(subproject, project) {
+			continue
+		}
+
+		out = append(out, subproject)
+	}
+
+	sort.Strings(out)
+	return out
+}
+
 func GetProjects(datapath string) ([]string, error) {
 	dir, err := ioutil.ReadDir(datapath)
 	if err != nil {

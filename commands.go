@@ -39,18 +39,19 @@ const (
 const (
 	ActionDone             = "done"
 	ActionList             = "list"
-	ActionListDates        = "listdates"
-	ActionListNotes        = "listnotes"
-	ActionListProjects     = "listprojects"
-	ActionListTodos        = "listtodos"
-	ActionListTracks       = "listtracks"
-	ActionListActiveTracks = "listactivetracks"
+	ActionListDates        = "dates"
+	ActionListNotes        = "notes"
+	ActionListProjects     = "projects"
+	ActionListTodos        = "todos"
+	ActionListTracks       = "tracks"
+	ActionListActiveTracks = "activetracks"
 	ActionNote             = "note"
 	ActionRename           = "rename"
 	ActionTodo             = "todo"
 	ActionMerge            = "merge"
 	ActionTrack            = "track"
 	ActionStopTracking     = "stoptrack"
+	ActionListSubprojects  = "subprojects"
 )
 
 func NewCommand() *Command {
@@ -91,9 +92,31 @@ func (com *Command) Run() error {
 		return com.runStopTrack()
 	case ActionListActiveTracks:
 		return com.runListActiveTracks()
+	case ActionListSubprojects:
+		return com.runListSubprojects()
 	default:
 		return errgo.New("Do not recognize the action: " + com.Action)
 	}
+}
+
+func (com *Command) runListSubprojects() error {
+	if com.Project == "" {
+		return errgo.New("we need a valid project to list subprojects")
+	}
+	if !com.checkProjectExists(com.Project) {
+		return errgo.New("no project with the name " + com.Project)
+	}
+
+	subprojects, err := com.getProjectSubprojects(com.Project)
+	if err != nil {
+		return err
+	}
+
+	for _, project := range subprojects {
+		fmt.Println(project)
+	}
+
+	return nil
 }
 
 func (com *Command) runStopTrack() error {
@@ -988,4 +1011,14 @@ func (com *Command) getProjectActiveTracks(project string) ([]Track, error) {
 
 func (com *Command) getProjects() ([]string, error) {
 	return GetProjects(com.DataPath)
+}
+
+func (com *Command) getProjectSubprojects(project string) ([]string, error) {
+	projects, err := com.getProjects()
+	if err != nil {
+		return nil, err
+	}
+
+	subprojects := GetProjectSubprojects(project, projects)
+	return subprojects, nil
 }
