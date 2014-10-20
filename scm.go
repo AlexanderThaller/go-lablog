@@ -29,10 +29,11 @@ func gitCommit(datapath, message string) error {
 	}
 
 	// Give git time to commit everything and remove the lockfile.
-	time.Sleep(50 * time.Millisecond)
+	time.Sleep(5 * time.Millisecond)
 	return nil
 }
 
+// TODO: Change this to scm, filename, datapath
 func scmAdd(scm, datapath, filename string) error {
 	switch scm {
 	case "git":
@@ -55,7 +56,7 @@ func gitAdd(datapath, filename string) error {
 	}
 
 	// Give git time to commit everything and remove the lockfile.
-	time.Sleep(50 * time.Millisecond)
+	time.Sleep(5 * time.Millisecond)
 	return nil
 }
 
@@ -81,6 +82,58 @@ func gitPush(datapath string) error {
 	}
 
 	// Give git time to commit everything and remove the lockfile.
-	time.Sleep(50 * time.Millisecond)
+	time.Sleep(5 * time.Millisecond)
+	return nil
+}
+
+func scmRename(scm, oldpath, newpath, datapath string) error {
+	switch scm {
+	case "git":
+		return gitRename(oldpath, newpath, datapath)
+	default:
+		return errgo.New("do not know the scm " + scm)
+	}
+}
+
+func gitRename(oldpath, newpath, datapath string) error {
+	command := exec.Command("git", "mv", oldpath, newpath)
+	command.Dir = datapath
+
+	output, err := command.CombinedOutput()
+	if err != nil {
+		err = errgo.New("problem when moving file in git: " + err.Error() + " - " +
+			string(output))
+
+		return err
+	}
+
+	// Give git time
+	time.Sleep(5 * time.Millisecond)
+	return nil
+}
+
+func scmRemove(scm, filename, datapath string) error {
+	switch scm {
+	case "git":
+		return gitRemove(filename, datapath)
+	default:
+		return errgo.New("do not know the scm " + scm)
+	}
+}
+
+func gitRemove(filename, datapath string) error {
+	command := exec.Command("git", "rm", filename)
+	command.Dir = datapath
+
+	output, err := command.CombinedOutput()
+	if err != nil {
+		err = errgo.New("problem when moving file in git: " + err.Error() + " - " +
+			string(output))
+
+		return err
+	}
+
+	// Give git time
+	time.Sleep(5 * time.Millisecond)
 	return nil
 }

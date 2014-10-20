@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/AlexanderThaller/lablog",
-	"GoVersion": "go1.3.1",
+	"GoVersion": "go1.3.2",
 	"Packages": [
 		"./..."
 	],
@@ -11,8 +11,16 @@
 			"Rev": "2f014ea8b2a96158b0bd097b22b49d9235cee894"
 		},
 		{
+			"ImportPath": "github.com/jinzhu/now",
+			"Rev": "caef738a54cb159a5fe083e01609bc6873a84501"
+		},
+		{
 			"ImportPath": "github.com/juju/errgo",
 			"Rev": "26caa7d4884f6048c5687fa44c410e5d5d95e554"
+		},
+		{
+			"ImportPath": "github.com/mitchellh/go-homedir",
+			"Rev": "7d2d8c8a4e078ce3c58736ab521a40b37a504c52"
 		}
 	]
 }
