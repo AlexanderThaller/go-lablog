@@ -44,6 +44,7 @@ const (
 	ActionListNotes    = "listnotes"
 	ActionListProjects = "listprojects"
 	ActionListTodos    = "listtodos"
+	ActionListTracks   = "listtracks"
 	ActionNote         = "note"
 	ActionRename       = "rename"
 	ActionTodo         = "todo"
@@ -75,6 +76,8 @@ func (com *Command) Run() error {
 		return com.runListProjects()
 	case ActionListTodos:
 		return com.runListTodos()
+	case ActionListTracks:
+		return com.runListTracks()
 	case ActionTodo:
 		return com.runTodo()
 	case ActionRename:
@@ -322,6 +325,26 @@ func (com *Command) runListTodos() error {
 	return nil
 }
 
+func (com *Command) runListTracks() error {
+	if com.Project != "" {
+		return com.runListProjectTracks(com.Project)
+	}
+
+	projects, err := com.getProjects()
+	if err != nil {
+		return err
+	}
+
+	for _, project := range projects {
+		err := com.runListProjectTracks(project)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (com *Command) runListProjects() error {
 	projects, err := com.getProjects()
 	if err != nil {
@@ -537,6 +560,33 @@ func (com *Command) runListProjectTodos(project string) error {
 	return nil
 }
 
+func (com *Command) runListProjectTracks(project string) error {
+	if project == "" {
+		return errgo.New("project name can not be empty")
+	}
+	if !com.checkProjectExists(project) {
+		return errgo.New("the project does not exist")
+	}
+
+	tracks, err := com.getProjectTracks(project)
+	if err != nil {
+		return err
+	}
+
+	if len(tracks) == 0 {
+		return nil
+	}
+
+	fmt.Println("#", project, "- Tracks")
+
+	for _, track := range tracks {
+		fmt.Println("  *", track.TimeStamp, "-", track.Value)
+	}
+	fmt.Println("")
+
+	return nil
+}
+
 func (com *Command) filterTodos(todos []Todo) []Todo {
 	filter := make(map[string]Todo)
 
@@ -704,6 +754,52 @@ func (com *Command) getProjectTodos(project string) ([]Todo, error) {
 		}
 
 		out = append(out, todo)
+	}
+
+	return out, err
+}
+
+func (com *Command) getProjectTracks(project string) ([]Track, error) {
+	l := logger.New(Name, "Command", "get", "ProjectTracks")
+	l.SetLevel(logger.Debug)
+
+	if com.DataPath == "" {
+		return nil, errgo.New("datapath can not be empty")
+	}
+	if project == "" {
+		return nil, errgo.New("project name can not be empty")
+	}
+	if !com.checkProjectExists(project) {
+		return nil, errgo.New("project does not exist")
+	}
+
+	filepath := filepath.Join(com.DataPath, project+".csv")
+	file, err := os.OpenFile(filepath, os.O_RDONLY, 0640)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	reader := csv.NewReader(file)
+	reader.FieldsPerRecord = 3
+
+	var out []Track
+	for {
+		csv, err := reader.Read()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+
+			continue
+		}
+
+		track, err := TrackFromCSV(csv)
+		if err != nil {
+			continue
+		}
+
+		out = append(out, track)
 	}
 
 	return out, err

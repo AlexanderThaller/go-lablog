@@ -84,6 +84,28 @@ func TodoFromCSV(values []string) (Todo, error) {
 	return todo, nil
 }
 
+func TrackFromCSV(values []string) (Track, error) {
+	if len(values) != 3 {
+		return Track{}, errgo.New("we need three fields for parsing a todo")
+	}
+
+	if values[1] != "track" {
+		return Track{}, errgo.New("second field has to have the string 'track' in it")
+	}
+
+	timestamp, err := time.Parse(RecordTimeStampFormat, values[0])
+	if err != nil {
+		return Track{}, err
+	}
+
+	todo := Track{
+		TimeStamp: timestamp,
+		Value:     values[2],
+	}
+
+	return todo, nil
+}
+
 type Note struct {
 	Project   string
 	TimeStamp time.Time
