@@ -6,9 +6,18 @@
 	],
 	"Deps": [
 		{
+			"ImportPath": "bitbucket.org/kardianos/osext",
+			"Comment": "null-15",
+			"Rev": "44140c5fc69ecf1102c5ef451d73cd98ef59b178"
+		},
+		{
 			"ImportPath": "github.com/AlexanderThaller/logger",
 			"Comment": "1.1.0-6-g2f014ea",
 			"Rev": "2f014ea8b2a96158b0bd097b22b49d9235cee894"
+		},
+		{
+			"ImportPath": "github.com/davecheney/profile",
+			"Rev": "867e56f7b923dac5d47fd39ac837b329d0313454"
 		},
 		{
 			"ImportPath": "github.com/jinzhu/now",

@@ -3,10 +3,14 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"os"
+	"path"
 	"time"
+	"bitbucket.org/kardianos/osext"
 
 	"github.com/AlexanderThaller/logger"
+	"github.com/davecheney/profile"
 	"github.com/jinzhu/now"
 	"github.com/juju/errgo"
 	"github.com/mitchellh/go-homedir"
@@ -27,6 +31,7 @@ var (
 	flagValue         = flag.String("v", "", "The value which is used by certain commands")
 	flagLogLevel      = flag.String("loglevel", "Notice", "The loglevel")
 	flagNoSubprojects = flag.Bool("nosubprojects", false, "If true we will not print records for subprojects")
+	flagProfile       = flag.String("profile", "", "Path to folder where profile data will be saved.")
 )
 
 const (
@@ -59,6 +64,16 @@ func main() {
 	l := logger.New(Name, "main")
 	l.Info("Version: ", buildVersion)
 	l.Info("Buildtime: ", buildTime)
+
+	if *flagProfile != "" {
+		prof, err := configProfile(*flagProfile)
+		if err != nil {
+			l.Alert("Can not start profiling: ", errgo.Details(err))
+			os.Exit(1)
+		}
+
+		defer prof.Stop()
+	}
 
 	command := NewCommand()
 	command.Action = *flagAction
@@ -93,6 +108,45 @@ func main() {
 		l.Alert("Problem while running command: ", errgo.Details(err))
 		os.Exit(1)
 	}
+}
 
-	os.Exit(0)
+// configProfile will start profiling based on the default profile
+// settings.
+func configProfile(folder string) (interface {
+	Stop()
+}, error) {
+
+	timestamp := time.Now().Format(time.RFC3339Nano)
+	folderpath := path.Join(folder, timestamp)
+
+	prof := profile.Config{
+		CPUProfile:     true,
+		MemProfile:     true,
+		NoShutdownHook: true,       // do not hook SIGINT
+		ProfilePath:    folderpath, // store profiles in current directory
+		Quiet:          true,
+	}
+
+	err := os.MkdirAll(folderpath, 0755)
+	if err != nil {
+		return nil, err
+	}
+
+	binarypath, err := osext.Executable()
+	if err != nil {
+		return nil, err
+	}
+
+	data, err := ioutil.ReadFile(binarypath)
+	if err != nil {
+		return nil, err
+	}
+
+	filepath := path.Join(folderpath, "binary")
+	err = ioutil.WriteFile(filepath, data, 0755)
+	if err != nil {
+		return nil, err
+	}
+
+	return profile.Start(&prof), nil
 }
