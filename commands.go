@@ -335,7 +335,7 @@ func (com *Command) runList() error {
 
 func (com *Command) runListNotes() error {
 	if com.Project != "" {
-		return com.runListProjectNotes(com.Project)
+		return com.runListNotesAndSubnotes()
 	}
 
 	projects, err := com.getProjects()
@@ -344,6 +344,27 @@ func (com *Command) runListNotes() error {
 	}
 
 	for _, project := range projects {
+		err := com.runListProjectNotes(project)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (com *Command) runListNotesAndSubnotes() error {
+	err := com.runListProjectNotes(com.Project)
+	if err != nil {
+		return err
+	}
+
+	subprojects, err := com.getProjectSubprojects(com.Project)
+	if err != nil {
+		return err
+	}
+
+	for _, project := range subprojects {
 		err := com.runListProjectNotes(project)
 		if err != nil {
 			return err
