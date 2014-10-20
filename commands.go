@@ -29,6 +29,7 @@ type Command struct {
 	StartTime     time.Time
 	TimeStamp     time.Time
 	Value         string
+	NoSubprojects bool
 }
 
 const (
@@ -327,15 +328,15 @@ func (com *Command) runList() error {
 		return err
 	}
 	if len(notes) != 0 {
-		return com.runListProjectNotes(com.Project)
+		return com.runListNotesAndSubnotes(com.Project)
 	}
 
-	return com.runListProjectTodos(com.Project)
+	return com.runListProjectTodosAndSubtodos(com.Project)
 }
 
 func (com *Command) runListNotes() error {
 	if com.Project != "" {
-		return com.runListNotesAndSubnotes()
+		return com.runListNotesAndSubnotes(com.Project)
 	}
 
 	projects, err := com.getProjects()
@@ -353,19 +354,23 @@ func (com *Command) runListNotes() error {
 	return nil
 }
 
-func (com *Command) runListNotesAndSubnotes() error {
-	err := com.runListProjectNotes(com.Project)
+func (com *Command) runListNotesAndSubnotes(project string) error {
+	err := com.runListProjectNotes(project)
 	if err != nil {
 		return err
 	}
 
-	subprojects, err := com.getProjectSubprojects(com.Project)
+	if com.NoSubprojects {
+		return nil
+	}
+
+	subprojects, err := com.getProjectSubprojects(project)
 	if err != nil {
 		return err
 	}
 
-	for _, project := range subprojects {
-		err := com.runListProjectNotes(project)
+	for _, subproject := range subprojects {
+		err := com.runListProjectNotes(subproject)
 		if err != nil {
 			return err
 		}
@@ -376,7 +381,7 @@ func (com *Command) runListNotesAndSubnotes() error {
 
 func (com *Command) runListTodos() error {
 	if com.Project != "" {
-		return com.runListProjectTodos(com.Project)
+		return com.runListProjectTodosAndSubtodos(com.Project)
 	}
 
 	projects, err := com.getProjects()
@@ -386,6 +391,31 @@ func (com *Command) runListTodos() error {
 
 	for _, project := range projects {
 		err := com.runListProjectTodos(project)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (com *Command) runListProjectTodosAndSubtodos(project string) error {
+	err := com.runListProjectTodos(project)
+	if err != nil {
+		return err
+	}
+
+	if com.NoSubprojects {
+		return nil
+	}
+
+	subprojects, err := com.getProjectSubprojects(project)
+	if err != nil {
+		return err
+	}
+
+	for _, subproject := range subprojects {
+		err := com.runListProjectTodos(subproject)
 		if err != nil {
 			return err
 		}

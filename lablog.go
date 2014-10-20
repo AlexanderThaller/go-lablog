@@ -26,6 +26,7 @@ var (
 	flagStartTime     = flag.String("starttime", time.Time{}.String(), "The starttime for the timerange filter")
 	flagValue         = flag.String("v", "", "The value which is used by certain commands")
 	flagLogLevel      = flag.String("loglevel", "Notice", "The loglevel")
+	flagNoSubprojects = flag.Bool("nosubprojects", false, "If true we will not print records for subprojects")
 )
 
 const (
@@ -69,6 +70,7 @@ func main() {
 	command.SCMAutoPush = *flagSCMAutoPush
 	command.TimeStamp = time.Now()
 	command.Value = *flagValue
+	command.NoSubprojects = *flagNoSubprojects
 
 	starttime, err := now.Parse(*flagStartTime)
 	if err != nil {
