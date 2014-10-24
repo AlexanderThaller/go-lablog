@@ -38,21 +38,22 @@ const (
 )
 
 const (
-	ActionDone             = "done"
-	ActionList             = "list"
-	ActionListDates        = "dates"
-	ActionListNotes        = "notes"
-	ActionListProjects     = "projects"
-	ActionListTodos        = "todos"
-	ActionListTracks       = "tracks"
-	ActionListActiveTracks = "activetracks"
-	ActionNote             = "note"
-	ActionRename           = "rename"
-	ActionTodo             = "todo"
-	ActionMerge            = "merge"
-	ActionTrack            = "track"
-	ActionStopTracking     = "stoptrack"
-	ActionListSubprojects  = "subprojects"
+	ActionDone               = "done"
+	ActionList               = "list"
+	ActionListDates          = "dates"
+	ActionListNotes          = "notes"
+	ActionListProjects       = "projects"
+	ActionListTodos          = "todos"
+	ActionListTracks         = "tracks"
+	ActionListActiveTracks   = "activetracks"
+	ActionNote               = "note"
+	ActionRename             = "rename"
+	ActionTodo               = "todo"
+	ActionMerge              = "merge"
+	ActionTrack              = "track"
+	ActionStopTracking       = "stoptrack"
+	ActionListSubprojects    = "subprojects"
+	ActionListTracksDuration = "duration"
 )
 
 func NewCommand() *Command {
@@ -95,9 +96,40 @@ func (com *Command) Run() error {
 		return com.runListActiveTracks()
 	case ActionListSubprojects:
 		return com.runListSubprojects()
+	case ActionListTracksDuration:
+		return com.runListTracksDuration()
 	default:
 		return errgo.New("Do not recognize the action: " + com.Action)
 	}
+}
+
+func (com *Command) runListTracksDuration() error {
+	tracks, err := com.getProjectTracks(com.Project)
+	if err != nil {
+		return err
+	}
+
+	starttracks := make(map[string]Track)
+	durations := make(map[string]time.Duration)
+	active := make(map[string]bool)
+	for _, track := range tracks {
+		if !active[track.Value] {
+			starttracks[track.Value] = track
+			active[track.Value] = true
+			continue
+		}
+
+		startrack := starttracks[track.Value]
+		duration := track.TimeStamp.Sub(startrack.TimeStamp)
+		durations[track.Value] += duration
+		active[track.Value] = false
+	}
+
+	for value, duration := range durations {
+		fmt.Println(value, "-", duration)
+	}
+
+	return nil
 }
 
 func (com *Command) runListSubprojects() error {
