@@ -18,7 +18,7 @@ func GetProjectSubprojects(project string, projects []string) []string {
 			continue
 		}
 
-		if !strings.HasPrefix(subproject, project) {
+		if !strings.HasPrefix(subproject, project+".") {
 			continue
 		}
 
