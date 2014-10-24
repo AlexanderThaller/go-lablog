@@ -40,20 +40,19 @@ const (
 const (
 	ActionDone                = "done"
 	ActionList                = "list"
+	ActionListActiveTracks    = "activetracks"
 	ActionListDates           = "dates"
 	ActionListNotes           = "notes"
 	ActionListProjects        = "projects"
 	ActionListTodos           = "todos"
 	ActionListTracks          = "tracks"
-	ActionListActiveTracks    = "activetracks"
+	ActionListTracksDurations = "durations"
+	ActionMerge               = "merge"
 	ActionNote                = "note"
 	ActionRename              = "rename"
-	ActionTodo                = "todo"
-	ActionMerge               = "merge"
-	ActionTrack               = "track"
 	ActionStopTracking        = "stoptrack"
-	ActionListSubprojects     = "subprojects"
-	ActionListTracksDurations = "durations"
+	ActionTodo                = "todo"
+	ActionTrack               = "track"
 )
 
 func NewCommand() *Command {
@@ -94,8 +93,6 @@ func (com *Command) Run() error {
 		return com.runStopTrack()
 	case ActionListActiveTracks:
 		return com.runListActiveTracks()
-	case ActionListSubprojects:
-		return com.runListSubprojects()
 	case ActionListTracksDurations:
 		return com.runListTracksDurations()
 	default:
@@ -167,26 +164,6 @@ func (com *Command) runListActiveTracks() error {
 
 func (com *Command) runStopTrack() error {
 	return com.runListCommand(com.runStopTrackingProject)
-}
-
-func (com *Command) runListSubprojects() error {
-	if com.Project == "" {
-		return errgo.New("we need a valid project to list subprojects")
-	}
-	if !com.checkProjectExists(com.Project) {
-		return errgo.New("no project with the name " + com.Project)
-	}
-
-	subprojects, err := com.getProjectSubprojects(com.Project)
-	if err != nil {
-		return err
-	}
-
-	for _, project := range subprojects {
-		fmt.Println(project)
-	}
-
-	return nil
 }
 
 func (com *Command) runListProjects() error {
