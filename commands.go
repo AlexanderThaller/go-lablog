@@ -103,8 +103,91 @@ func (com *Command) Run() error {
 	}
 }
 
+func (com *Command) runList() error {
+	if com.Project == "" {
+		return com.runListProjects()
+	}
+
+	if !com.checkProjectExists(com.Project) {
+		return errgo.New("project " + com.Project + " does not exist")
+	}
+
+	notes, err := com.getProjectNotes(com.Project)
+	if err != nil {
+		return err
+	}
+	if len(notes) != 0 {
+		return com.runListNotesAndSubnotes(com.Project)
+	}
+
+	return com.runListProjectTodosAndSubtodos(com.Project)
+}
+
+type listCommand func(string) error
+
+func (com *Command) runListCommand(command listCommand) error {
+	if com.Project != "" {
+		return command(com.Project)
+	}
+
+	projects, err := com.getProjects()
+	if err != nil {
+		return err
+	}
+
+	for _, project := range projects {
+		err := command(project)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (com *Command) runListNotes() error {
+	return com.runListCommand(com.runListNotesAndSubnotes)
+}
+
+func (com *Command) runListTodos() error {
+	return com.runListCommand(com.runListProjectTodosAndSubtodos)
+}
+
+func (com *Command) runListTracks() error {
+	return com.runListCommand(com.runListProjectTracks)
+}
+
 func (com *Command) runListTracksDuration() error {
-	tracks, err := com.getProjectTracks(com.Project)
+	return com.runListCommand(com.runListProjectTracksDuration)
+}
+
+func (com *Command) runListNotesAndSubnotes(project string) error {
+	err := com.runListProjectNotes(project)
+	if err != nil {
+		return err
+	}
+
+	if com.NoSubprojects {
+		return nil
+	}
+
+	subprojects, err := com.getProjectSubprojects(project)
+	if err != nil {
+		return err
+	}
+
+	for _, subproject := range subprojects {
+		err := com.runListProjectNotes(subproject)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (com *Command) runListProjectTracksDuration(project string) error {
+	tracks, err := com.getProjectTracks(project)
 	if err != nil {
 		return err
 	}
@@ -125,8 +208,50 @@ func (com *Command) runListTracksDuration() error {
 		active[track.Value] = false
 	}
 
+	if len(durations) == 0 {
+		return nil
+	}
+
+	fmt.Println("#", project, "- Durations")
 	for value, duration := range durations {
 		fmt.Println(value, "-", duration)
+	}
+	fmt.Println()
+
+	return nil
+}
+
+func (com *Command) runListProjectNotes(project string) error {
+	if project == "" {
+		return errgo.New("project name can not be empty")
+	}
+	if !com.checkProjectExists(project) {
+		return errgo.New("project" + project + " does not exist")
+	}
+
+	notes, err := com.getProjectNotes(project)
+	if err != nil {
+		return err
+	}
+
+	if len(notes) == 0 {
+		return nil
+	}
+
+	fmt.Println("#", project)
+	sort.Sort(NotesByDate(notes))
+
+	reg, err := regexp.Compile("(?m)^#")
+	if err != nil {
+		return err
+	}
+
+	for _, note := range notes {
+		fmt.Println("##", note.GetTimeStamp())
+
+		out := reg.ReplaceAllString(note.GetValue(), "###")
+		fmt.Println(out)
+		fmt.Println("")
 	}
 
 	return nil
@@ -147,6 +272,234 @@ func (com *Command) runListSubprojects() error {
 
 	for _, project := range subprojects {
 		fmt.Println(project)
+	}
+
+	return nil
+}
+
+func (com *Command) runListProjectTodosAndSubtodos(project string) error {
+	err := com.runListProjectTodos(project)
+	if err != nil {
+		return err
+	}
+
+	if com.NoSubprojects {
+		return nil
+	}
+
+	subprojects, err := com.getProjectSubprojects(project)
+	if err != nil {
+		return err
+	}
+
+	for _, subproject := range subprojects {
+		err := com.runListProjectTodos(subproject)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (com *Command) runListActiveTracks() error {
+	if com.Project != "" {
+		return com.runListProjectActiveTracks(com.Project)
+	}
+
+	projects, err := com.getProjects()
+	if err != nil {
+		return err
+	}
+
+	for _, project := range projects {
+		err := com.runListProjectActiveTracks(project)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (com *Command) runListProjects() error {
+	projects, err := com.getProjects()
+	if err != nil {
+		return err
+	}
+
+	out := make(map[string]struct{})
+	for _, project := range projects {
+		notes, err := com.getProjectNotes(project)
+		if err != nil {
+			return err
+		}
+
+		if len(notes) == 0 {
+			continue
+		}
+
+		out[project] = struct{}{}
+	}
+
+	for _, project := range projects {
+		todos, err := com.getProjectTodos(project)
+		if err != nil {
+			return err
+		}
+
+		if len(todos) == 0 {
+			continue
+		}
+
+		out[project] = struct{}{}
+	}
+
+	var outsort []string
+	for project := range out {
+		outsort = append(outsort, project)
+	}
+	sort.Strings(outsort)
+
+	for _, project := range outsort {
+		fmt.Println(project)
+	}
+
+	return nil
+}
+
+func (com *Command) runListDates() error {
+	l := logger.New(Name, "Command", "run", "ListDates")
+
+	var dates []string
+	var err error
+
+	if com.Project == "" {
+		dates, err = com.getDates()
+	} else {
+		dates, err = com.getProjectDates(com.Project)
+	}
+
+	if err != nil {
+		return err
+	}
+
+	sort.Strings(dates)
+	for _, date := range dates {
+		timestamp, err := now.Parse(date)
+		if err != nil {
+			l.Warning("Can not parse timestamp: ", errgo.Details(err))
+			continue
+		}
+
+		if timestamp.Before(com.StartTime) {
+			continue
+		}
+
+		if timestamp.After(com.EndTime) {
+			continue
+		}
+
+		fmt.Println(date)
+	}
+
+	return nil
+}
+
+func (com *Command) runListProjectTodos(project string) error {
+	if project == "" {
+		return errgo.New("project name can not be empty")
+	}
+	if !com.checkProjectExists(project) {
+		return errgo.New("the project does not exist")
+	}
+
+	todos, err := com.getProjectTodos(project)
+	if err != nil {
+		return err
+	}
+	todos = com.filterTodos(todos)
+
+	if len(todos) == 0 {
+		return nil
+	}
+
+	fmt.Println("#", project, "- Todos")
+
+	var out []string
+	for _, todo := range todos {
+		out = append(out, "  * "+todo.GetValue())
+	}
+	sort.Strings(out)
+
+	for _, todo := range out {
+		fmt.Println(todo)
+	}
+	fmt.Println("")
+
+	return nil
+}
+
+func (com *Command) runListProjectTracks(project string) error {
+	if project == "" {
+		return errgo.New("project name can not be empty")
+	}
+	if !com.checkProjectExists(project) {
+		return errgo.New("the project does not exist")
+	}
+
+	tracks, err := com.getProjectTracks(project)
+	if err != nil {
+		return err
+	}
+
+	if len(tracks) == 0 {
+		return nil
+	}
+
+	fmt.Println("#", project, "- Tracks")
+
+	for _, track := range tracks {
+		out := "  * " + track.GetTimeStamp()
+
+		if track.Value != "" {
+			out += " - " + track.Value
+		}
+
+		fmt.Println(out)
+	}
+	fmt.Println("")
+
+	return nil
+}
+
+func (com *Command) runListProjectActiveTracks(project string) error {
+	if project == "" {
+		return errgo.New("project name can not be empty")
+	}
+	if !com.checkProjectExists(project) {
+		return errgo.New("the project does not exist")
+	}
+
+	tracks, err := com.getProjectActiveTracks(project)
+	if err != nil {
+		return err
+	}
+
+	if len(tracks) == 0 {
+		return nil
+	}
+
+	fmt.Println("#", project, "- ActiveTracks")
+
+	for _, track := range tracks {
+		out := "  * " + track.GetTimeStamp()
+
+		if track.Value != "" {
+			out += " - " + track.Value
+		}
+
+		fmt.Println(out)
 	}
 
 	return nil
@@ -346,240 +699,6 @@ func (com *Command) runTodo() error {
 	return com.Write(todo)
 }
 
-func (com *Command) runList() error {
-	if com.Project == "" {
-		return com.runListProjects()
-	}
-
-	if !com.checkProjectExists(com.Project) {
-		return errgo.New("project " + com.Project + " does not exist")
-	}
-
-	notes, err := com.getProjectNotes(com.Project)
-	if err != nil {
-		return err
-	}
-	if len(notes) != 0 {
-		return com.runListNotesAndSubnotes(com.Project)
-	}
-
-	return com.runListProjectTodosAndSubtodos(com.Project)
-}
-
-func (com *Command) runListNotes() error {
-	if com.Project != "" {
-		return com.runListNotesAndSubnotes(com.Project)
-	}
-
-	projects, err := com.getProjects()
-	if err != nil {
-		return err
-	}
-
-	for _, project := range projects {
-		err := com.runListProjectNotes(project)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (com *Command) runListNotesAndSubnotes(project string) error {
-	err := com.runListProjectNotes(project)
-	if err != nil {
-		return err
-	}
-
-	if com.NoSubprojects {
-		return nil
-	}
-
-	subprojects, err := com.getProjectSubprojects(project)
-	if err != nil {
-		return err
-	}
-
-	for _, subproject := range subprojects {
-		err := com.runListProjectNotes(subproject)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (com *Command) runListTodos() error {
-	if com.Project != "" {
-		return com.runListProjectTodosAndSubtodos(com.Project)
-	}
-
-	projects, err := com.getProjects()
-	if err != nil {
-		return err
-	}
-
-	for _, project := range projects {
-		err := com.runListProjectTodos(project)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (com *Command) runListProjectTodosAndSubtodos(project string) error {
-	err := com.runListProjectTodos(project)
-	if err != nil {
-		return err
-	}
-
-	if com.NoSubprojects {
-		return nil
-	}
-
-	subprojects, err := com.getProjectSubprojects(project)
-	if err != nil {
-		return err
-	}
-
-	for _, subproject := range subprojects {
-		err := com.runListProjectTodos(subproject)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (com *Command) runListTracks() error {
-	if com.Project != "" {
-		return com.runListProjectTracks(com.Project)
-	}
-
-	projects, err := com.getProjects()
-	if err != nil {
-		return err
-	}
-
-	for _, project := range projects {
-		err := com.runListProjectTracks(project)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (com *Command) runListActiveTracks() error {
-	if com.Project != "" {
-		return com.runListProjectActiveTracks(com.Project)
-	}
-
-	projects, err := com.getProjects()
-	if err != nil {
-		return err
-	}
-
-	for _, project := range projects {
-		err := com.runListProjectActiveTracks(project)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (com *Command) runListProjects() error {
-	projects, err := com.getProjects()
-	if err != nil {
-		return err
-	}
-
-	out := make(map[string]struct{})
-	for _, project := range projects {
-		notes, err := com.getProjectNotes(project)
-		if err != nil {
-			return err
-		}
-
-		if len(notes) == 0 {
-			continue
-		}
-
-		out[project] = struct{}{}
-	}
-
-	for _, project := range projects {
-		todos, err := com.getProjectTodos(project)
-		if err != nil {
-			return err
-		}
-
-		if len(todos) == 0 {
-			continue
-		}
-
-		out[project] = struct{}{}
-	}
-
-	var outsort []string
-	for project := range out {
-		outsort = append(outsort, project)
-	}
-	sort.Strings(outsort)
-
-	for _, project := range outsort {
-		fmt.Println(project)
-	}
-
-	return nil
-}
-
-func (com *Command) runListDates() error {
-	l := logger.New(Name, "Command", "run", "ListDates")
-
-	var dates []string
-	var err error
-
-	if com.Project == "" {
-		dates, err = com.getDates()
-	} else {
-		dates, err = com.getProjectDates(com.Project)
-	}
-
-	if err != nil {
-		return err
-	}
-
-	sort.Strings(dates)
-	for _, date := range dates {
-		timestamp, err := now.Parse(date)
-		if err != nil {
-			l.Warning("Can not parse timestamp: ", errgo.Details(err))
-			continue
-		}
-
-		if timestamp.Before(com.StartTime) {
-			continue
-		}
-
-		if timestamp.After(com.EndTime) {
-			continue
-		}
-
-		fmt.Println(date)
-	}
-
-	return nil
-}
-
 func (com *Command) getDates() ([]string, error) {
 	projects, err := com.getProjects()
 	if err != nil {
@@ -652,105 +771,6 @@ func (com *Command) getProjectDates(project string) ([]string, error) {
 	return out, nil
 }
 
-func (com *Command) runListProjectTodos(project string) error {
-	if project == "" {
-		return errgo.New("project name can not be empty")
-	}
-	if !com.checkProjectExists(project) {
-		return errgo.New("the project does not exist")
-	}
-
-	todos, err := com.getProjectTodos(project)
-	if err != nil {
-		return err
-	}
-	todos = com.filterTodos(todos)
-
-	if len(todos) == 0 {
-		return nil
-	}
-
-	fmt.Println("#", project, "- Todos")
-
-	var out []string
-	for _, todo := range todos {
-		out = append(out, "  * "+todo.GetValue())
-	}
-	sort.Strings(out)
-
-	for _, todo := range out {
-		fmt.Println(todo)
-	}
-	fmt.Println("")
-
-	return nil
-}
-
-func (com *Command) runListProjectTracks(project string) error {
-	if project == "" {
-		return errgo.New("project name can not be empty")
-	}
-	if !com.checkProjectExists(project) {
-		return errgo.New("the project does not exist")
-	}
-
-	tracks, err := com.getProjectTracks(project)
-	if err != nil {
-		return err
-	}
-
-	if len(tracks) == 0 {
-		return nil
-	}
-
-	fmt.Println("#", project, "- Tracks")
-
-	for _, track := range tracks {
-		out := "  * " + track.GetTimeStamp()
-
-		if track.Value != "" {
-			out += " - " + track.Value
-		}
-
-		fmt.Println(out)
-	}
-	fmt.Println("")
-
-	return nil
-}
-
-func (com *Command) runListProjectActiveTracks(project string) error {
-	if project == "" {
-		return errgo.New("project name can not be empty")
-	}
-	if !com.checkProjectExists(project) {
-		return errgo.New("the project does not exist")
-	}
-
-	tracks, err := com.getProjectActiveTracks(project)
-	if err != nil {
-		return err
-	}
-
-	if len(tracks) == 0 {
-		return nil
-	}
-
-	fmt.Println("#", project, "- ActiveTracks")
-
-	for _, track := range tracks {
-		out := "  * " + track.GetTimeStamp()
-
-		if track.Value != "" {
-			out += " - " + track.Value
-		}
-
-		fmt.Println(out)
-	}
-
-	return nil
-}
-
 func (com *Command) filterTodos(todos []Todo) []Todo {
 	filter := make(map[string]Todo)
 
@@ -769,42 +789,6 @@ func (com *Command) filterTodos(todos []Todo) []Todo {
 	}
 
 	return out
-}
-
-func (com *Command) runListProjectNotes(project string) error {
-	if project == "" {
-		return errgo.New("project name can not be empty")
-	}
-	if !com.checkProjectExists(project) {
-		return errgo.New("project" + project + " does not exist")
-	}
-
-	notes, err := com.getProjectNotes(project)
-	if err != nil {
-		return err
-	}
-
-	if len(notes) == 0 {
-		return nil
-	}
-
-	fmt.Println("#", project)
-	sort.Sort(NotesByDate(notes))
-
-	reg, err := regexp.Compile("(?m)^#")
-	if err != nil {
-		return err
-	}
-
-	for _, note := range notes {
-		fmt.Println("##", note.GetTimeStamp())
-
-		out := reg.ReplaceAllString(note.GetValue(), "###")
-		fmt.Println(out)
-		fmt.Println("")
-	}
-
-	return nil
 }
 
 func (com *Command) checkProjectExists(project string) bool {
