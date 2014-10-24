@@ -172,40 +172,7 @@ func (com *Command) runListProjects() error {
 		return err
 	}
 
-	out := make(map[string]struct{})
 	for _, project := range projects {
-		notes, err := com.getProjectNotes(project)
-		if err != nil {
-			return err
-		}
-
-		if len(notes) == 0 {
-			continue
-		}
-
-		out[project] = struct{}{}
-	}
-
-	for _, project := range projects {
-		todos, err := com.getProjectTodos(project)
-		if err != nil {
-			return err
-		}
-
-		if len(todos) == 0 {
-			continue
-		}
-
-		out[project] = struct{}{}
-	}
-
-	var outsort []string
-	for project := range out {
-		outsort = append(outsort, project)
-	}
-	sort.Strings(outsort)
-
-	for _, project := range outsort {
 		fmt.Println(project)
 	}
 
@@ -736,116 +703,6 @@ func (com *Command) filterTodos(todos []Todo) []Todo {
 	return out
 }
 
-func (com *Command) checkProjectExists(project string) bool {
-	projects, err := com.getProjects()
-	if err != nil {
-		return false
-	}
-
-	for _, d := range projects {
-		if d == project {
-			return true
-		}
-	}
-
-	return false
-}
-
-func (com *Command) getProjectNotes(project string) ([]Note, error) {
-	if com.DataPath == "" {
-		return nil, errgo.New("datapath can not be empty")
-	}
-	if project == "" {
-		return nil, errgo.New("project name can not be empty")
-	}
-	if !com.checkProjectExists(project) {
-		return nil, errgo.New("project does not exist")
-	}
-
-	filepath := filepath.Join(com.DataPath, project+".csv")
-	file, err := os.OpenFile(filepath, os.O_RDONLY, 0640)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	reader := csv.NewReader(file)
-	reader.FieldsPerRecord = 3
-
-	var out []Note
-	for {
-		csv, err := reader.Read()
-		if err != nil {
-			if err == io.EOF {
-				break
-			}
-
-			continue
-		}
-
-		note, err := NoteFromCSV(csv)
-		if err != nil {
-			continue
-		}
-		note.SetProject(project)
-
-		if note.TimeStamp.Before(com.StartTime) {
-			continue
-		}
-
-		if note.TimeStamp.After(com.EndTime) {
-			continue
-		}
-
-		out = append(out, note)
-	}
-
-	return out, err
-}
-
-func (com *Command) getProjectTodos(project string) ([]Todo, error) {
-	if com.DataPath == "" {
-		return nil, errgo.New("datapath can not be empty")
-	}
-	if project == "" {
-		return nil, errgo.New("project name can not be empty")
-	}
-	if !com.checkProjectExists(project) {
-		return nil, errgo.New("project does not exist")
-	}
-
-	filepath := filepath.Join(com.DataPath, project+".csv")
-	file, err := os.OpenFile(filepath, os.O_RDONLY, 0640)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	reader := csv.NewReader(file)
-	reader.FieldsPerRecord = 4
-
-	var out []Todo
-	for {
-		csv, err := reader.Read()
-		if err != nil {
-			if err == io.EOF {
-				break
-			}
-
-			continue
-		}
-
-		todo, err := TodoFromCSV(csv)
-		if err != nil {
-			continue
-		}
-
-		out = append(out, todo)
-	}
-
-	return out, err
-}
-
 func (com *Command) getProjectTracks(project string) ([]Track, error) {
 	if com.DataPath == "" {
 		return nil, errgo.New("datapath can not be empty")
@@ -1022,7 +879,7 @@ func (com *Command) getProjectActiveTracks(project string) ([]Track, error) {
 }
 
 func (com *Command) getProjects() ([]string, error) {
-	return GetProjects(com.DataPath)
+	return Projects(com.DataPath, com.StartTime, com.EndTime)
 }
 
 func (com *Command) getProjectSubprojects(project string) ([]string, error) {
@@ -1031,6 +888,18 @@ func (com *Command) getProjectSubprojects(project string) ([]string, error) {
 		return nil, err
 	}
 
-	subprojects := GetProjectSubprojects(project, projects)
+	subprojects := ProjectSubprojects(project, projects)
 	return subprojects, nil
+}
+
+func (com *Command) checkProjectExists(project string) bool {
+	return ProjectExists(project, com.DataPath)
+}
+
+func (com *Command) getProjectNotes(project string) ([]Note, error) {
+	return ProjectNotes(project, com.DataPath, com.StartTime, com.EndTime)
+}
+
+func (com *Command) getProjectTodos(project string) ([]Todo, error) {
+	return ProjectTodos(project, com.DataPath)
 }
