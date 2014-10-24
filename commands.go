@@ -161,6 +161,14 @@ func (com *Command) runListTracksDurations() error {
 	return com.runListCommand(com.runListProjectTracksDurations)
 }
 
+func (com *Command) runListActiveTracks() error {
+	return com.runListCommand(com.runListProjectActiveTracks)
+}
+
+func (com *Command) runStopTrack() error {
+	return com.runListCommand(com.runStopTrackingProject)
+}
+
 func (com *Command) runListSubprojects() error {
 	if com.Project == "" {
 		return errgo.New("we need a valid project to list subprojects")
@@ -179,10 +187,6 @@ func (com *Command) runListSubprojects() error {
 	}
 
 	return nil
-}
-
-func (com *Command) runListActiveTracks() error {
-	return com.runListCommand(com.runListProjectActiveTracks)
 }
 
 func (com *Command) runListProjects() error {
@@ -484,26 +488,6 @@ func (com *Command) runListProjectActiveTracks(project string) error {
 		}
 
 		fmt.Println(out)
-	}
-
-	return nil
-}
-
-func (com *Command) runStopTrack() error {
-	if com.Project != "" {
-		return com.runStopTrackingProject(com.Project)
-	}
-
-	projects, err := com.getProjects()
-	if err != nil {
-		return err
-	}
-
-	for _, project := range projects {
-		err := com.runStopTrackingProject(project)
-		if err != nil {
-			return err
-		}
 	}
 
 	return nil
