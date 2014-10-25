@@ -1,6 +1,9 @@
 package main
 
 import (
+	"bytes"
+	"io/ioutil"
+	"path"
 	"runtime"
 	"testing"
 	"time"
@@ -53,6 +56,21 @@ func BenchmarkProjectHasTodos(b *testing.B) {
 func BenchmarkProjectNotes(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		ProjectNotes(Project, DataPath, StartTime, EndTime)
+	}
+}
+
+func BenchmarkProjectNotesFromReader(b *testing.B) {
+	path := path.Join(DataPath, Project+".csv")
+	data, err := ioutil.ReadFile(path)
+	if err != nil {
+		return
+	}
+
+	buffer := bytes.NewBuffer(data)
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		ProjectNotesFromReader(Project, StartTime, EndTime, buffer)
 	}
 }
 

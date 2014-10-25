@@ -290,3 +290,15 @@ func testerr(t *testing.T, l logger.Logger, message string, err error, got, expe
 		t.Fail()
 	}
 }
+
+func BenchmarkNoteFromCSV(b *testing.B) {
+	csv := []string{
+		"2014-10-25T03:59:33.398546576+02:00",
+		"note",
+		"Test1",
+	}
+
+	for i := 0; i < b.N; i++ {
+		NoteFromCSV(csv)
+	}
+}

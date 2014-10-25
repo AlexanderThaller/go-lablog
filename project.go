@@ -203,12 +203,16 @@ func ProjectNotes(project, datapath string, start, end time.Time) ([]Note, error
 	}
 	defer file.Close()
 
-	reader := csv.NewReader(file)
-	reader.FieldsPerRecord = 3
+	return ProjectNotesFromReader(project, start, end, file), nil
+}
+
+func ProjectNotesFromReader(project string, start, end time.Time, reader io.Reader) []Note {
+	parser := csv.NewReader(reader)
+	parser.FieldsPerRecord = 3
 
 	var out []Note
 	for {
-		csv, err := reader.Read()
+		csv, err := parser.Read()
 		if err != nil {
 			if err == io.EOF {
 				break
@@ -234,7 +238,7 @@ func ProjectNotes(project, datapath string, start, end time.Time) ([]Note, error
 		out = append(out, note)
 	}
 
-	return out, err
+	return out
 }
 
 func ProjectTodos(project, datapath string, start, end time.Time) ([]Todo, error) {
