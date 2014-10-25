@@ -1,6 +1,7 @@
 package main
 
 import (
+	"sort"
 	"strconv"
 	"time"
 
@@ -246,4 +247,24 @@ func (track TracksByDate) Swap(i, j int) {
 
 func (track TracksByDate) Less(i, j int) bool {
 	return track[j].TimeStamp.After(track[i].TimeStamp)
+}
+
+func FilterInactiveTodos(todos []Todo) []Todo {
+	filter := make(map[string]Todo)
+
+	sort.Sort(TodoByDate(todos))
+	for _, todo := range todos {
+		filter[todo.Value] = todo
+	}
+
+	var out []Todo
+	for _, todo := range filter {
+		if todo.Done {
+			continue
+		}
+
+		out = append(out, todo)
+	}
+
+	return out
 }

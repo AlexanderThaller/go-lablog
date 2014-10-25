@@ -350,7 +350,7 @@ func (com *Command) runListProjectTodos(project string) error {
 	if err != nil {
 		return err
 	}
-	todos = com.filterTodos(todos)
+	todos = FilterInactiveTodos(todos)
 
 	if len(todos) == 0 {
 		return nil
@@ -494,26 +494,6 @@ func (com *Command) runMerge() error {
 	return nil
 }
 
-func (com *Command) runMergeFiles(srcpath, dstpath string) error {
-	srcdata, err := ioutil.ReadFile(srcpath)
-	if err != nil {
-		return errgo.New(err.Error())
-	}
-
-	dstfile, err := os.OpenFile(dstpath, os.O_APPEND|os.O_WRONLY, 0600)
-	if err != nil {
-		return errgo.New(err.Error())
-	}
-	defer dstfile.Close()
-
-	_, err = dstfile.Write(srcdata)
-	if err != nil {
-		return errgo.New(err.Error())
-	}
-
-	return nil
-}
-
 func (com *Command) runRename() error {
 	if com.Project == "" {
 		return errgo.New("Project name can not be empty")
@@ -611,142 +591,6 @@ func (com *Command) runTodo() error {
 	return com.Write(todo)
 }
 
-func (com *Command) getDates() ([]string, error) {
-	projects, err := com.getProjects()
-	if err != nil {
-		return nil, err
-	}
-
-	datemap := make(map[string]struct{})
-	for _, project := range projects {
-		dates, err := com.getProjectDates(project)
-		if err != nil {
-			return nil, err
-		}
-
-		for _, date := range dates {
-			datemap[date] = struct{}{}
-		}
-	}
-
-	var out []string
-	for date := range datemap {
-		out = append(out, date)
-	}
-
-	return out, nil
-}
-
-func (com *Command) getProjectDates(project string) ([]string, error) {
-	if com.DataPath == "" {
-		return nil, errgo.New("datapath can not be empty")
-	}
-	if project == "" {
-		return nil, errgo.New("project name can not be empty")
-	}
-	if !com.checkProjectExists(project) {
-		return nil, errgo.New("project does not exist")
-	}
-
-	var out []string
-
-	notes, err := com.getProjectNotes(project)
-	if err != nil {
-		return nil, err
-	}
-
-	todos, err := com.getProjectTodos(project)
-	if err != nil {
-		return nil, err
-	}
-	todos = com.filterTodos(todos)
-
-	datemap := make(map[string]struct{})
-
-	for _, note := range notes {
-		date, err := time.Parse(RecordTimeStampFormat, note.GetTimeStamp())
-		if err != nil {
-			return nil, err
-		}
-
-		datemap[date.Format(DateFormat)] = struct{}{}
-	}
-
-	for _, todo := range todos {
-		datemap[todo.TimeStamp.Format(DateFormat)] = struct{}{}
-	}
-
-	for date := range datemap {
-		out = append(out, date)
-	}
-
-	return out, nil
-}
-
-func (com *Command) filterTodos(todos []Todo) []Todo {
-	filter := make(map[string]Todo)
-
-	sort.Sort(TodoByDate(todos))
-	for _, todo := range todos {
-		filter[todo.Value] = todo
-	}
-
-	var out []Todo
-	for _, todo := range filter {
-		if todo.Done {
-			continue
-		}
-
-		out = append(out, todo)
-	}
-
-	return out
-}
-
-func (com *Command) getProjectTracks(project string) ([]Track, error) {
-	if com.DataPath == "" {
-		return nil, errgo.New("datapath can not be empty")
-	}
-	if project == "" {
-		return nil, errgo.New("project name can not be empty")
-	}
-	if !com.checkProjectExists(project) {
-		return nil, errgo.New("project does not exist")
-	}
-
-	filepath := filepath.Join(com.DataPath, project+".csv")
-	file, err := os.OpenFile(filepath, os.O_RDONLY, 0640)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	reader := csv.NewReader(file)
-	reader.FieldsPerRecord = 3
-
-	var out []Track
-	for {
-		csv, err := reader.Read()
-		if err != nil {
-			if err == io.EOF {
-				break
-			}
-
-			continue
-		}
-
-		track, err := TrackFromCSV(csv)
-		if err != nil {
-			continue
-		}
-
-		out = append(out, track)
-	}
-	sort.Sort(TracksByDate(out))
-
-	return out, err
-}
-
 func (com *Command) Write(record Record) error {
 	l := logger.New(Name, "Command", "Write")
 	if com.DataPath == "" {
@@ -814,30 +658,30 @@ func (com *Command) Commit(record Record) error {
 	return nil
 }
 
-func (com *Command) runStopTrackingProject(project string) error {
-	active, err := com.getProjectActiveTracks(project)
+func (com *Command) getProjects() ([]string, error) {
+	return Projects(com.DataPath, com.StartTime, com.EndTime)
+}
+
+func (com *Command) getProjectSubprojects(project string) ([]string, error) {
+	projects, err := com.getProjects()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	if len(active) == 0 {
-		return nil
-	}
+	subprojects := ProjectSubprojects(project, projects)
+	return subprojects, nil
+}
 
-	for _, track := range active {
-		track := Track{
-			Project:   project,
-			TimeStamp: com.TimeStamp,
-			Value:     track.Value,
-		}
+func (com *Command) checkProjectExists(project string) bool {
+	return ProjectExists(project, com.DataPath)
+}
 
-		err := com.Write(track)
-		if err != nil {
-			return err
-		}
-	}
+func (com *Command) getProjectNotes(project string) ([]Note, error) {
+	return ProjectNotes(project, com.DataPath, com.StartTime, com.EndTime)
+}
 
-	return nil
+func (com *Command) getProjectTodos(project string) ([]Todo, error) {
+	return ProjectTodos(project, com.DataPath)
 }
 
 func (com *Command) getProjectActiveTracks(project string) ([]Track, error) {
@@ -878,28 +722,164 @@ func (com *Command) getProjectActiveTracks(project string) ([]Track, error) {
 	return out, nil
 }
 
-func (com *Command) getProjects() ([]string, error) {
-	return Projects(com.DataPath, com.StartTime, com.EndTime)
+func (com *Command) getProjectTracks(project string) ([]Track, error) {
+	if com.DataPath == "" {
+		return nil, errgo.New("datapath can not be empty")
+	}
+	if project == "" {
+		return nil, errgo.New("project name can not be empty")
+	}
+	if !com.checkProjectExists(project) {
+		return nil, errgo.New("project does not exist")
+	}
+
+	filepath := filepath.Join(com.DataPath, project+".csv")
+	file, err := os.OpenFile(filepath, os.O_RDONLY, 0640)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	reader := csv.NewReader(file)
+	reader.FieldsPerRecord = 3
+
+	var out []Track
+	for {
+		csv, err := reader.Read()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+
+			continue
+		}
+
+		track, err := TrackFromCSV(csv)
+		if err != nil {
+			continue
+		}
+
+		out = append(out, track)
+	}
+	sort.Sort(TracksByDate(out))
+
+	return out, err
 }
 
-func (com *Command) getProjectSubprojects(project string) ([]string, error) {
+func (com *Command) runStopTrackingProject(project string) error {
+	active, err := com.getProjectActiveTracks(project)
+	if err != nil {
+		return err
+	}
+
+	if len(active) == 0 {
+		return nil
+	}
+
+	for _, track := range active {
+		track := Track{
+			Project:   project,
+			TimeStamp: com.TimeStamp,
+			Value:     track.Value,
+		}
+
+		err := com.Write(track)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (com *Command) getProjectDates(project string) ([]string, error) {
+	if com.DataPath == "" {
+		return nil, errgo.New("datapath can not be empty")
+	}
+	if project == "" {
+		return nil, errgo.New("project name can not be empty")
+	}
+	if !com.checkProjectExists(project) {
+		return nil, errgo.New("project does not exist")
+	}
+
+	var out []string
+
+	notes, err := com.getProjectNotes(project)
+	if err != nil {
+		return nil, err
+	}
+
+	todos, err := com.getProjectTodos(project)
+	if err != nil {
+		return nil, err
+	}
+	todos = FilterInactiveTodos(todos)
+
+	datemap := make(map[string]struct{})
+
+	for _, note := range notes {
+		date, err := time.Parse(RecordTimeStampFormat, note.GetTimeStamp())
+		if err != nil {
+			return nil, err
+		}
+
+		datemap[date.Format(DateFormat)] = struct{}{}
+	}
+
+	for _, todo := range todos {
+		datemap[todo.TimeStamp.Format(DateFormat)] = struct{}{}
+	}
+
+	for date := range datemap {
+		out = append(out, date)
+	}
+
+	return out, nil
+}
+
+func (com *Command) getDates() ([]string, error) {
 	projects, err := com.getProjects()
 	if err != nil {
 		return nil, err
 	}
 
-	subprojects := ProjectSubprojects(project, projects)
-	return subprojects, nil
+	datemap := make(map[string]struct{})
+	for _, project := range projects {
+		dates, err := com.getProjectDates(project)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, date := range dates {
+			datemap[date] = struct{}{}
+		}
+	}
+
+	var out []string
+	for date := range datemap {
+		out = append(out, date)
+	}
+
+	return out, nil
 }
 
-func (com *Command) checkProjectExists(project string) bool {
-	return ProjectExists(project, com.DataPath)
-}
+func (com *Command) runMergeFiles(srcpath, dstpath string) error {
+	srcdata, err := ioutil.ReadFile(srcpath)
+	if err != nil {
+		return errgo.New(err.Error())
+	}
 
-func (com *Command) getProjectNotes(project string) ([]Note, error) {
-	return ProjectNotes(project, com.DataPath, com.StartTime, com.EndTime)
-}
+	dstfile, err := os.OpenFile(dstpath, os.O_APPEND|os.O_WRONLY, 0600)
+	if err != nil {
+		return errgo.New(err.Error())
+	}
+	defer dstfile.Close()
 
-func (com *Command) getProjectTodos(project string) ([]Todo, error) {
-	return ProjectTodos(project, com.DataPath)
+	_, err = dstfile.Write(srcdata)
+	if err != nil {
+		return errgo.New(err.Error())
+	}
+
+	return nil
 }
