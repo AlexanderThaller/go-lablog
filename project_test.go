@@ -1,6 +1,9 @@
 package main
 
-import "testing"
+import (
+	"testing"
+	"time"
+)
 
 const (
 	DataPath = "testdata"
@@ -13,8 +16,8 @@ func BenchmarkProjectsFiles(b *testing.B) {
 }
 
 func BenchmarkProjects(b *testing.B) {
-  start := time.Time{}
-  end := time.Time{}
+	start := time.Time{}
+	end := time.Time{}
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
