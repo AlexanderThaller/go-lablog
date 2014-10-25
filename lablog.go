@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"runtime"
 	"time"
 	"bitbucket.org/kardianos/osext"
 
@@ -40,6 +41,7 @@ const (
 
 func init() {
 	l := logger.New(Name, "init")
+	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	home, err := homedir.Dir()
 	if err != nil {

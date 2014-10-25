@@ -1,9 +1,14 @@
 package main
 
 import (
+	"runtime"
 	"testing"
 	"time"
 )
+
+func init() {
+	runtime.GOMAXPROCS(runtime.NumCPU())
+}
 
 const (
 	Project  = "Test1"

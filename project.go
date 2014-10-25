@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/AlexanderThaller/logger"
@@ -96,12 +97,30 @@ func Projects(datapath string, start, end time.Time) ([]string, error) {
 		return nil, err
 	}
 
-	var out []string
+	checker := make(chan string, 5000)
+	var wg sync.WaitGroup
+
 	for _, project := range projects {
-		if ProjectWasActive(project, datapath, start, end) {
-			out = append(out, project)
-		}
+		wg.Add(1)
+		go func(project string) {
+			if ProjectWasActive(project, datapath, start, end) {
+				checker <- project
+			} else {
+				wg.Done()
+			}
+		}(project)
 	}
+
+	var out []string
+	go func() {
+		for {
+			project := <-checker
+			out = append(out, project)
+			wg.Done()
+		}
+	}()
+
+	wg.Wait()
 	sort.Strings(out)
 
 	return out, nil
@@ -120,6 +139,7 @@ func ProjectWasActive(project, datapath string, start, end time.Time) bool {
 }
 
 func ProjectHasNotes(project, datapath string, start, end time.Time) bool {
+	//TODO: We don't have to read every note for checking if there is one note
 	notes, _ := ProjectNotes(project, datapath, start, end)
 	if len(notes) != 0 {
 		return true
@@ -129,6 +149,7 @@ func ProjectHasNotes(project, datapath string, start, end time.Time) bool {
 }
 
 func ProjectHasTodos(project, datapath string, start, end time.Time) bool {
+	//TODO: We don't have to read every todo for checking if there is one todo
 	todos, _ := ProjectTodos(project, datapath, start, end)
 	if len(todos) != 0 {
 		return true
