@@ -6,13 +6,13 @@ import (
 )
 
 const (
-  Project = "Test1"
+	Project  = "Test1"
 	DataPath = "testdata"
 )
 
 var (
-  StartTime = time.Time{}
-  EndTime = time.Time{}
+	StartTime = time.Time{}
+	EndTime   = time.Time{}
 )
 
 func BenchmarkProjectsFiles(b *testing.B) {
@@ -42,5 +42,17 @@ func BenchmarkProjectHasNotes(b *testing.B) {
 func BenchmarkProjectHasTodos(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		ProjectHasTodos(Project, DataPath, StartTime, EndTime)
+	}
+}
+
+func BenchmarkProjectNotes(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		ProjectNotes(Project, DataPath, StartTime, EndTime)
+	}
+}
+
+func BenchmarkProjectTodos(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		ProjectTodos(Project, DataPath, StartTime, EndTime)
 	}
 }
