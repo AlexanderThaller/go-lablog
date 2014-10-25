@@ -37,3 +37,6 @@ dependencies_save:
 
 dependencies_restore:
 	godep restore ./...
+
+bench:
+	go test -test.benchmem=true -test.bench . 2> /dev/null
