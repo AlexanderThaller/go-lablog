@@ -96,40 +96,45 @@ func Projects(datapath string, start, end time.Time) ([]string, error) {
 		return nil, err
 	}
 
-	out := make(map[string]struct{})
+	var out []string
 	for _, project := range projects {
-		notes, err := ProjectNotes(project, datapath, start, end)
-		if err != nil {
-			return nil, err
+		if ProjectWasActive(project, datapath, start, end) {
+			out = append(out, project)
 		}
+	}
+	sort.Strings(out)
 
-		if len(notes) == 0 {
-			continue
-		}
+	return out, nil
+}
 
-		out[project] = struct{}{}
+func ProjectWasActive(project, datapath string, start, end time.Time) bool {
+	if ProjectHasNotes(project, datapath, start, end) {
+		return true
 	}
 
-	for _, project := range projects {
-		todos, err := ProjectTodos(project, datapath)
-		if err != nil {
-			return nil, err
-		}
-
-		if len(todos) == 0 {
-			continue
-		}
-
-		out[project] = struct{}{}
+	if ProjectHasTodos(project, datapath, start, end) {
+		return true
 	}
 
-	var outsort []string
-	for project := range out {
-		outsort = append(outsort, project)
-	}
-	sort.Strings(outsort)
+	return false
+}
 
-	return outsort, nil
+func ProjectHasNotes(project, datapath string, start, end time.Time) bool {
+	notes, _ := ProjectNotes(project, datapath, start, end)
+	if len(notes) != 0 {
+		return true
+	}
+
+	return false
+}
+
+func ProjectHasTodos(project, datapath string, start, end time.Time) bool {
+	todos, _ := ProjectTodos(project, datapath, start, end)
+	if len(todos) != 0 {
+		return true
+	}
+
+	return false
 }
 
 func ProjectSubprojects(project, datapath string, start, end time.Time) ([]string, error) {
@@ -211,7 +216,7 @@ func ProjectNotes(project, datapath string, start, end time.Time) ([]Note, error
 	return out, err
 }
 
-func ProjectTodos(project, datapath string) ([]Todo, error) {
+func ProjectTodos(project, datapath string, start, end time.Time) ([]Todo, error) {
 	if datapath == "" {
 		return nil, errgo.New("datapath can not be empty")
 	}
@@ -245,6 +250,14 @@ func ProjectTodos(project, datapath string) ([]Todo, error) {
 
 		todo, err := TodoFromCSV(csv)
 		if err != nil {
+			continue
+		}
+
+		if todo.TimeStamp.Before(start) {
+			continue
+		}
+
+		if todo.TimeStamp.After(end) {
 			continue
 		}
 
@@ -287,7 +300,7 @@ func ProjectDates(project, datapath string, start, end time.Time) ([]string, err
 		return nil, err
 	}
 
-	todos, err := ProjectTodos(project, datapath)
+	todos, err := ProjectTodos(project, datapath, start, end)
 	if err != nil {
 		return nil, err
 	}

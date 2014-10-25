@@ -671,7 +671,7 @@ func (com *Command) getProjectNotes(project string) ([]Note, error) {
 }
 
 func (com *Command) getProjectTodos(project string) ([]Todo, error) {
-	return ProjectTodos(project, com.DataPath)
+	return ProjectTodos(project, com.DataPath, com.StartTime, com.EndTime)
 }
 
 func (com *Command) getProjectDates(project string) ([]string, error) {
