@@ -72,7 +72,7 @@ func (com *Command) Run() error {
 	case ActionList:
 		return com.runList()
 	case ActionListNotes:
-		return com.runListCommand(com.runListNotesAndSubnotes)
+		return com.runNotes()
 	case ActionListProjects:
 		return com.runListProjects()
 	case ActionListTodos:
@@ -181,10 +181,18 @@ func (com *Command) runList() error {
 		return err
 	}
 	if len(notes) != 0 {
-		return com.runListNotesAndSubnotes(com.Project)
+		return com.runListProjectNotesAndSubnotes(com.Project)
 	}
 
 	return com.runListProjectTodosAndSubtodos(com.Project)
+}
+
+func (com *Command) runNotes() error {
+	if com.Project == "" {
+		return com.runListCommand(com.runListProjectNotes)
+	}
+
+	return com.runListProjectNotesAndSubnotes(com.Project)
 }
 
 func (com *Command) runListCommand(command listCommand) error {
@@ -258,66 +266,6 @@ func (com *Command) runListDates() error {
 	return nil
 }
 
-func (com *Command) runListNotesAndSubnotes(project string) error {
-	err := com.runListProjectNotes(project)
-	if err != nil {
-		return err
-	}
-
-	if com.NoSubprojects {
-		return nil
-	}
-
-	subprojects, err := com.getProjectSubprojects(project)
-	if err != nil {
-		return err
-	}
-
-	for _, subproject := range subprojects {
-		err := com.runListProjectNotes(subproject)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (com *Command) runListProjectTracksDurations(project string) error {
-	tracks, err := com.getProjectTracks(project)
-	if err != nil {
-		return err
-	}
-
-	starttracks := make(map[string]Track)
-	durations := make(map[string]time.Duration)
-	active := make(map[string]bool)
-	for _, track := range tracks {
-		if !active[track.Value] {
-			starttracks[track.Value] = track
-			active[track.Value] = true
-			continue
-		}
-
-		startrack := starttracks[track.Value]
-		duration := track.TimeStamp.Sub(startrack.TimeStamp)
-		durations[track.Value] += duration
-		active[track.Value] = false
-	}
-
-	if len(durations) == 0 {
-		return nil
-	}
-
-	fmt.Println("#", project, "- Durations")
-	for value, duration := range durations {
-		fmt.Println(value, "-", duration)
-	}
-	fmt.Println()
-
-	return nil
-}
-
 func (com *Command) runListProjectNotes(project string) error {
 	if project == "" {
 		return errgo.New("project name can not be empty")
@@ -354,8 +302,8 @@ func (com *Command) runListProjectNotes(project string) error {
 	return nil
 }
 
-func (com *Command) runListProjectTodosAndSubtodos(project string) error {
-	err := com.runListProjectTodos(project)
+func (com *Command) runListProjectNotesAndSubnotes(project string) error {
+	err := com.runListProjectNotes(project)
 	if err != nil {
 		return err
 	}
@@ -370,7 +318,7 @@ func (com *Command) runListProjectTodosAndSubtodos(project string) error {
 	}
 
 	for _, subproject := range subprojects {
-		err := com.runListProjectTodos(subproject)
+		err := com.runListProjectNotes(subproject)
 		if err != nil {
 			return err
 		}
@@ -409,6 +357,31 @@ func (com *Command) runListProjectTodos(project string) error {
 		fmt.Println(todo)
 	}
 	fmt.Println("")
+
+	return nil
+}
+
+func (com *Command) runListProjectTodosAndSubtodos(project string) error {
+	err := com.runListProjectTodos(project)
+	if err != nil {
+		return err
+	}
+
+	if com.NoSubprojects {
+		return nil
+	}
+
+	subprojects, err := com.getProjectSubprojects(project)
+	if err != nil {
+		return err
+	}
+
+	for _, subproject := range subprojects {
+		err := com.runListProjectTodos(subproject)
+		if err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
@@ -500,6 +473,41 @@ func (com *Command) runProjectStopTracking(project string) error {
 			return err
 		}
 	}
+
+	return nil
+}
+
+func (com *Command) runListProjectTracksDurations(project string) error {
+	tracks, err := com.getProjectTracks(project)
+	if err != nil {
+		return err
+	}
+
+	starttracks := make(map[string]Track)
+	durations := make(map[string]time.Duration)
+	active := make(map[string]bool)
+	for _, track := range tracks {
+		if !active[track.Value] {
+			starttracks[track.Value] = track
+			active[track.Value] = true
+			continue
+		}
+
+		startrack := starttracks[track.Value]
+		duration := track.TimeStamp.Sub(startrack.TimeStamp)
+		durations[track.Value] += duration
+		active[track.Value] = false
+	}
+
+	if len(durations) == 0 {
+		return nil
+	}
+
+	fmt.Println("#", project, "- Durations")
+	for value, duration := range durations {
+		fmt.Println(value, "-", duration)
+	}
+	fmt.Println()
 
 	return nil
 }
