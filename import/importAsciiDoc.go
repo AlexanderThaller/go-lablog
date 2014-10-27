@@ -62,64 +62,75 @@ func main() {
 	var project string
 	var timestamp time.Time
 	var value string
+	var inverbatimenv bool
 	for scanner.Scan() {
 		entry := scanner.Text()
 
-		if strings.HasPrefix(entry, "==== ") ||
-			strings.HasPrefix(entry, "===== ") ||
-			strings.HasPrefix(entry, "====== ") {
-
-			value += strings.TrimPrefix(entry, "===")
-			value += "\n"
-			continue
+		if strings.HasPrefix(entry, "----") {
+			if inverbatimenv {
+				inverbatimenv = false
+			} else {
+				inverbatimenv = true
+			}
 		}
 
-		if strings.HasPrefix(entry, "=== ") {
-			oldtimestamp := timestamp
-			entrytrim := strings.TrimPrefix(entry, "=== ")
-			stamp, err := now.Parse(entrytrim)
-			if err != nil {
-				l.Alert("Can not parse timestamp: ", err)
-				return
-			}
-			timestamp = stamp
+		if !inverbatimenv {
+			if strings.HasPrefix(entry, "==== ") ||
+				strings.HasPrefix(entry, "===== ") ||
+				strings.HasPrefix(entry, "====== ") {
 
-			if oldtimestamp.Equal(time.Time{}) {
+				value += strings.TrimPrefix(entry, "===")
+				value += "\n"
 				continue
 			}
 
-			note := Note{
-				Project:   project,
-				TimeStamp: timestamp,
-				Value:     value,
-			}
-			fmt.Printf("note: %+v\n", note)
-			value = ""
+			if strings.HasPrefix(entry, "=== ") {
+				oldtimestamp := timestamp
+				entrytrim := strings.TrimPrefix(entry, "=== ")
+				stamp, err := now.Parse(entrytrim)
+				if err != nil {
+					l.Alert("Can not parse timestamp: ", err)
+					return
+				}
+				timestamp = stamp
 
-			notes = append(notes, note)
-			continue
-		}
+				if oldtimestamp.Equal(time.Time{}) {
+					continue
+				}
 
-		if strings.HasPrefix(entry, "== ") {
-			oldproject := project
-			entrytrim := strings.TrimPrefix(entry, "== ")
-			project = entrytrim
+				note := Note{
+					Project:   project,
+					TimeStamp: oldtimestamp,
+					Value:     value,
+				}
+				fmt.Printf("note: %+v\n", note)
+				value = ""
 
-			if oldproject == "" {
+				notes = append(notes, note)
 				continue
 			}
 
-			note := Note{
-				Project:   project,
-				TimeStamp: timestamp,
-				Value:     value,
-			}
-			fmt.Printf("note: %+v\n", note)
-			value = ""
-			timestamp = time.Time{}
+			if strings.HasPrefix(entry, "== ") {
+				oldproject := project
+				entrytrim := strings.TrimPrefix(entry, "== ")
+				project = entrytrim
 
-			notes = append(notes, note)
-			continue
+				if oldproject == "" {
+					continue
+				}
+
+				note := Note{
+					Project:   oldproject,
+					TimeStamp: timestamp,
+					Value:     value,
+				}
+				fmt.Printf("note: %+v\n", note)
+				value = ""
+				timestamp = time.Time{}
+
+				notes = append(notes, note)
+				continue
+			}
 		}
 
 		value += entry
