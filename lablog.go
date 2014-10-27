@@ -8,6 +8,7 @@ import (
 	"path"
 	"runtime"
 	"time"
+
 	"bitbucket.org/kardianos/osext"
 
 	"github.com/AlexanderThaller/logger"

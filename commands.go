@@ -298,6 +298,7 @@ func (com *Command) runListProjectNotes(project string, indent int) error {
 
 	section := strings.Repeat("=", indent)
 	fmt.Println(section, project)
+	fmt.Println("")
 	for _, note := range notes {
 		fmt.Println(section+"=", note.GetTimeStamp())
 
