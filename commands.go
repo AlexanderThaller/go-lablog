@@ -194,8 +194,12 @@ func (com *Command) runNotes() error {
 	}
 
 	fmt.Println("=", com.Project)
-	fmt.Println(":toc:")
+	fmt.Println(`:toc:`)
+	fmt.Println(`:doctype: book`)
+	fmt.Println(`:source-highlighter: coderay`)
+	fmt.Println(`:listing-caption: Listing`)
 	fmt.Println("")
+
 	return com.runListProjectNotesAndSubnotes(com.Project, 2)
 }
 
@@ -210,8 +214,12 @@ func (com *Command) runListCommand(command listCommand) error {
 	}
 
 	fmt.Println("=", "Lablog")
-	fmt.Println(":toc:")
+	fmt.Println(`:toc:`)
+	fmt.Println(`:doctype: book`)
+	fmt.Println(`:source-highlighter: coderay`)
+	fmt.Println(`:listing-caption: Listing`)
 	fmt.Println("")
+
 	for _, project := range projects {
 		err := command(project, 2)
 		if err != nil {
