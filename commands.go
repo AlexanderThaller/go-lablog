@@ -10,6 +10,7 @@ import (
 	"sort"
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/AlexanderThaller/logger"
 	"github.com/jinzhu/now"
@@ -223,7 +224,9 @@ func (com *Command) runListCommand(command listCommand) error {
 		return err
 	}
 
-	fmt.Println("=", "Lablog")
+	capcommand := []rune(com.Action)
+	capcommand[0] = unicode.ToUpper(capcommand[0])
+	fmt.Println("=", "Lablog -- ", string(capcommand))
 	fmt.Println(AsciiDocSettings)
 	fmt.Println("")
 
@@ -369,7 +372,15 @@ func (com *Command) runListProjectTodos(project string, indent int) error {
 	}
 
 	section := strings.Repeat("=", indent)
-	fmt.Println(section, project, "- Todos")
+
+	var action string
+	if indent == 1 {
+		capcommand := []rune(com.Action)
+		capcommand[0] = unicode.ToUpper(capcommand[0])
+		action = "-- " + string(capcommand) + "\n"
+	}
+
+	fmt.Println(section, project, action)
 
 	var out []string
 	for _, todo := range todos {

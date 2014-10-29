@@ -10,12 +10,11 @@ import (
 	"time"
 
 	"bitbucket.org/kardianos/osext"
-
-	"github.com/AlexanderThaller/go-lablog/Godeps/_workspace/src/github.com/mitchellh/go-homedir"
 	"github.com/AlexanderThaller/logger"
 	"github.com/davecheney/profile"
 	"github.com/jinzhu/now"
 	"github.com/juju/errgo"
+	"github.com/mitchellh/go-homedir"
 )
 
 var (
