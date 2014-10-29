@@ -36,6 +36,19 @@ const (
 	DateFormat                   = "2006-01-02"
 )
 
+const AsciiDocSettings = `:toc: right
+:toclevels: 1
+:sectanchors:
+:sectlink:
+:icons: font
+:linkattrs:
+:numbered:
+:idprefix:
+:idseparator: -
+:doctype: article
+:source-highlighter: coderay
+:listing-caption: Listing`
+
 const (
 	ActionDone                = "done"
 	ActionList                = "list"
@@ -194,10 +207,7 @@ func (com *Command) runNotes() error {
 	}
 
 	fmt.Println("=", com.Project)
-	fmt.Println(`:toc:`)
-	fmt.Println(`:doctype: book`)
-	fmt.Println(`:source-highlighter: coderay`)
-	fmt.Println(`:listing-caption: Listing`)
+	fmt.Println(AsciiDocSettings)
 	fmt.Println("")
 
 	return com.runListProjectNotesAndSubnotes(com.Project, 2)
@@ -214,10 +224,7 @@ func (com *Command) runListCommand(command listCommand) error {
 	}
 
 	fmt.Println("=", "Lablog")
-	fmt.Println(`:toc:`)
-	fmt.Println(`:doctype: book`)
-	fmt.Println(`:source-highlighter: coderay`)
-	fmt.Println(`:listing-caption: Listing`)
+	fmt.Println(AsciiDocSettings)
 	fmt.Println("")
 
 	for _, project := range projects {
