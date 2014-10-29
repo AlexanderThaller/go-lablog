@@ -711,7 +711,7 @@ func (com *Command) getProjectActiveTracks(project string) ([]Track, error) {
 }
 
 func (com *Command) getProjectTracks(project string) ([]Track, error) {
-	return ProjectTracks(project, com.DataPath)
+	return ProjectTracks(project, com.DataPath, com.StartTime, com.EndTime)
 }
 
 func (com *Command) getProjectSubprojects(project string) ([]string, error) {
