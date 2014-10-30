@@ -18,6 +18,21 @@ func Test_RunNoDataPath(t *testing.T) {
 	testerr_output(t, l, err, got, expected)
 }
 
+func Test_RunDates(t *testing.T) {
+	l := logger.New(Name, "Test", "Command", "Run", "Dates")
+
+	command, buffer := testCommand(ActionDates)
+
+	expected := `2014-10-25
+2014-10-31
+`
+
+	err := command.Run()
+	got := buffer.String()
+
+	testerr_output(t, l, err, got, expected)
+}
+
 func Test_RunList(t *testing.T) {
 	l := logger.New(Name, "Test", "Command", "Run", "List")
 
