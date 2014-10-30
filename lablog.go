@@ -9,6 +9,7 @@ import (
 	"runtime"
 	"time"
 
+	"bytes"
 	"bitbucket.org/kardianos/osext"
 	"github.com/AlexanderThaller/logger"
 	"github.com/davecheney/profile"
@@ -77,7 +78,8 @@ func main() {
 		defer prof.Stop()
 	}
 
-	command := NewCommand()
+	buffer := bytes.NewBufferString("")
+	command := NewCommand(buffer)
 	command.Action = *flagAction
 	command.Args = flag.Args()
 	command.DataPath = *flagDataPath
@@ -110,6 +112,8 @@ func main() {
 		l.Alert("Problem while running command: ", errgo.Details(err))
 		os.Exit(1)
 	}
+
+	fmt.Print(buffer.String())
 }
 
 // configProfile will start profiling based on the default profile

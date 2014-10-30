@@ -28,6 +28,7 @@ type Command struct {
 	TimeStamp     time.Time
 	Value         string
 	NoSubprojects bool
+	writer        io.Writer
 }
 
 const (
@@ -53,8 +54,11 @@ const (
 	ActionTrack               = "track"
 )
 
-func NewCommand() *Command {
-	return new(Command)
+func NewCommand(writer io.Writer) *Command {
+	command := new(Command)
+	command.writer = writer
+
+	return command
 }
 
 func (com *Command) Run() error {
@@ -181,10 +185,10 @@ func (com *Command) runList() error {
 		return err
 	}
 	if len(notes) != 0 {
-		return com.runListProjectNotesAndSubnotes(os.Stdout, com.Project, 1)
+		return com.runListProjectNotesAndSubnotes(com.writer, com.Project, 1)
 	}
 
-	return com.runListProjectTodosAndSubtodos(os.Stdout, com.Project, 1)
+	return com.runListProjectTodosAndSubtodos(com.writer, com.Project, 1)
 }
 
 func (com *Command) runNotes() error {
@@ -192,16 +196,16 @@ func (com *Command) runNotes() error {
 		return com.runListCommand(com.runListProjectNotes)
 	}
 
-	FormatHeader(os.Stdout, com.Project, com.Action, 1)
+	FormatHeader(com.writer, com.Project, com.Action, 1)
 
-	return com.runListProjectNotesAndSubnotes(os.Stdout, com.Project, 2)
+	return com.runListProjectNotesAndSubnotes(com.writer, com.Project, 2)
 }
 
 func (com *Command) runListCommand(command listCommand) error {
-	FormatHeader(os.Stdout, "Lablog", com.Action, 1)
+	FormatHeader(com.writer, "Lablog", com.Action, 1)
 
 	if com.Project != "" {
-		return command(os.Stdout, com.Project, 1)
+		return command(com.writer, com.Project, 1)
 	}
 
 	projects, err := com.getProjects()
@@ -210,7 +214,7 @@ func (com *Command) runListCommand(command listCommand) error {
 	}
 
 	for _, project := range projects {
-		err := command(os.Stdout, project, 2)
+		err := command(com.writer, project, 2)
 		if err != nil {
 			return err
 		}
