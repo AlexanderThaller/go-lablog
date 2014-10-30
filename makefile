@@ -40,3 +40,9 @@ dependencies_restore:
 
 bench:
 	go test -test.benchmem=true -test.bench . 2> /dev/null
+
+coverage:
+	rm -f coverage.out
+	go test -coverprofile=coverage.out
+	go tool cover -func=coverage.out
+	go tool cover -html=coverage.out
