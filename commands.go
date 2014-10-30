@@ -1,12 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"encoding/csv"
 	"fmt"
 	"os"
 	"path"
 	"path/filepath"
-	"regexp"
 	"sort"
 	"strings"
 	"time"
@@ -36,19 +36,6 @@ const (
 	CommitMessageTimeStampFormat = RecordTimeStampFormat
 	DateFormat                   = "2006-01-02"
 )
-
-const AsciiDocSettings = `:toc: right
-:toclevels: 1
-:sectanchors:
-:sectlink:
-:icons: font
-:linkattrs:
-:numbered:
-:idprefix:
-:idseparator: -
-:doctype: article
-:source-highlighter: coderay
-:listing-caption: Listing`
 
 const (
 	ActionDone                = "done"
@@ -224,11 +211,7 @@ func (com *Command) runListCommand(command listCommand) error {
 		return err
 	}
 
-	capcommand := []rune(com.Action)
-	capcommand[0] = unicode.ToUpper(capcommand[0])
-	fmt.Println("=", "Lablog -- ", string(capcommand))
-	fmt.Println(AsciiDocSettings)
-	fmt.Println("")
+	FormatHeader(os.Stdout, com.Action)
 
 	for _, project := range projects {
 		err := command(project, 2)
@@ -292,38 +275,18 @@ func (com *Command) runListDates() error {
 }
 
 func (com *Command) runListProjectNotes(project string, indent int) error {
-	if project == "" {
-		return errgo.New("project name can not be empty")
-	}
-	if !com.checkProjectExists(project) {
-		return errgo.New("project" + project + " does not exist")
-	}
-
 	notes, err := com.getProjectNotes(project)
 	if err != nil {
 		return err
 	}
-
-	if len(notes) == 0 {
-		return nil
-	}
-
 	sort.Sort(NotesByDate(notes))
-	reg, err := regexp.Compile("(?m)^=")
+
+	buffer := bytes.NewBufferString("")
+	err = FormatNotes(buffer, project, notes, indent)
 	if err != nil {
 		return err
 	}
-
-	section := strings.Repeat("=", indent)
-	fmt.Println(section, project)
-	fmt.Println("")
-	for _, note := range notes {
-		fmt.Println(section+"=", note.GetTimeStamp())
-
-		out := reg.ReplaceAllString(note.GetValue(), section+"==")
-		fmt.Println(out)
-		fmt.Println("")
-	}
+	fmt.Print(buffer.String())
 
 	return nil
 }
