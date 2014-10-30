@@ -230,7 +230,7 @@ func (com *Command) runListProjects() error {
 	}
 
 	for _, project := range projects {
-		fmt.Println(project)
+		com.writer.Write([]byte(project + "\n"))
 	}
 
 	return nil
@@ -268,7 +268,7 @@ func (com *Command) runListDates() error {
 			continue
 		}
 
-		fmt.Println(date)
+		com.writer.Write([]byte(date + "\n"))
 	}
 
 	return nil
