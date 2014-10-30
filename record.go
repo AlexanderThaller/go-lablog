@@ -18,6 +18,7 @@ type Record interface {
 	GetProject() string
 	GetTimeStamp() string
 	GetValue() string
+	GetFormattedValue() string
 }
 
 func RecordFromCSV(values []string) (Record, error) {
@@ -137,6 +138,10 @@ func (note Note) GetValue() string {
 	return note.Value
 }
 
+func (note Note) GetFormattedValue() string {
+	return note.Value
+}
+
 func (note *Note) SetProject(project string) {
 	note.Project = project
 }
@@ -171,6 +176,10 @@ func (todo Todo) GetTimeStamp() string {
 
 func (todo Todo) GetValue() string {
 	return todo.Value
+}
+
+func (todo Todo) GetFormattedValue() string {
+	return "* " + todo.Value
 }
 
 func (todo Todo) SetProject(project string) {
@@ -233,6 +242,16 @@ func (track Track) GetTimeStamp() string {
 
 func (track Track) GetValue() string {
 	return track.Value
+}
+
+func (track Track) GetFormattedValue() string {
+	out := "  * " + track.GetTimeStamp()
+
+	if track.Value != "" {
+		out += " - " + track.Value
+	}
+
+	return out
 }
 
 type TracksByDate []Track

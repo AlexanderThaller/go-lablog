@@ -15,7 +15,7 @@ func Test_FormatHeader(t *testing.T) {
 	expected += AsciiDocSettings + "\n\n"
 
 	buffer := bytes.NewBufferString("")
-	FormatHeader(buffer, "notes")
+	FormatHeader(buffer, "Lablog", ActionListNotes, 1)
 	got := buffer.String()
 	if got != expected {
 		l.Error("Did not get the expected output")

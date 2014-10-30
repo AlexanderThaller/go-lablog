@@ -1,16 +1,14 @@
 package main
 
 import (
-	"bytes"
 	"encoding/csv"
 	"fmt"
+	"io"
 	"os"
 	"path"
 	"path/filepath"
 	"sort"
-	"strings"
 	"time"
-	"unicode"
 
 	"github.com/AlexanderThaller/logger"
 	"github.com/jinzhu/now"
@@ -167,7 +165,7 @@ func (com *Command) Write(record Record) error {
 	return nil
 }
 
-type listCommand func(string, int) error
+type listCommand func(io.Writer, string, int) error
 
 func (com *Command) runList() error {
 	if com.Project == "" {
@@ -183,10 +181,10 @@ func (com *Command) runList() error {
 		return err
 	}
 	if len(notes) != 0 {
-		return com.runListProjectNotesAndSubnotes(com.Project, 1)
+		return com.runListProjectNotesAndSubnotes(os.Stdout, com.Project, 1)
 	}
 
-	return com.runListProjectTodosAndSubtodos(com.Project, 1)
+	return com.runListProjectTodosAndSubtodos(os.Stdout, com.Project, 1)
 }
 
 func (com *Command) runNotes() error {
@@ -194,16 +192,16 @@ func (com *Command) runNotes() error {
 		return com.runListCommand(com.runListProjectNotes)
 	}
 
-	fmt.Println("=", com.Project)
-	fmt.Println(AsciiDocSettings)
-	fmt.Println("")
+	FormatHeader(os.Stdout, com.Project, com.Action, 1)
 
-	return com.runListProjectNotesAndSubnotes(com.Project, 2)
+	return com.runListProjectNotesAndSubnotes(os.Stdout, com.Project, 2)
 }
 
 func (com *Command) runListCommand(command listCommand) error {
+	FormatHeader(os.Stdout, "Lablog", com.Action, 1)
+
 	if com.Project != "" {
-		return command(com.Project, 1)
+		return command(os.Stdout, com.Project, 1)
 	}
 
 	projects, err := com.getProjects()
@@ -211,10 +209,8 @@ func (com *Command) runListCommand(command listCommand) error {
 		return err
 	}
 
-	FormatHeader(os.Stdout, com.Action)
-
 	for _, project := range projects {
-		err := command(project, 2)
+		err := command(os.Stdout, project, 2)
 		if err != nil {
 			return err
 		}
@@ -274,25 +270,23 @@ func (com *Command) runListDates() error {
 	return nil
 }
 
-func (com *Command) runListProjectNotes(project string, indent int) error {
+func (com *Command) runListProjectNotes(writer io.Writer, project string, indent int) error {
 	notes, err := com.getProjectNotes(project)
 	if err != nil {
 		return err
 	}
 	sort.Sort(NotesByDate(notes))
 
-	buffer := bytes.NewBufferString("")
-	err = FormatNotes(buffer, project, notes, indent)
+	err = FormatNotes(writer, project, notes, indent)
 	if err != nil {
 		return err
 	}
-	fmt.Print(buffer.String())
 
 	return nil
 }
 
-func (com *Command) runListProjectNotesAndSubnotes(project string, indent int) error {
-	err := com.runListProjectNotes(project, indent)
+func (com *Command) runListProjectNotesAndSubnotes(writer io.Writer, project string, indent int) error {
+	err := com.runListProjectNotes(writer, project, indent)
 	if err != nil {
 		return err
 	}
@@ -307,7 +301,7 @@ func (com *Command) runListProjectNotesAndSubnotes(project string, indent int) e
 	}
 
 	for _, subproject := range subprojects {
-		err := com.runListProjectNotes(subproject, indent+1)
+		err := com.runListProjectNotes(writer, subproject, indent+1)
 		if err != nil {
 			return err
 		}
@@ -316,51 +310,23 @@ func (com *Command) runListProjectNotesAndSubnotes(project string, indent int) e
 	return nil
 }
 
-func (com *Command) runListProjectTodos(project string, indent int) error {
-	if project == "" {
-		return errgo.New("project name can not be empty")
-	}
-	if !com.checkProjectExists(project) {
-		return errgo.New("the project does not exist")
-	}
-
+func (com *Command) runListProjectTodos(writer io.Writer, project string, indent int) error {
 	todos, err := com.getProjectTodos(project)
 	if err != nil {
 		return err
 	}
 	todos = FilterInactiveTodos(todos)
 
-	if len(todos) == 0 {
-		return nil
+	err = FormatTodos(writer, project, todos, indent)
+	if err != nil {
+		return err
 	}
-
-	section := strings.Repeat("=", indent)
-
-	var action string
-	if indent == 1 {
-		capcommand := []rune(com.Action)
-		capcommand[0] = unicode.ToUpper(capcommand[0])
-		action = "-- " + string(capcommand) + "\n"
-	}
-
-	fmt.Println(section, project, action)
-
-	var out []string
-	for _, todo := range todos {
-		out = append(out, "  * "+todo.GetValue())
-	}
-	sort.Strings(out)
-
-	for _, todo := range out {
-		fmt.Println(todo)
-	}
-	fmt.Println("")
 
 	return nil
 }
 
-func (com *Command) runListProjectTodosAndSubtodos(project string, indent int) error {
-	err := com.runListProjectTodos(project, indent)
+func (com *Command) runListProjectTodosAndSubtodos(writer io.Writer, project string, indent int) error {
+	err := com.runListProjectTodos(writer, project, indent)
 	if err != nil {
 		return err
 	}
@@ -375,7 +341,7 @@ func (com *Command) runListProjectTodosAndSubtodos(project string, indent int) e
 	}
 
 	for _, subproject := range subprojects {
-		err := com.runListProjectTodos(subproject, indent+1)
+		err := com.runListProjectTodos(writer, subproject, indent+1)
 		if err != nil {
 			return err
 		}
@@ -384,83 +350,42 @@ func (com *Command) runListProjectTodosAndSubtodos(project string, indent int) e
 	return nil
 }
 
-func (com *Command) runListProjectTracks(project string, indent int) error {
-	if project == "" {
-		return errgo.New("project name can not be empty")
-	}
-	if !com.checkProjectExists(project) {
-		return errgo.New("the project does not exist")
-	}
-
+func (com *Command) runListProjectTracks(writer io.Writer, project string, indent int) error {
 	tracks, err := com.getProjectTracks(project)
 	if err != nil {
 		return err
 	}
 
-	if len(tracks) == 0 {
-		return nil
-	}
-
-	section := strings.Repeat("=", indent)
-	fmt.Println(section, project, "- Tracks")
-
-	for _, track := range tracks {
-		out := "  * " + track.GetTimeStamp()
-
-		if track.Value != "" {
-			out += " - " + track.Value
-		}
-
-		fmt.Println(out)
-	}
-	fmt.Println("")
-
-	return nil
-}
-
-func (com *Command) runListProjectActiveTracks(project string, indent int) error {
-	if project == "" {
-		return errgo.New("project name can not be empty")
-	}
-	if !com.checkProjectExists(project) {
-		return errgo.New("the project does not exist")
-	}
-
-	tracks, err := com.getProjectActiveTracks(project)
+	err = FormatTracks(writer, project, tracks, indent)
 	if err != nil {
 		return err
 	}
 
-	if len(tracks) == 0 {
-		return nil
+	return nil
+}
+
+func (com *Command) runListProjectActiveTracks(writer io.Writer, project string, indent int) error {
+	active, err := com.getProjectActiveTracks(project)
+	if err != nil {
+		return err
 	}
 
-	section := strings.Repeat("=", indent)
-	fmt.Println(section, project, "- ActiveTracks")
-
-	for _, track := range tracks {
-		out := "* " + track.GetTimeStamp()
-
-		if track.Value != "" {
-			out += " -- " + track.Value
-		}
-
-		fmt.Println(out)
-	}
+	err = FormatTracks(writer, project, active, indent)
 
 	return nil
 }
 
-func (com *Command) runProjectStopTracking(project string, indent int) error {
+func (com *Command) runProjectStopTracking(writer io.Writer, project string, indent int) error {
 	active, err := com.getProjectActiveTracks(project)
 	if err != nil {
 		return err
 	}
 
 	if len(active) == 0 {
-		return nil
+		return errgo.New("no active tracks we could stop")
 	}
 
+	FormatTracks(writer, project, active, indent)
 	for _, track := range active {
 		track := Track{
 			Project:   project,
@@ -477,7 +402,7 @@ func (com *Command) runProjectStopTracking(project string, indent int) error {
 	return nil
 }
 
-func (com *Command) runListProjectTracksDurations(project string, indent int) error {
+func (com *Command) runListProjectTracksDurations(writer io.Writer, project string, indent int) error {
 	tracks, err := com.getProjectTracks(project)
 	if err != nil {
 		return err
@@ -499,16 +424,7 @@ func (com *Command) runListProjectTracksDurations(project string, indent int) er
 		active[track.Value] = false
 	}
 
-	if len(durations) == 0 {
-		return nil
-	}
-
-	section := strings.Repeat("=", indent)
-	fmt.Println(section, project, "- Durations")
-	for value, duration := range durations {
-		fmt.Println(value, "-", duration)
-	}
-	fmt.Println()
+	FormatDurations(writer, project, durations, indent)
 
 	return nil
 }
