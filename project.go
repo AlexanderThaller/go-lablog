@@ -377,7 +377,7 @@ func ProjectDates(project, datapath string, start, end time.Time) ([]string, err
 	if project == "" {
 		return nil, errgo.New("project name can not be empty")
 	}
-	if ProjectExists(project, datapath) {
+	if !ProjectExists(project, datapath) {
 		return nil, errgo.New("project does not exist")
 	}
 

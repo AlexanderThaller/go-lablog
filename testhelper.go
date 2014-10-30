@@ -20,12 +20,14 @@ var (
 	EndTime   = time.Time{}
 )
 
-func testCommand() (*Command, *bytes.Buffer) {
+func testCommand(action string) (*Command, *bytes.Buffer) {
 	buffer := bytes.NewBufferString("")
 	command := NewCommand(buffer)
+
 	command.DataPath = TestDataPath
-	command.StartTime = time.Time{}
 	command.EndTime = time.Now()
+	command.StartTime = time.Time{}
+	command.Action = action
 
 	return command, buffer
 }

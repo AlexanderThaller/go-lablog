@@ -26,3 +26,4 @@ _testmain.go
 go-lablog
 lablog
 profile
+coverage.out

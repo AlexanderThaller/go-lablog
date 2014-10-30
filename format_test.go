@@ -16,7 +16,7 @@ func Test_FormatHeader(t *testing.T) {
 
 	buffer := bytes.NewBufferString("")
 
-	FormatHeader(buffer, "Lablog", ActionListNotes, 1)
+	FormatHeader(buffer, "Lablog", ActionNotes, 1)
 	got := buffer.String()
 
 	testerr_output(t, l, nil, got, expected)

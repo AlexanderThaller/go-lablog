@@ -37,21 +37,21 @@ const (
 )
 
 const (
-	ActionDone                = "done"
-	ActionList                = "list"
-	ActionListActiveTracks    = "activetracks"
-	ActionListDates           = "dates"
-	ActionListNotes           = "notes"
-	ActionListProjects        = "projects"
-	ActionListTodos           = "todos"
-	ActionListTracks          = "tracks"
-	ActionListTracksDurations = "durations"
-	ActionMerge               = "merge"
-	ActionNote                = "note"
-	ActionRename              = "rename"
-	ActionStopTracking        = "stoptrack"
-	ActionTodo                = "todo"
-	ActionTrack               = "track"
+	ActionDates           = "dates"
+	ActionDone            = "done"
+	ActionList            = "list"
+	ActionMerge           = "merge"
+	ActionNote            = "note"
+	ActionNotes           = "notes"
+	ActionProjects        = "projects"
+	ActionRename          = "rename"
+	ActionTodo            = "todo"
+	ActionTodos           = "todos"
+	ActionTrack           = "track"
+	ActionTrackStop       = "trackstop"
+	ActionTracks          = "tracks"
+	ActionTracksActive    = "tracksactive"
+	ActionTracksDurations = "durations"
 )
 
 func NewCommand(writer io.Writer) *Command {
@@ -67,35 +67,35 @@ func (com *Command) Run() error {
 	}
 
 	switch com.Action {
+	case ActionDates:
+		return com.runListDates()
 	case ActionDone:
 		return com.runDone()
-	case ActionNote:
-		return com.runNote()
-	case ActionListDates:
-		return com.runListDates()
 	case ActionList:
 		return com.runList()
-	case ActionListNotes:
-		return com.runNotes()
-	case ActionListProjects:
-		return com.runListProjects()
-	case ActionListTodos:
-		return com.runListCommand(com.runListProjectTodosAndSubtodos)
-	case ActionListTracks:
-		return com.runListCommand(com.runListProjectTracks)
-	case ActionTodo:
-		return com.runTodo()
-	case ActionRename:
-		return com.runRename()
 	case ActionMerge:
 		return com.runMerge()
+	case ActionNote:
+		return com.runNote()
+	case ActionNotes:
+		return com.runNotes()
+	case ActionProjects:
+		return com.runListProjects()
+	case ActionRename:
+		return com.runRename()
+	case ActionTodo:
+		return com.runTodo()
+	case ActionTodos:
+		return com.runListCommand(com.runListProjectTodosAndSubtodos)
 	case ActionTrack:
 		return com.runTrack()
-	case ActionStopTracking:
-		return com.runListCommand(com.runProjectStopTracking)
-	case ActionListActiveTracks:
+	case ActionTrackStop:
+		return com.runListCommand(com.runProjectTrackStop)
+	case ActionTracks:
+		return com.runListCommand(com.runListProjectTracks)
+	case ActionTracksActive:
 		return com.runListCommand(com.runListProjectActiveTracks)
-	case ActionListTracksDurations:
+	case ActionTracksDurations:
 		return com.runListCommand(com.runListProjectTracksDurations)
 	default:
 		return errgo.New("Do not recognize the action: " + com.Action)
@@ -379,7 +379,7 @@ func (com *Command) runListProjectActiveTracks(writer io.Writer, project string,
 	return nil
 }
 
-func (com *Command) runProjectStopTracking(writer io.Writer, project string, indent int) error {
+func (com *Command) runProjectTrackStop(writer io.Writer, project string, indent int) error {
 	active, err := com.getProjectActiveTracks(project)
 	if err != nil {
 		return err

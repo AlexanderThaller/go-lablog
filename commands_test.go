@@ -6,10 +6,22 @@ import (
 	"github.com/AlexanderThaller/logger"
 )
 
-func Test_runListProjects(t *testing.T) {
-	l := logger.New(Name, "Test", "Command", "runListProjects")
+func Test_RunNoDataPath(t *testing.T) {
+	l := logger.New(Name, "Test", "Command", "Run", "NoDataPath")
 
-	command, buffer := testCommand()
+	command := new(Command)
+	err := command.Run()
+
+	got := err.Error()
+	expected := "the datapath can not be empty"
+
+	testerr_output(t, l, err, got, expected)
+}
+
+func Test_RunList(t *testing.T) {
+	l := logger.New(Name, "Test", "Command", "Run", "List")
+
+	command, buffer := testCommand(ActionList)
 
 	expected := `Test1
 Test10
@@ -23,7 +35,7 @@ Test8
 Test9
 `
 
-	err := command.runListProjects()
+	err := command.Run()
 	got := buffer.String()
 
 	testerr_output(t, l, err, got, expected)
