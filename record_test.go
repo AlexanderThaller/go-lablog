@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"strconv"
 	"testing"
 	"time"
@@ -233,61 +232,6 @@ func Test_TodoGet(t *testing.T) {
 		got := note.GetValue()
 		expected := value
 		test(t, l, message, got, expected)
-	}
-}
-
-func compareRecord(t *testing.T, l logger.Logger, err error, newrecord, record Record) {
-	if record == nil {
-		l.Alert("record is nil")
-		t.Fail()
-		return
-	}
-	if newrecord == nil {
-		l.Alert("newrecord is nil")
-		t.Fail()
-		return
-	}
-
-	{
-		message := "Newrecord action is not the same with record action"
-		got := newrecord.GetAction()
-		expected := record.GetAction()
-		testerr(t, l, message, err, got, expected)
-	}
-
-	{
-		message := "Newrecord project is not the same with record project"
-		got := newrecord.GetProject()
-		expected := record.GetProject()
-		testerr(t, l, message, err, got, expected)
-	}
-
-	{
-		message := "Newrecord timestamp is not the same with record timestamp"
-		got := newrecord.GetTimeStamp()
-		expected := record.GetTimeStamp()
-		testerr(t, l, message, err, got, expected)
-	}
-
-	{
-		message := "Newrecord value is not the same with record value"
-		got := newrecord.GetValue()
-		expected := record.GetValue()
-		testerr(t, l, message, err, got, expected)
-	}
-}
-
-func test(t *testing.T, l logger.Logger, message string, got, expected interface{}) {
-	testerr(t, l, message, errors.New("no error"), got, expected)
-}
-
-func testerr(t *testing.T, l logger.Logger, message string, err error, got, expected interface{}) {
-	if got != expected {
-		l.Error("MESSAGE : ", message)
-		l.Error("ERROR   : ", err)
-		l.Error("GOT     : ", got)
-		l.Error("EXPECTED: ", expected)
-		t.Fail()
 	}
 }
 

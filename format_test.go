@@ -15,15 +15,11 @@ func Test_FormatHeader(t *testing.T) {
 	expected += AsciiDocSettings + "\n\n"
 
 	buffer := bytes.NewBufferString("")
+
 	FormatHeader(buffer, "Lablog", ActionListNotes, 1)
 	got := buffer.String()
-	if got != expected {
-		l.Error("Did not get the expected output")
-		l.Notice("GOT: ", got)
-		l.Notice("EXPECTED: ", expected)
 
-		t.Fail()
-	}
+	testerr_output(t, l, nil, got, expected)
 }
 
 func Test_FormatNotes(t *testing.T) {
@@ -45,14 +41,7 @@ TestValue
 	buffer := bytes.NewBufferString("")
 	err := FormatNotes(buffer, "TestProject", records, 1)
 	got := buffer.String()
-	if got != expected {
-		l.Error("Did not get the expected output")
-		l.Notice("ERROR: ", err)
-		l.Notice("GOT: ", got)
-		l.Notice("EXPECTED: ", expected)
-
-		t.Fail()
-	}
+	testerr_output(t, l, err, got, expected)
 }
 
 func Test_FormatRecordsNote(t *testing.T) {
@@ -74,12 +63,5 @@ TestValue
 	buffer := bytes.NewBufferString("")
 	err := FormatRecords(buffer, "TestProject", records, 1)
 	got := buffer.String()
-	if got != expected {
-		l.Error("Did not get the expected output")
-		l.Notice("ERROR: ", err)
-		l.Notice("GOT: ", got)
-		l.Notice("EXPECTED: ", expected)
-
-		t.Fail()
-	}
+	testerr_output(t, l, err, got, expected)
 }
