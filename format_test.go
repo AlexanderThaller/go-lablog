@@ -19,7 +19,7 @@ func Test_FormatHeader(t *testing.T) {
 	FormatHeader(buffer, "Lablog", ActionNotes, 1)
 	got := buffer.String()
 
-	testerr_output(t, l, nil, got, expected)
+	test_output(t, l, got, expected)
 }
 
 func Test_FormatNotes(t *testing.T) {

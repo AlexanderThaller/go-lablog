@@ -32,6 +32,15 @@ func testCommand(action string) (*Command, *bytes.Buffer) {
 	return command, buffer
 }
 
+func testCommandRunOutput(t *testing.T, l logger.Logger, action, expected string) {
+	command, buffer := testCommand(action)
+
+	err := command.Run()
+	got := buffer.String()
+
+	testerr_output(t, l, err, got, expected)
+}
+
 func compareRecord(t *testing.T, l logger.Logger, err error, newrecord, record Record) {
 	if record == nil {
 		l.Alert("record is nil")
@@ -71,6 +80,11 @@ func compareRecord(t *testing.T, l logger.Logger, err error, newrecord, record R
 		expected := record.GetValue()
 		testerr(t, l, message, err, got, expected)
 	}
+}
+
+func test_output(t *testing.T, l logger.Logger, got, expected interface{}) {
+	message := "Did not get the expected output"
+	test(t, l, message, got, expected)
 }
 
 func test(t *testing.T, l logger.Logger, message string, got, expected interface{}) {
