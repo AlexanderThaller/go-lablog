@@ -135,11 +135,14 @@ func ProjectWasActive(project, datapath string, start, end time.Time) bool {
 		return true
 	}
 
+	if ProjectHasTracks(project, datapath, start, end) {
+		return true
+	}
+
 	return false
 }
 
 func ProjectHasNotes(project, datapath string, start, end time.Time) bool {
-	//TODO: We don't have to read every note for checking if there is one note
 	notes, _ := ProjectNotes(project, datapath, start, end)
 	if len(notes) != 0 {
 		return true
@@ -149,9 +152,17 @@ func ProjectHasNotes(project, datapath string, start, end time.Time) bool {
 }
 
 func ProjectHasTodos(project, datapath string, start, end time.Time) bool {
-	//TODO: We don't have to read every todo for checking if there is one todo
 	todos, _ := ProjectTodos(project, datapath, start, end)
 	if len(todos) != 0 {
+		return true
+	}
+
+	return false
+}
+
+func ProjectHasTracks(project, datapath string, start, end time.Time) bool {
+	tracks, _ := ProjectTracks(project, datapath, start, end)
+	if len(tracks) != 0 {
 		return true
 	}
 
@@ -206,41 +217,6 @@ func ProjectNotes(project, datapath string, start, end time.Time) ([]Note, error
 	return ProjectNotesFromReader(project, start, end, file), nil
 }
 
-func ProjectNotesFromReader(project string, start, end time.Time, reader io.Reader) []Note {
-	parser := csv.NewReader(reader)
-	parser.FieldsPerRecord = 3
-
-	var out []Note
-	for {
-		csv, err := parser.Read()
-		if err != nil {
-			if err == io.EOF {
-				break
-			}
-
-			continue
-		}
-
-		note, err := NoteFromCSV(csv)
-		if err != nil {
-			continue
-		}
-		note.SetProject(project)
-
-		if note.TimeStamp.Before(start) {
-			continue
-		}
-
-		if note.TimeStamp.After(end) {
-			continue
-		}
-
-		out = append(out, note)
-	}
-
-	return out
-}
-
 func ProjectTodos(project, datapath string, start, end time.Time) ([]Todo, error) {
 	if datapath == "" {
 		return nil, errgo.New("datapath can not be empty")
@@ -292,6 +268,93 @@ func ProjectTodos(project, datapath string, start, end time.Time) ([]Todo, error
 	return out, err
 }
 
+func ProjectTracks(project, datapath string, start, end time.Time) ([]Track, error) {
+	if datapath == "" {
+		return nil, errgo.New("datapath can not be empty")
+	}
+	if project == "" {
+		return nil, errgo.New("project name can not be empty")
+	}
+	if !ProjectExists(project, datapath) {
+		return nil, errgo.New("project does not exist")
+	}
+
+	filepath := filepath.Join(datapath, project+".csv")
+	file, err := os.OpenFile(filepath, os.O_RDONLY, 0640)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	reader := csv.NewReader(file)
+	reader.FieldsPerRecord = 3
+
+	var out []Track
+	for {
+		csv, err := reader.Read()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+
+			continue
+		}
+
+		track, err := TrackFromCSV(csv)
+		if err != nil {
+			continue
+		}
+
+		if track.TimeStamp.Before(start) {
+			continue
+		}
+
+		if track.TimeStamp.After(end) {
+			continue
+		}
+
+		out = append(out, track)
+	}
+	sort.Sort(TracksByDate(out))
+
+	return out, err
+}
+
+func ProjectNotesFromReader(project string, start, end time.Time, reader io.Reader) []Note {
+	parser := csv.NewReader(reader)
+	parser.FieldsPerRecord = 3
+
+	var out []Note
+	for {
+		csv, err := parser.Read()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+
+			continue
+		}
+
+		note, err := NoteFromCSV(csv)
+		if err != nil {
+			continue
+		}
+		note.SetProject(project)
+
+		if note.TimeStamp.Before(start) {
+			continue
+		}
+
+		if note.TimeStamp.After(end) {
+			continue
+		}
+
+		out = append(out, note)
+	}
+
+	return out
+}
+
 func ProjectExists(project, datapath string) bool {
 	projects, err := ProjectsFiles(datapath)
 	if err != nil {
@@ -314,7 +377,7 @@ func ProjectDates(project, datapath string, start, end time.Time) ([]string, err
 	if project == "" {
 		return nil, errgo.New("project name can not be empty")
 	}
-	if ProjectExists(project, datapath) {
+	if !ProjectExists(project, datapath) {
 		return nil, errgo.New("project does not exist")
 	}
 
@@ -356,7 +419,7 @@ func ProjectDates(project, datapath string, start, end time.Time) ([]string, err
 func ProjectActiveTracks(project, datapath string) ([]Track, error) {
 	l := logger.New(Name, "Command", "Get", "Project", "ActiveTracks")
 
-	tracks, err := ProjectTracks(project, datapath)
+	tracks, err := ProjectTracks(project, datapath, time.Time{}, time.Now())
 	if err != nil {
 		return nil, err
 	}
@@ -389,48 +452,4 @@ func ProjectActiveTracks(project, datapath string) ([]Track, error) {
 	}
 
 	return out, nil
-}
-
-func ProjectTracks(project, datapath string) ([]Track, error) {
-	if datapath == "" {
-		return nil, errgo.New("datapath can not be empty")
-	}
-	if project == "" {
-		return nil, errgo.New("project name can not be empty")
-	}
-	if !ProjectExists(project, datapath) {
-		return nil, errgo.New("project does not exist")
-	}
-
-	filepath := filepath.Join(datapath, project+".csv")
-	file, err := os.OpenFile(filepath, os.O_RDONLY, 0640)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	reader := csv.NewReader(file)
-	reader.FieldsPerRecord = 3
-
-	var out []Track
-	for {
-		csv, err := reader.Read()
-		if err != nil {
-			if err == io.EOF {
-				break
-			}
-
-			continue
-		}
-
-		track, err := TrackFromCSV(csv)
-		if err != nil {
-			continue
-		}
-
-		out = append(out, track)
-	}
-	sort.Sort(TracksByDate(out))
-
-	return out, err
 }

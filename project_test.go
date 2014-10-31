@@ -6,61 +6,50 @@ import (
 	"path"
 	"runtime"
 	"testing"
-	"time"
 )
 
 func init() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 }
 
-const (
-	Project  = "Test1"
-	DataPath = "testdata"
-)
-
-var (
-	StartTime = time.Time{}
-	EndTime   = time.Time{}
-)
-
 func BenchmarkProjectsFiles(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		ProjectsFiles(DataPath)
+		ProjectsFiles(TestDataPath)
 	}
 }
 
 func BenchmarkProjects(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		Projects(DataPath, StartTime, EndTime)
+		Projects(TestDataPath, StartTime, EndTime)
 	}
 }
 
 func BenchmarkProjectWasActive(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		ProjectWasActive(Project, DataPath, StartTime, EndTime)
+		ProjectWasActive(Project, TestDataPath, StartTime, EndTime)
 	}
 }
 
 func BenchmarkProjectHasNotes(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		ProjectHasNotes(Project, DataPath, StartTime, EndTime)
+		ProjectHasNotes(Project, TestDataPath, StartTime, EndTime)
 	}
 }
 
 func BenchmarkProjectHasTodos(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		ProjectHasTodos(Project, DataPath, StartTime, EndTime)
+		ProjectHasTodos(Project, TestDataPath, StartTime, EndTime)
 	}
 }
 
 func BenchmarkProjectNotes(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		ProjectNotes(Project, DataPath, StartTime, EndTime)
+		ProjectNotes(Project, TestDataPath, StartTime, EndTime)
 	}
 }
 
 func BenchmarkProjectNotesFromReader(b *testing.B) {
-	path := path.Join(DataPath, Project+".csv")
+	path := path.Join(TestDataPath, Project+".csv")
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
 		return
@@ -76,6 +65,6 @@ func BenchmarkProjectNotesFromReader(b *testing.B) {
 
 func BenchmarkProjectTodos(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		ProjectTodos(Project, DataPath, StartTime, EndTime)
+		ProjectTodos(Project, TestDataPath, StartTime, EndTime)
 	}
 }
