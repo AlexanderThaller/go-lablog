@@ -23,8 +23,7 @@ func Test_RunDates(t *testing.T) {
 
 	action := ActionDates
 
-	expected := `2014-10-25
-2014-10-31
+	expected := `2014-10-31
 `
 
 	testCommandRunOutput(t, l, action, expected)
@@ -34,16 +33,36 @@ func Test_RunList(t *testing.T) {
 	l := logger.New(Name, "Test", "Command", "Run", "List")
 
 	action := ActionList
-	expected := `Test1
-Test10
+	expected := `TestNotes
+`
+
+	testCommandRunOutput(t, l, action, expected)
+}
+
+func Test_RunNotes(t *testing.T) {
+	l := logger.New(Name, "Test", "Command", "Run", "Notes")
+	l.SetLevel(logger.Info)
+
+	action := ActionNotes
+	expected := "= Lablog -- Notes\n"
+	expected += AsciiDocSettings + "\n\n"
+	expected += `== TestNotes
+
+=== 2014-10-31T21:36:31.49146148+01:00
+Test1
+
+=== 2014-10-31T21:36:33.49871531+01:00
 Test2
+
+=== 2014-10-31T21:36:35.138412374+01:00
 Test3
+
+=== 2014-10-31T21:36:36.810478305+01:00
 Test4
+
+=== 2014-10-31T21:36:38.450479686+01:00
 Test5
-Test6
-Test7
-Test8
-Test9
+
 `
 
 	testCommandRunOutput(t, l, action, expected)
