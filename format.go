@@ -60,12 +60,20 @@ func FormatTodos(writer io.Writer, project string, todos []Todo, indent int) err
 }
 
 func FormatTracks(writer io.Writer, project string, tracks []Track, indent int) error {
-	records := make([]Record, len(tracks))
-	for i, v := range tracks {
-		records[i] = Record(v)
+	if len(tracks) == 0 {
+		return nil
 	}
 
-	return FormatRecords(writer, project, records, indent)
+	section := strings.Repeat("=", indent)
+	writer.Write([]byte(section + " " + project + "\n\n"))
+
+	for _, record := range tracks {
+		out := record.GetFormattedValue()
+		writer.Write([]byte(out + "\n"))
+	}
+	writer.Write([]byte("\n"))
+
+	return nil
 }
 
 func FormatDurations(writer io.Writer, project string, durations map[string]time.Duration, indent int) error {

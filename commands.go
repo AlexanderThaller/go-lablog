@@ -361,6 +361,7 @@ func (com *Command) runListProjectTracks(writer io.Writer, project string, inden
 		return err
 	}
 
+	sort.Sort(TracksByDate(tracks))
 	err = FormatTracks(writer, project, tracks, indent)
 	if err != nil {
 		return err
