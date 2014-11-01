@@ -43,12 +43,20 @@ func FormatNotes(writer io.Writer, project string, notes []Note, indent int) err
 }
 
 func FormatTodos(writer io.Writer, project string, todos []Todo, indent int) error {
-	records := make([]Record, len(todos))
-	for i, v := range todos {
-		records[i] = Record(v)
+	if len(todos) == 0 {
+		return nil
 	}
 
-	return FormatRecords(writer, project, records, indent)
+	section := strings.Repeat("=", indent)
+	writer.Write([]byte(section + " " + project + "\n\n"))
+
+	for _, record := range todos {
+		out := record.GetFormattedValue()
+		writer.Write([]byte(out + "\n"))
+	}
+	writer.Write([]byte("\n"))
+
+	return nil
 }
 
 func FormatTracks(writer io.Writer, project string, tracks []Track, indent int) error {

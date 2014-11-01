@@ -321,6 +321,7 @@ func (com *Command) runListProjectTodos(writer io.Writer, project string, indent
 	}
 	todos = FilterInactiveTodos(todos)
 
+	sort.Sort(TodoByValue(todos))
 	err = FormatTodos(writer, project, todos, indent)
 	if err != nil {
 		return err

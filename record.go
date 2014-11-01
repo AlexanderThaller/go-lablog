@@ -200,6 +200,20 @@ func (todo TodoByDate) Less(i, j int) bool {
 	return todo[j].TimeStamp.After(todo[i].TimeStamp)
 }
 
+type TodoByValue []Todo
+
+func (todo TodoByValue) Len() int {
+	return len(todo)
+}
+
+func (todo TodoByValue) Swap(i, j int) {
+	todo[i], todo[j] = todo[j], todo[i]
+}
+
+func (todo TodoByValue) Less(i, j int) bool {
+	return todo[i].Value < todo[j].Value
+}
+
 type NotesByDate []Note
 
 func (note NotesByDate) Len() int {
