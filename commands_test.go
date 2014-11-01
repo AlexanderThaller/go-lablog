@@ -71,6 +71,18 @@ Test5
 	testCommandRunOutput(t, l, action, expected)
 }
 
+func Test_RunProjects(t *testing.T) {
+	l := logger.New(Name, "Test", "Command", "Run", "Projects")
+
+	action := ActionProjects
+	expected := `TestNotes
+TestTodos
+TestTracks
+`
+
+	testCommandRunOutput(t, l, action, expected)
+}
+
 func Test_RunTodos(t *testing.T) {
 	l := logger.New(Name, "Test", "Command", "Run", "Todos")
 	l.SetLevel(logger.Info)
