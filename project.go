@@ -453,3 +453,39 @@ func ProjectActiveTracks(project, datapath string) ([]Track, error) {
 
 	return out, nil
 }
+
+func ProjectDurations(project, datapath string, start, end time.Time) ([]Duration, error) {
+	tracks, err := ProjectTracks(project, datapath, start, end)
+	if err != nil {
+		return nil, err
+	}
+
+	starttracks := make(map[string]Track)
+	durations := make(map[string]time.Duration)
+	active := make(map[string]bool)
+	for _, track := range tracks {
+		if !active[track.Value] {
+			starttracks[track.Value] = track
+			active[track.Value] = true
+			continue
+		}
+
+		startrack := starttracks[track.Value]
+		duration := track.TimeStamp.Sub(startrack.TimeStamp)
+		durations[track.Value] += duration
+		active[track.Value] = false
+	}
+
+	var out []Duration
+	for value, duration := range durations {
+		duration := Duration{
+			Project:  project,
+			Duration: duration,
+			Value:    value,
+		}
+
+		out = append(out, duration)
+	}
+
+	return out, nil
+}

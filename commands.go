@@ -410,27 +410,12 @@ func (com *Command) runProjectTrackStop(writer io.Writer, project string, indent
 }
 
 func (com *Command) runListProjectTracksDurations(writer io.Writer, project string, indent int) error {
-	tracks, err := com.getProjectTracks(project)
+	durations, err := com.getProjectDurations(project)
 	if err != nil {
 		return err
 	}
 
-	starttracks := make(map[string]Track)
-	durations := make(map[string]time.Duration)
-	active := make(map[string]bool)
-	for _, track := range tracks {
-		if !active[track.Value] {
-			starttracks[track.Value] = track
-			active[track.Value] = true
-			continue
-		}
-
-		startrack := starttracks[track.Value]
-		duration := track.TimeStamp.Sub(startrack.TimeStamp)
-		durations[track.Value] += duration
-		active[track.Value] = false
-	}
-
+	sort.Sort(DurationsByValue(durations))
 	FormatDurations(writer, project, durations, indent)
 
 	return nil
@@ -616,6 +601,10 @@ func (com *Command) getProjectActiveTracks(project string) ([]Track, error) {
 
 func (com *Command) getProjectTracks(project string) ([]Track, error) {
 	return ProjectTracks(project, com.DataPath, com.StartTime, com.EndTime)
+}
+
+func (com *Command) getProjectDurations(project string) ([]Duration, error) {
+	return ProjectDurations(project, com.DataPath, com.StartTime, com.EndTime)
 }
 
 func (com *Command) getProjectSubprojects(project string) ([]string, error) {

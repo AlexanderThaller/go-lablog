@@ -4,7 +4,6 @@ import (
 	"io"
 	"regexp"
 	"strings"
-	"time"
 	"unicode"
 )
 
@@ -86,7 +85,7 @@ func FormatTracks(writer io.Writer, project string, tracks []Track, indent int) 
 	return nil
 }
 
-func FormatDurations(writer io.Writer, project string, durations map[string]time.Duration, indent int) error {
+func FormatDurations(writer io.Writer, project string, durations []Duration, indent int) error {
 	if durations == nil {
 		return nil
 	}
@@ -97,11 +96,8 @@ func FormatDurations(writer io.Writer, project string, durations map[string]time
 	section := strings.Repeat("=", indent)
 	writer.Write([]byte(section + " " + project + "\n\n"))
 
-	for value, duration := range durations {
-		if value != "" {
-			value += " -- "
-		}
-		writer.Write([]byte("* " + value + duration.String() + "\n"))
+	for _, duration := range durations {
+		writer.Write([]byte(duration.GetFormattedValue() + "\n"))
 	}
 
 	writer.Write([]byte("\n"))

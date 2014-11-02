@@ -301,3 +301,32 @@ func FilterInactiveTodos(todos []Todo) []Todo {
 
 	return out
 }
+
+type Duration struct {
+	Project  string
+	Duration time.Duration
+	Value    string
+}
+
+func (duration Duration) GetFormattedValue() string {
+	value := duration.Value
+	if value != "" {
+		value += " -- "
+	}
+
+	return "* " + value + duration.Duration.String()
+}
+
+type DurationsByValue []Duration
+
+func (duration DurationsByValue) Len() int {
+	return len(duration)
+}
+
+func (duration DurationsByValue) Swap(i, j int) {
+	duration[i], duration[j] = duration[j], duration[i]
+}
+
+func (duration DurationsByValue) Less(i, j int) bool {
+	return duration[i].Value < duration[j].Value
+}
