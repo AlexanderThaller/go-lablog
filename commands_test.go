@@ -151,3 +151,20 @@ func Test_RunTracksActive(t *testing.T) {
 
 	testCommandRunOutput(t, l, action, expected)
 }
+
+func Test_RunTracksDurations(t *testing.T) {
+	l := logger.New(Name, "Test", "Command", "Run", "TracksDurations")
+	l.SetLevel(logger.Info)
+
+	action := ActionTracksDurations
+	expected := "= Lablog -- Durations\n"
+	expected += AsciiDocSettings + "\n\n"
+	expected += `== TestTracks
+
+* Test6 -- 1.879901811s
+* Test7 -- 1.103979635s
+
+`
+
+	testCommandRunOutput(t, l, action, expected)
+}
