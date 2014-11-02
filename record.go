@@ -262,7 +262,7 @@ func (track Track) GetFormattedValue() string {
 	out := "* " + track.GetTimeStamp()
 
 	if track.Value != "" {
-		out += " - " + track.Value
+		out += " -- " + track.Value
 	}
 
 	return out
