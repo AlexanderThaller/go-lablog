@@ -21,15 +21,25 @@ const AsciiDocSettings = `:toc: right
 :source-highlighter: coderay
 :listing-caption: Listing`
 
+func FormatAction(action string) string {
+	switch action {
+	case ActionTracksActive:
+		return "TracksActive"
+
+	default:
+		capaction := []rune(action)
+		capaction[0] = unicode.ToUpper(capaction[0])
+		return string(capaction)
+	}
+}
+
 func FormatHeader(writer io.Writer, project, action string, indent int) {
 	if indent != 1 {
 		return
 	}
 
-	capaction := []rune(action)
-	capaction[0] = unicode.ToUpper(capaction[0])
-
-	writer.Write([]byte("= " + project + " -- " + string(capaction) + "\n"))
+	formaction := FormatAction(action)
+	writer.Write([]byte("= " + project + " -- " + string(formaction) + "\n"))
 	writer.Write([]byte(AsciiDocSettings + "\n\n"))
 }
 

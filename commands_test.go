@@ -129,3 +129,25 @@ func Test_RunTracks(t *testing.T) {
 
 	testCommandRunOutput(t, l, action, expected)
 }
+
+func Test_RunTracksActive(t *testing.T) {
+	l := logger.New(Name, "Test", "Command", "Run", "TracksActive")
+	l.SetLevel(logger.Info)
+
+	action := ActionTracksActive
+	expected := "= Lablog -- TracksActive\n"
+	expected += AsciiDocSettings + "\n\n"
+	expected += `== TestTracks
+
+* 2014-11-02T00:46:27.250010094+01:00 - Test1
+* 2014-11-02T00:46:31.186052306+01:00 - Test2
+* 2014-11-02T00:46:32.794131714+01:00 - Test3
+* 2014-11-02T00:46:34.322047221+01:00 - Test4
+* 2014-11-02T00:46:35.658221386+01:00 - Test5
+* 2014-11-02T00:46:38.385921461+01:00
+* 2014-11-02T00:46:57.953493565+01:00 - Test7
+
+`
+
+	testCommandRunOutput(t, l, action, expected)
+}

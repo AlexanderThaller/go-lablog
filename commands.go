@@ -376,6 +376,7 @@ func (com *Command) runListProjectActiveTracks(writer io.Writer, project string,
 		return err
 	}
 
+	sort.Sort(TracksByDate(active))
 	err = FormatTracks(writer, project, active, indent)
 
 	return nil
