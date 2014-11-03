@@ -175,9 +175,6 @@ func (com *Command) runList() error {
 	if com.Project == "" {
 		return com.runListProjects()
 	}
-	if !com.checkProjectExists(com.Project) {
-		return errgo.New("project " + com.Project + " does not exist")
-	}
 
 	notes, err := com.getProjectNotes(com.Project)
 	if err != nil {
@@ -187,7 +184,15 @@ func (com *Command) runList() error {
 		return com.runListProjectNotesAndSubnotes(com.writer, com.Project, 1)
 	}
 
-	return com.runListProjectTodosAndSubtodos(com.writer, com.Project, 1)
+	todos, err := com.getProjectTodos(com.Project)
+	if err != nil {
+		return err
+	}
+	if len(todos) != 0 {
+		return com.runListProjectTodosAndSubtodos(com.writer, com.Project, 1)
+	}
+
+	return com.runListProjectActiveTracks(com.writer, com.Project, 1)
 }
 
 func (com *Command) runNotes() error {

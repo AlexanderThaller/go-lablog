@@ -99,6 +99,44 @@ func Test_RunListProjectNoNotes(t *testing.T) {
 	testerr_output(t, l, err, got, expected)
 }
 
+func Test_RunListProjectNoNotesNoTodos(t *testing.T) {
+	l := logger.New(Name, "Test", "Command", "Run", "List", "Project", "NoNotesNoTodos")
+
+	action := ActionList
+	command, buffer := testCommand(action)
+	command.Project = "TestTracks"
+
+	expected := "= TestTracks -- List\n"
+	expected += AsciiDocSettings + "\n\n"
+	expected += `* 2014-11-01T00:46:27.250010094+01:00 -- Test1
+* 2014-11-01T00:46:31.186052306+01:00 -- Test2
+* 2014-11-01T00:46:32.794131714+01:00 -- Test3
+* 2014-11-01T00:46:34.322047221+01:00 -- Test4
+* 2014-11-01T00:46:35.658221386+01:00 -- Test5
+* 2014-11-01T00:46:57.953493565+01:00 -- Test7
+
+`
+
+	err := command.Run()
+	got := buffer.String()
+
+	testerr_output(t, l, err, got, expected)
+}
+
+func Test_RunListProjectNoExists(t *testing.T) {
+	l := logger.New(Name, "Test", "Command", "Run", "List", "Project", "NoExists")
+
+	action := ActionList
+	command, buffer := testCommand(action)
+	command.Project = "DOES NOT EXIST"
+
+	expected := ""
+	err := command.Run()
+	got := buffer.String()
+
+	testerr_output(t, l, err, got, expected)
+}
+
 func Test_RunNotes(t *testing.T) {
 	l := logger.New(Name, "Test", "Command", "Run", "Notes")
 	l.SetLevel(logger.Info)
