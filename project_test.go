@@ -90,3 +90,9 @@ func BenchmarkProjectTodos(b *testing.B) {
 		ProjectTodos(Project, BenchDataPath, StartTime, EndTime)
 	}
 }
+
+func BenchmarkProjectExists(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		ProjectExists(Project, BenchDataPath)
+	}
+}
