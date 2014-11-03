@@ -200,9 +200,6 @@ func ProjectNotes(project, datapath string, start, end time.Time) ([]Note, error
 	if datapath == "" {
 		return nil, errgo.New("datapath can not be empty")
 	}
-	if project == "" {
-		return nil, errgo.New("project name can not be empty")
-	}
 	if !ProjectExists(project, datapath) {
 		return nil, errgo.New("project does not exist")
 	}
@@ -220,9 +217,6 @@ func ProjectNotes(project, datapath string, start, end time.Time) ([]Note, error
 func ProjectTodos(project, datapath string, start, end time.Time) ([]Todo, error) {
 	if datapath == "" {
 		return nil, errgo.New("datapath can not be empty")
-	}
-	if project == "" {
-		return nil, errgo.New("project name can not be empty")
 	}
 	if !ProjectExists(project, datapath) {
 		return nil, errgo.New("project does not exist")
@@ -271,9 +265,6 @@ func ProjectTodos(project, datapath string, start, end time.Time) ([]Todo, error
 func ProjectTracks(project, datapath string, start, end time.Time) ([]Track, error) {
 	if datapath == "" {
 		return nil, errgo.New("datapath can not be empty")
-	}
-	if project == "" {
-		return nil, errgo.New("project name can not be empty")
 	}
 	if !ProjectExists(project, datapath) {
 		return nil, errgo.New("project does not exist")
@@ -373,9 +364,6 @@ func ProjectExists(project, datapath string) bool {
 func ProjectDates(project, datapath string, start, end time.Time) ([]string, error) {
 	if datapath == "" {
 		return nil, errgo.New("datapath can not be empty")
-	}
-	if project == "" {
-		return nil, errgo.New("project name can not be empty")
 	}
 	if !ProjectExists(project, datapath) {
 		return nil, errgo.New("project does not exist")

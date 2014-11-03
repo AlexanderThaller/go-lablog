@@ -75,6 +75,20 @@ Test5
 	testerr_output(t, l, err, got, expected)
 }
 
+func Test_RunListProjectNoDataDir(t *testing.T) {
+	l := logger.New(Name, "Test", "Command", "Run", "List", "Project", "NoDataDir")
+
+	action := ActionList
+	command, buffer := testCommand(action)
+	command.DataPath = "/tmp/fail/fail/fail/fail/fail"
+
+	expected := ""
+	err := command.Run()
+	got := buffer.String()
+
+	testerr_output(t, l, err, got, expected)
+}
+
 func Test_RunListProjectNoNotes(t *testing.T) {
 	l := logger.New(Name, "Test", "Command", "Run", "List", "Project", "NoNotes")
 

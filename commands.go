@@ -80,7 +80,7 @@ func (com *Command) Run() error {
 	case ActionNotes:
 		return com.Notes()
 	case ActionProjects:
-		return com.runListProjects()
+		return com.Projects()
 	case ActionRename:
 		return com.runRename()
 	case ActionTodo:
@@ -171,30 +171,6 @@ func (com *Command) Write(record Record) error {
 
 type listCommand func(io.Writer, string, int) error
 
-func (com *Command) List() error {
-	if com.Project == "" {
-		return com.runListProjects()
-	}
-
-	if ProjectHasNotes(com.Project, com.DataPath, com.StartTime, com.EndTime) {
-		return com.runListProjectNotesAndSubnotes(com.writer, com.Project, 1)
-	}
-
-	if ProjectHasTodos(com.Project, com.DataPath, com.StartTime, com.EndTime) {
-		return com.runListProjectTodosAndSubtodos(com.writer, com.Project, 1)
-	}
-
-	return com.runListProjectActiveTracks(com.writer, com.Project, 1)
-}
-
-func (com *Command) Notes() error {
-	if com.Project == "" {
-		return com.runListCommand(com.runListProjectNotes)
-	}
-
-	return com.runListProjectNotesAndSubnotes(com.writer, com.Project, 1)
-}
-
 func (com *Command) runListCommand(command listCommand) error {
 	FormatHeader(com.writer, "Lablog", com.Action, 1)
 
@@ -217,7 +193,31 @@ func (com *Command) runListCommand(command listCommand) error {
 	return nil
 }
 
-func (com *Command) runListProjects() error {
+func (com *Command) List() error {
+	if com.Project == "" {
+		return com.Projects()
+	}
+
+	if ProjectHasNotes(com.Project, com.DataPath, com.StartTime, com.EndTime) {
+		return com.runListProjectNotesAndSubnotes(com.writer, com.Project, 1)
+	}
+
+	if ProjectHasTodos(com.Project, com.DataPath, com.StartTime, com.EndTime) {
+		return com.runListProjectTodosAndSubtodos(com.writer, com.Project, 1)
+	}
+
+	return com.runListProjectActiveTracks(com.writer, com.Project, 1)
+}
+
+func (com *Command) Notes() error {
+	if com.Project == "" {
+		return com.runListCommand(com.runListProjectNotes)
+	}
+
+	return com.runListProjectNotesAndSubnotes(com.writer, com.Project, 1)
+}
+
+func (com *Command) Projects() error {
 	projects, err := com.getProjects()
 	if err != nil {
 		return err
