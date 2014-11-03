@@ -78,7 +78,7 @@ func (com *Command) Run() error {
 	case ActionNote:
 		return com.runNote()
 	case ActionNotes:
-		return com.runNotes()
+		return com.Notes()
 	case ActionProjects:
 		return com.runListProjects()
 	case ActionRename:
@@ -187,14 +187,12 @@ func (com *Command) List() error {
 	return com.runListProjectActiveTracks(com.writer, com.Project, 1)
 }
 
-func (com *Command) runNotes() error {
+func (com *Command) Notes() error {
 	if com.Project == "" {
 		return com.runListCommand(com.runListProjectNotes)
 	}
 
-	FormatHeader(com.writer, com.Project, com.Action, 1)
-
-	return com.runListProjectNotesAndSubnotes(com.writer, com.Project, 2)
+	return com.runListProjectNotesAndSubnotes(com.writer, com.Project, 1)
 }
 
 func (com *Command) runListCommand(command listCommand) error {
