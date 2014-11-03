@@ -72,7 +72,7 @@ func (com *Command) Run() error {
 	case ActionDone:
 		return com.runDone()
 	case ActionList:
-		return com.runList()
+		return com.List()
 	case ActionMerge:
 		return com.runMerge()
 	case ActionNote:
@@ -171,24 +171,16 @@ func (com *Command) Write(record Record) error {
 
 type listCommand func(io.Writer, string, int) error
 
-func (com *Command) runList() error {
+func (com *Command) List() error {
 	if com.Project == "" {
 		return com.runListProjects()
 	}
 
-	notes, err := com.getProjectNotes(com.Project)
-	if err != nil {
-		return err
-	}
-	if len(notes) != 0 {
+	if ProjectHasNotes(com.Project, com.DataPath, com.StartTime, com.EndTime) {
 		return com.runListProjectNotesAndSubnotes(com.writer, com.Project, 1)
 	}
 
-	todos, err := com.getProjectTodos(com.Project)
-	if err != nil {
-		return err
-	}
-	if len(todos) != 0 {
+	if ProjectHasTodos(com.Project, com.DataPath, com.StartTime, com.EndTime) {
 		return com.runListProjectTodosAndSubtodos(com.writer, com.Project, 1)
 	}
 
