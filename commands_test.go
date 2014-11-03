@@ -80,7 +80,7 @@ func Test_RunListProjectNoDataDir(t *testing.T) {
 
 	action := ActionList
 	command, buffer := testCommand(action)
-	command.DataPath = "/tmp/fail/fail/fail/fail/fail"
+	command.DataPath = TestDataPathFail
 
 	expected := ""
 	err := command.Run()

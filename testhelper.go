@@ -14,9 +14,10 @@ import (
 )
 
 const (
-	Project       = "Test1"
-	TestDataPath  = "testdata/tests"
-	BenchDataPath = "testdata/benchmark"
+	Project          = "Test1"
+	TestDataPath     = "testdata/tests"
+	TestDataPathFail = "/FAILFAILFAIL_12345"
+	BenchDataPath    = "testdata/benchmark"
 )
 
 var (

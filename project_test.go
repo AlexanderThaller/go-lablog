@@ -6,10 +6,32 @@ import (
 	"path"
 	"runtime"
 	"testing"
+
+	"github.com/AlexanderThaller/logger"
 )
 
 func init() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
+}
+
+func Test_ProjectExists(t *testing.T) {
+	l := logger.New(Name, "Test", "Project", "Exists")
+
+	tests := make(map[string]bool)
+	tests["TestNotes"] = true
+	tests["TestTodos"] = true
+	tests["TestTracks"] = true
+	tests["ShouldNotExist"] = false
+
+	for project, expected := range tests {
+		got := ProjectExists(project, TestDataPath)
+		test(t, l, "Did not get the expected output for project "+project,
+			got, expected)
+	}
+
+	expected := false
+	got := ProjectExists("TestNotes", TestDataPathFail)
+	test(t, l, "Did not get the expected output for the failstate", got, expected)
 }
 
 func BenchmarkProjectsFiles(b *testing.B) {
