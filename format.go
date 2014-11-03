@@ -42,13 +42,13 @@ func FormatHeader(writer io.Writer, project, action string, indent int) {
 	writer.Write([]byte(AsciiDocSettings + "\n\n"))
 }
 
-func FormatNotes(writer io.Writer, project string, notes []Note, indent int) error {
+func FormatNotes(writer io.Writer, project, action string, notes []Note, indent int) error {
 	records := make([]Record, len(notes))
 	for i, v := range notes {
 		records[i] = Record(v)
 	}
 
-	return FormatRecords(writer, project, records, indent)
+	return FormatRecords(writer, project, action, records, indent)
 }
 
 func FormatTodos(writer io.Writer, project string, todos []Todo, indent int) error {
@@ -105,7 +105,7 @@ func FormatDurations(writer io.Writer, project string, durations []Duration, ind
 	return nil
 }
 
-func FormatRecords(writer io.Writer, project string, records []Record, indent int) error {
+func FormatRecords(writer io.Writer, project, action string, records []Record, indent int) error {
 	if len(records) == 0 {
 		return nil
 	}
@@ -116,7 +116,11 @@ func FormatRecords(writer io.Writer, project string, records []Record, indent in
 	}
 
 	section := strings.Repeat("=", indent)
-	writer.Write([]byte(section + " " + project + "\n\n"))
+	if indent == 1 {
+		FormatHeader(writer, project, action, indent)
+	} else {
+		writer.Write([]byte(section + " " + project + "\n\n"))
+	}
 
 	for _, record := range records {
 		writer.Write([]byte(section + "= " + record.GetTimeStamp() + "\n"))

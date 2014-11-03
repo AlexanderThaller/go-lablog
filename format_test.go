@@ -30,16 +30,16 @@ func Test_FormatNotes(t *testing.T) {
 		TimeStamp: time.Time{},
 		Value:     "TestValue",
 	}
-	expected := `= TestProject
-
-== 0001-01-01T00:00:00Z
+	expected := "= TestProject -- Notes\n"
+	expected += AsciiDocSettings + "\n\n"
+	expected += `== 0001-01-01T00:00:00Z
 TestValue
 
 `
 
 	records := []Note{note}
 	buffer := bytes.NewBufferString("")
-	err := FormatNotes(buffer, "TestProject", records, 1)
+	err := FormatNotes(buffer, "TestProject", ActionNotes, records, 1)
 	got := buffer.String()
 	testerr_output(t, l, err, got, expected)
 }
@@ -52,16 +52,16 @@ func Test_FormatRecordsNote(t *testing.T) {
 		TimeStamp: time.Time{},
 		Value:     "TestValue",
 	}
-	expected := `= TestProject
-
-== 0001-01-01T00:00:00Z
+	expected := "= TestProject -- Notes\n"
+	expected += AsciiDocSettings + "\n\n"
+	expected += `== 0001-01-01T00:00:00Z
 TestValue
 
 `
 
 	records := []Record{note}
 	buffer := bytes.NewBufferString("")
-	err := FormatRecords(buffer, "TestProject", records, 1)
+	err := FormatRecords(buffer, "TestProject", ActionNotes, records, 1)
 	got := buffer.String()
 	testerr_output(t, l, err, got, expected)
 }

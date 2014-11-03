@@ -175,7 +175,6 @@ func (com *Command) runList() error {
 	if com.Project == "" {
 		return com.runListProjects()
 	}
-
 	if !com.checkProjectExists(com.Project) {
 		return errgo.New("project " + com.Project + " does not exist")
 	}
@@ -281,7 +280,7 @@ func (com *Command) runListProjectNotes(writer io.Writer, project string, indent
 	}
 	sort.Sort(NotesByDate(notes))
 
-	err = FormatNotes(writer, project, notes, indent)
+	err = FormatNotes(writer, project, com.Action, notes, indent)
 	if err != nil {
 		return err
 	}

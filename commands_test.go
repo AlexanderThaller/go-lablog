@@ -43,6 +43,38 @@ TestTracks
 	testCommandRunOutput(t, l, action, expected)
 }
 
+func Test_RunListProject(t *testing.T) {
+	l := logger.New(Name, "Test", "Command", "Run", "List", "Project")
+
+	action := ActionList
+	command, buffer := testCommand(action)
+	command.Project = "TestNotes"
+
+	expected := "= TestNotes -- List\n"
+	expected += AsciiDocSettings + "\n\n"
+	expected += `== 2014-10-30T21:36:31.49146148+01:00
+Test1
+
+== 2014-10-30T21:36:33.49871531+01:00
+Test2
+
+== 2014-10-30T21:36:35.138412374+01:00
+Test3
+
+== 2014-10-30T21:36:36.810478305+01:00
+Test4
+
+== 2014-10-30T21:36:38.450479686+01:00
+Test5
+
+`
+
+	err := command.Run()
+	got := buffer.String()
+
+	testerr_output(t, l, err, got, expected)
+}
+
 func Test_RunNotes(t *testing.T) {
 	l := logger.New(Name, "Test", "Command", "Run", "Notes")
 	l.SetLevel(logger.Info)
