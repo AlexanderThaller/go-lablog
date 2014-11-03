@@ -392,7 +392,11 @@ func ProjectDates(project, datapath string, start, end time.Time) ([]string, err
 	if err != nil {
 		return nil, err
 	}
-	todos = FilterInactiveTodos(todos)
+
+	tracks, err := ProjectTracks(project, datapath, start, end)
+	if err != nil {
+		return nil, err
+	}
 
 	datemap := make(map[string]struct{})
 
@@ -407,6 +411,10 @@ func ProjectDates(project, datapath string, start, end time.Time) ([]string, err
 
 	for _, todo := range todos {
 		datemap[todo.TimeStamp.Format(DateFormat)] = struct{}{}
+	}
+
+	for _, track := range tracks {
+		datemap[track.TimeStamp.Format(DateFormat)] = struct{}{}
 	}
 
 	for date := range datemap {
