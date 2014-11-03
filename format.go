@@ -2,6 +2,7 @@ package main
 
 import (
 	"io"
+	"reflect"
 	"regexp"
 	"strings"
 	"unicode"
@@ -51,38 +52,22 @@ func FormatNotes(writer io.Writer, project, action string, notes []Note, indent 
 	return FormatRecords(writer, project, action, records, indent)
 }
 
-func FormatTodos(writer io.Writer, project string, todos []Todo, indent int) error {
-	if len(todos) == 0 {
-		return nil
+func FormatTodos(writer io.Writer, project, action string, todos []Todo, indent int) error {
+	records := make([]Record, len(todos))
+	for i, v := range todos {
+		records[i] = Record(v)
 	}
 
-	section := strings.Repeat("=", indent)
-	writer.Write([]byte(section + " " + project + "\n\n"))
-
-	for _, record := range todos {
-		out := record.GetFormattedValue()
-		writer.Write([]byte(out + "\n"))
-	}
-	writer.Write([]byte("\n"))
-
-	return nil
+	return FormatRecords(writer, project, action, records, indent)
 }
 
-func FormatTracks(writer io.Writer, project string, tracks []Track, indent int) error {
-	if len(tracks) == 0 {
-		return nil
+func FormatTracks(writer io.Writer, project, action string, tracks []Track, indent int) error {
+	records := make([]Record, len(tracks))
+	for i, v := range tracks {
+		records[i] = Record(v)
 	}
 
-	section := strings.Repeat("=", indent)
-	writer.Write([]byte(section + " " + project + "\n\n"))
-
-	for _, record := range tracks {
-		out := record.GetFormattedValue()
-		writer.Write([]byte(out + "\n"))
-	}
-	writer.Write([]byte("\n"))
-
-	return nil
+	return FormatRecords(writer, project, action, records, indent)
 }
 
 func FormatDurations(writer io.Writer, project string, durations []Duration, indent int) error {
@@ -122,11 +107,18 @@ func FormatRecords(writer io.Writer, project, action string, records []Record, i
 		writer.Write([]byte(section + " " + project + "\n\n"))
 	}
 
-	for _, record := range records {
-		writer.Write([]byte(section + "= " + record.GetTimeStamp() + "\n"))
+	for index, record := range records {
+		if reflect.TypeOf(record).Name() == "Note" {
+			writer.Write([]byte(section + "= " + record.GetTimeStamp() + "\n"))
+		}
 
 		out := reg.ReplaceAllString(record.GetFormattedValue(), section+"==")
-		writer.Write([]byte(out + "\n\n"))
+		writer.Write([]byte(out + "\n"))
+		if reflect.TypeOf(record).Name() == "Note" {
+			writer.Write([]byte("\n"))
+		} else if len(records) == index+1 {
+			writer.Write([]byte("\n"))
+		}
 	}
 
 	return nil

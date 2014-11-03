@@ -75,6 +75,30 @@ Test5
 	testerr_output(t, l, err, got, expected)
 }
 
+func Test_RunListProjectNoNotes(t *testing.T) {
+	l := logger.New(Name, "Test", "Command", "Run", "List", "Project", "NoNotes")
+
+	action := ActionList
+	command, buffer := testCommand(action)
+	command.Project = "TestTodos"
+
+	expected := "= TestTodos -- List\n"
+	expected += AsciiDocSettings + "\n\n"
+	expected += `* Test1
+* Test2
+* Test3
+* Test4
+* Test5
+* Test7
+
+`
+
+	err := command.Run()
+	got := buffer.String()
+
+	testerr_output(t, l, err, got, expected)
+}
+
 func Test_RunNotes(t *testing.T) {
 	l := logger.New(Name, "Test", "Command", "Run", "Notes")
 	l.SetLevel(logger.Info)

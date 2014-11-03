@@ -321,7 +321,7 @@ func (com *Command) runListProjectTodos(writer io.Writer, project string, indent
 	todos = FilterInactiveTodos(todos)
 
 	sort.Sort(TodoByValue(todos))
-	err = FormatTodos(writer, project, todos, indent)
+	err = FormatTodos(writer, project, com.Action, todos, indent)
 	if err != nil {
 		return err
 	}
@@ -361,7 +361,7 @@ func (com *Command) runListProjectTracks(writer io.Writer, project string, inden
 	}
 
 	sort.Sort(TracksByDate(tracks))
-	err = FormatTracks(writer, project, tracks, indent)
+	err = FormatTracks(writer, project, com.Action, tracks, indent)
 	if err != nil {
 		return err
 	}
@@ -376,7 +376,7 @@ func (com *Command) runListProjectActiveTracks(writer io.Writer, project string,
 	}
 
 	sort.Sort(TracksByDate(active))
-	err = FormatTracks(writer, project, active, indent)
+	err = FormatTracks(writer, project, com.Action, active, indent)
 
 	return nil
 }
@@ -391,7 +391,7 @@ func (com *Command) runProjectTrackStop(writer io.Writer, project string, indent
 		return errgo.New("no active tracks we could stop")
 	}
 
-	FormatTracks(writer, project, active, indent)
+	FormatTracks(writer, project, com.Action, active, indent)
 	for _, track := range active {
 		track := Track{
 			Project:   project,
