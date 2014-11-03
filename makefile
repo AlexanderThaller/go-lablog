@@ -39,7 +39,8 @@ dependencies_restore:
 	godep restore ./...
 
 bench:
-	go test -test.benchmem=true -test.bench . 2> /dev/null
+	mkdir -p benchmarks/`git describe --always`/
+	go test -test.benchmem=true -test.bench . 2> /dev/null | tee benchmarks/`git describe --always`/`date +%s`
 
 coverage:
 	rm -f coverage.out

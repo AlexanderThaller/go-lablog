@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"encoding/csv"
 	"io"
 	"io/ioutil"
@@ -59,6 +60,23 @@ func MergeFiles(srcpath, dstpath string) error {
 	}
 
 	return nil
+}
+
+func ProjectFile(project, datapath string) (*os.File, error) {
+	if datapath == "" {
+		return nil, errgo.New("datapath can not be empty")
+	}
+	if !ProjectExists(project, datapath) {
+		return nil, errgo.New("project does not exist")
+	}
+
+	filepath := filepath.Join(datapath, project+".csv")
+	file, err := os.OpenFile(filepath, os.O_RDONLY, 0640)
+	if err != nil {
+		return nil, err
+	}
+
+	return file, nil
 }
 
 func ProjectsFiles(datapath string) ([]string, error) {
@@ -152,9 +170,18 @@ func ProjectHasNotes(project, datapath string, start, end time.Time) bool {
 }
 
 func ProjectHasTodos(project, datapath string, start, end time.Time) bool {
-	todos, _ := ProjectTodos(project, datapath, start, end)
-	if len(todos) != 0 {
-		return true
+	file, err := ProjectFile(project, datapath)
+	if err != nil {
+		return false
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.Contains(line, ",todo,") {
+			return true
+		}
 	}
 
 	return false
@@ -197,15 +224,7 @@ func ProjectSubprojects(project, datapath string, start, end time.Time) ([]strin
 }
 
 func ProjectNotes(project, datapath string, start, end time.Time) ([]Note, error) {
-	if datapath == "" {
-		return nil, errgo.New("datapath can not be empty")
-	}
-	if !ProjectExists(project, datapath) {
-		return nil, errgo.New("project does not exist")
-	}
-
-	filepath := filepath.Join(datapath, project+".csv")
-	file, err := os.OpenFile(filepath, os.O_RDONLY, 0640)
+	file, err := ProjectFile(project, datapath)
 	if err != nil {
 		return nil, err
 	}
@@ -215,15 +234,7 @@ func ProjectNotes(project, datapath string, start, end time.Time) ([]Note, error
 }
 
 func ProjectTodos(project, datapath string, start, end time.Time) ([]Todo, error) {
-	if datapath == "" {
-		return nil, errgo.New("datapath can not be empty")
-	}
-	if !ProjectExists(project, datapath) {
-		return nil, errgo.New("project does not exist")
-	}
-
-	filepath := filepath.Join(datapath, project+".csv")
-	file, err := os.OpenFile(filepath, os.O_RDONLY, 0640)
+	file, err := ProjectFile(project, datapath)
 	if err != nil {
 		return nil, err
 	}
@@ -263,15 +274,7 @@ func ProjectTodos(project, datapath string, start, end time.Time) ([]Todo, error
 }
 
 func ProjectTracks(project, datapath string, start, end time.Time) ([]Track, error) {
-	if datapath == "" {
-		return nil, errgo.New("datapath can not be empty")
-	}
-	if !ProjectExists(project, datapath) {
-		return nil, errgo.New("project does not exist")
-	}
-
-	filepath := filepath.Join(datapath, project+".csv")
-	file, err := os.OpenFile(filepath, os.O_RDONLY, 0640)
+	file, err := ProjectFile(project, datapath)
 	if err != nil {
 		return nil, err
 	}
@@ -362,13 +365,6 @@ func ProjectExists(project, datapath string) bool {
 }
 
 func ProjectDates(project, datapath string, start, end time.Time) ([]string, error) {
-	if datapath == "" {
-		return nil, errgo.New("datapath can not be empty")
-	}
-	if !ProjectExists(project, datapath) {
-		return nil, errgo.New("project does not exist")
-	}
-
 	var out []string
 
 	notes, err := ProjectNotes(project, datapath, start, end)
