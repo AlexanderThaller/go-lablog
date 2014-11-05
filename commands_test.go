@@ -52,21 +52,23 @@ func Test_RunListProject(t *testing.T) {
 	command, buffer := testCommand(action)
 	command.Project = "TestNotes"
 
-	expected := "= TestNotes -- List\n"
+	expected := "= Lablog -- List\n"
 	expected += AsciiDocSettings + "\n\n"
-	expected += `== 2014-10-30T21:36:31.49146148+01:00
+	expected += `== TestNotes
+
+=== 2014-10-30T21:36:31.49146148+01:00
 Test1
 
-== 2014-10-30T21:36:33.49871531+01:00
+=== 2014-10-30T21:36:33.49871531+01:00
 Test2
 
-== 2014-10-30T21:36:35.138412374+01:00
+=== 2014-10-30T21:36:35.138412374+01:00
 Test3
 
-== 2014-10-30T21:36:36.810478305+01:00
+=== 2014-10-30T21:36:36.810478305+01:00
 Test4
 
-== 2014-10-30T21:36:38.450479686+01:00
+=== 2014-10-30T21:36:38.450479686+01:00
 Test5
 
 == TestNotes.Subproject
@@ -103,9 +105,11 @@ func Test_RunListProjectNoNotes(t *testing.T) {
 	command, buffer := testCommand(action)
 	command.Project = "TestTodos"
 
-	expected := "= TestTodos -- List\n"
+	expected := "= Lablog -- List\n"
 	expected += AsciiDocSettings + "\n\n"
-	expected += `* Test1
+	expected += `== TestTodos
+
+* Test1
 * Test2
 * Test3
 * Test4
@@ -127,9 +131,11 @@ func Test_RunListProjectNoNotesNoTodos(t *testing.T) {
 	command, buffer := testCommand(action)
 	command.Project = "TestTracks"
 
-	expected := "= TestTracks -- List\n"
+	expected := "= Lablog -- List\n"
 	expected += AsciiDocSettings + "\n\n"
-	expected += `* 2014-11-01T00:46:27.250010094+01:00 -- Test1
+	expected += `== TestTracks
+
+* 2014-11-01T00:46:27.250010094+01:00 -- Test1
 * 2014-11-01T00:46:31.186052306+01:00 -- Test2
 * 2014-11-01T00:46:32.794131714+01:00 -- Test3
 * 2014-11-01T00:46:34.322047221+01:00 -- Test4
@@ -151,7 +157,9 @@ func Test_RunListProjectNoExists(t *testing.T) {
 	command, buffer := testCommand(action)
 	command.Project = "DOES NOT EXIST"
 
-	expected := ""
+	expected := "= Lablog -- List\n"
+	expected += AsciiDocSettings + "\n\n"
+
 	err := command.Run()
 	got := buffer.String()
 
@@ -210,21 +218,23 @@ func Test_RunNotesProject(t *testing.T) {
 	command, buffer := testCommand(action)
 	command.Project = "TestNotes"
 
-	expected := "= TestNotes -- Notes\n"
+	expected := "= Lablog -- Notes\n"
 	expected += AsciiDocSettings + "\n\n"
-	expected += `== 2014-10-30T21:36:31.49146148+01:00
+	expected += `== TestNotes
+
+=== 2014-10-30T21:36:31.49146148+01:00
 Test1
 
-== 2014-10-30T21:36:33.49871531+01:00
+=== 2014-10-30T21:36:33.49871531+01:00
 Test2
 
-== 2014-10-30T21:36:35.138412374+01:00
+=== 2014-10-30T21:36:35.138412374+01:00
 Test3
 
-== 2014-10-30T21:36:36.810478305+01:00
+=== 2014-10-30T21:36:36.810478305+01:00
 Test4
 
-== 2014-10-30T21:36:38.450479686+01:00
+=== 2014-10-30T21:36:38.450479686+01:00
 Test5
 
 == TestNotes.Subproject

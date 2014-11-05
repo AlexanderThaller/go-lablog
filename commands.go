@@ -96,7 +96,7 @@ func (com *Command) Run() error {
 	case ActionTracks:
 		return com.runListCommand(com.runListProjectTracks)
 	case ActionTracksActive:
-		return com.runListCommand(com.runListProjectActiveTracks)
+		return com.runListCommand(com.runListProjectTracksActive)
 	case ActionTracksDurations:
 		return com.runListCommand(com.runListProjectTracksDurations)
 	default:
@@ -173,25 +173,24 @@ func (com *Command) Write(record Record) error {
 
 type listCommand func(io.Writer, string, int) error
 
-func (com *Command) runListCommand(command listCommand) error {
+func (com *Command) runListCommand(command listCommand, projects ...string) error {
 	l := logger.New(Name, "Command", "runListCommand")
+
+	l.Trace("Length of projects: ", len(projects))
+	if len(projects) == 0 {
+		l.Debug("Trying to get projects")
+
+		projcts, err := com.getProjects()
+		if err != nil {
+			return err
+		}
+		projects = projcts
+	}
 
 	l.Debug("Will now format the header")
 	FormatHeader(com.writer, "Lablog", com.Action, 1)
 
-	if com.Project != "" {
-		l.Debug("Run the command for the project ", com.Project)
-		return command(com.writer, com.Project, 1)
-	}
-	l.Debug("Run the command for all projects")
-
-	l.Debug("Trying to get projects")
-	projects, err := com.getProjects()
-	if err != nil {
-		return err
-	}
-
-	l.Debug("Will now run the command for all projects")
+	l.Debug("Will now run the command for projects")
 	for _, project := range projects {
 		l.Trace("Run the command for the project ", project)
 		err := command(com.writer, project, 2)
@@ -210,14 +209,14 @@ func (com *Command) List() error {
 	}
 
 	if ProjectHasNotes(com.Project, com.DataPath, com.StartTime, com.EndTime) {
-		return com.runListProjectNotesAndSubnotes(com.writer, com.Project, 1)
+		return com.runListCommand(com.runListProjectNotesAndSubnotes, com.Project)
 	}
 
 	if ProjectHasTodos(com.Project, com.DataPath, com.StartTime, com.EndTime) {
-		return com.runListProjectTodosAndSubtodos(com.writer, com.Project, 1)
+		return com.runListCommand(com.runListProjectTodosAndSubtodos, com.Project)
 	}
 
-	return com.runListProjectActiveTracks(com.writer, com.Project, 1)
+	return com.runListCommand(com.runListProjectTracksActive, com.Project)
 }
 
 func (com *Command) Notes() error {
@@ -228,7 +227,7 @@ func (com *Command) Notes() error {
 	}
 
 	l.Debug("Will list notes for project ", com.Project)
-	return com.runListProjectNotesAndSubnotes(com.writer, com.Project, 1)
+	return com.runListCommand(com.runListProjectNotesAndSubnotes, com.Project)
 }
 
 func (com *Command) Todos() error {
@@ -239,7 +238,18 @@ func (com *Command) Todos() error {
 	}
 
 	l.Debug("Will list todos for project ", com.Project)
-	return com.runListProjectTodosAndSubtodos(com.writer, com.Project, 1)
+	return com.runListCommand(com.runListProjectTodosAndSubtodos, com.Project)
+}
+
+func (com *Command) Tracks() error {
+	l := logger.New(Name, "Command", "Tracks")
+	if com.Project == "" {
+		l.Debug("Will list tracks for all projects")
+		return com.runListCommand(com.runListProjectTracks)
+	}
+
+	l.Debug("Will list tracks for project ", com.Project)
+	return com.runListCommand(com.runListProjectTracksAndSubtracks, com.Project)
 }
 
 func (com *Command) Projects() error {
@@ -324,7 +334,7 @@ func (com *Command) runListProjectNotesAndSubnotes(writer io.Writer, project str
 	}
 
 	for _, subproject := range subprojects {
-		err := com.runListProjectNotes(writer, subproject, indent+1)
+		err := com.runListProjectNotes(writer, subproject, indent)
 		if err != nil {
 			return err
 		}
@@ -374,6 +384,31 @@ func (com *Command) runListProjectTodosAndSubtodos(writer io.Writer, project str
 	return nil
 }
 
+func (com *Command) runListProjectTracksAndSubtracks(writer io.Writer, project string, indent int) error {
+	err := com.runListProjectTracks(writer, project, indent)
+	if err != nil {
+		return err
+	}
+
+	if com.NoSubprojects {
+		return nil
+	}
+
+	subprojects, err := com.getProjectSubprojects(project)
+	if err != nil {
+		return err
+	}
+
+	for _, subproject := range subprojects {
+		err := com.runListProjectTracks(writer, subproject, indent+1)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (com *Command) runListProjectTracks(writer io.Writer, project string, indent int) error {
 	tracks, err := com.getProjectTracks(project)
 	if err != nil {
@@ -389,7 +424,7 @@ func (com *Command) runListProjectTracks(writer io.Writer, project string, inden
 	return nil
 }
 
-func (com *Command) runListProjectActiveTracks(writer io.Writer, project string, indent int) error {
+func (com *Command) runListProjectTracksActive(writer io.Writer, project string, indent int) error {
 	active, err := com.getProjectActiveTracks(project)
 	if err != nil {
 		return err
