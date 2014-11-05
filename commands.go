@@ -216,7 +216,7 @@ func (com *Command) List() error {
 		return com.runListCommand(com.runListProjectTodosAndSubtodos, com.Project)
 	}
 
-	return com.runListCommand(com.runListProjectTracksActive, com.Project)
+	return com.runListCommand(com.runListProjectTracksActiveAndSubtracks, com.Project)
 }
 
 func (com *Command) Notes() error {
@@ -375,7 +375,7 @@ func (com *Command) runListProjectTodosAndSubtodos(writer io.Writer, project str
 	}
 
 	for _, subproject := range subprojects {
-		err := com.runListProjectTodos(writer, subproject, indent+1)
+		err := com.runListProjectTodos(writer, subproject, indent)
 		if err != nil {
 			return err
 		}
@@ -400,7 +400,7 @@ func (com *Command) runListProjectTracksAndSubtracks(writer io.Writer, project s
 	}
 
 	for _, subproject := range subprojects {
-		err := com.runListProjectTracks(writer, subproject, indent+1)
+		err := com.runListProjectTracks(writer, subproject, indent)
 		if err != nil {
 			return err
 		}
@@ -432,6 +432,31 @@ func (com *Command) runListProjectTracksActive(writer io.Writer, project string,
 
 	sort.Sort(TracksByDate(active))
 	err = FormatTracks(writer, project, com.Action, active, indent)
+
+	return nil
+}
+
+func (com *Command) runListProjectTracksActiveAndSubtracks(writer io.Writer, project string, indent int) error {
+	err := com.runListProjectTracksActive(writer, project, indent)
+	if err != nil {
+		return err
+	}
+
+	if com.NoSubprojects {
+		return nil
+	}
+
+	subprojects, err := com.getProjectSubprojects(project)
+	if err != nil {
+		return err
+	}
+
+	for _, subproject := range subprojects {
+		err := com.runListProjectTracksActive(writer, subproject, indent)
+		if err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
