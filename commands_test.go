@@ -156,6 +156,45 @@ func Test_RunNotes(t *testing.T) {
 	l.SetLevel(logger.Info)
 
 	action := ActionNotes
+	expected := "= Lablog -- Notes\n"
+	expected += AsciiDocSettings + "\n\n"
+	expected += `== TestNotes
+
+=== 2014-10-30T21:36:31.49146148+01:00
+Test1
+
+=== 2014-10-30T21:36:33.49871531+01:00
+Test2
+
+=== 2014-10-30T21:36:35.138412374+01:00
+Test3
+
+=== 2014-10-30T21:36:36.810478305+01:00
+Test4
+
+=== 2014-10-30T21:36:38.450479686+01:00
+Test5
+
+`
+
+	testCommandRunOutput(t, l, action, expected)
+}
+
+func Benchmark_RunNotes(b *testing.B) {
+	action := ActionNotes
+	command, _ := testCommand(action)
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		command.Run()
+	}
+}
+
+func Test_RunNotesProject(t *testing.T) {
+	l := logger.New(Name, "Test", "Command", "Run", "Notes", "Project")
+	l.SetLevel(logger.Info)
+
+	action := ActionNotes
 	command, buffer := testCommand(action)
 	command.Project = "TestNotes"
 
@@ -182,35 +221,6 @@ Test5
 	got := buffer.String()
 
 	testerr_output(t, l, err, got, expected)
-}
-
-func Test_RunNotesProject(t *testing.T) {
-	l := logger.New(Name, "Test", "Command", "Run", "Notes", "Project")
-	l.SetLevel(logger.Info)
-
-	action := ActionNotes
-	expected := "= Lablog -- Notes\n"
-	expected += AsciiDocSettings + "\n\n"
-	expected += `== TestNotes
-
-=== 2014-10-30T21:36:31.49146148+01:00
-Test1
-
-=== 2014-10-30T21:36:33.49871531+01:00
-Test2
-
-=== 2014-10-30T21:36:35.138412374+01:00
-Test3
-
-=== 2014-10-30T21:36:36.810478305+01:00
-Test4
-
-=== 2014-10-30T21:36:38.450479686+01:00
-Test5
-
-`
-
-	testCommandRunOutput(t, l, action, expected)
 }
 
 func Test_RunProjects(t *testing.T) {
@@ -244,6 +254,16 @@ func Test_RunTodos(t *testing.T) {
 `
 
 	testCommandRunOutput(t, l, action, expected)
+}
+
+func Benchmark_RunTodos(b *testing.B) {
+	action := ActionTodos
+	command, _ := testCommand(action)
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		command.Run()
+	}
 }
 
 func Test_RunTracks(t *testing.T) {
