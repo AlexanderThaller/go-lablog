@@ -41,6 +41,7 @@ const (
 )
 
 func init() {
+	logger.SetTimeFormat(".", time.RFC3339Nano)
 	l := logger.New(Name, "init")
 	runtime.GOMAXPROCS(runtime.NumCPU())
 

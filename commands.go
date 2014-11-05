@@ -62,10 +62,12 @@ func NewCommand(writer io.Writer) *Command {
 }
 
 func (com *Command) Run() error {
+	l := logger.New(Name, "Command", "Run")
 	if com.DataPath == "" {
 		return errgo.New("the datapath can not be empty")
 	}
 
+	l.Debug("Will now run the action ", com.Action)
 	switch com.Action {
 	case ActionDates:
 		return com.runListDates()
@@ -172,23 +174,32 @@ func (com *Command) Write(record Record) error {
 type listCommand func(io.Writer, string, int) error
 
 func (com *Command) runListCommand(command listCommand) error {
+	l := logger.New(Name, "Command", "runListCommand")
+
+	l.Debug("Will now format the header")
 	FormatHeader(com.writer, "Lablog", com.Action, 1)
 
 	if com.Project != "" {
+		l.Debug("Run the command for the project ", com.Project)
 		return command(com.writer, com.Project, 1)
 	}
+	l.Debug("Run the command for all projects")
 
+	l.Debug("Trying to get projects")
 	projects, err := com.getProjects()
 	if err != nil {
 		return err
 	}
 
+	l.Debug("Will now run the command for all projects")
 	for _, project := range projects {
+		l.Trace("Run the command for the project ", project)
 		err := command(com.writer, project, 2)
 		if err != nil {
 			return err
 		}
 	}
+	l.Debug("Finished running the command")
 
 	return nil
 }
@@ -210,10 +221,13 @@ func (com *Command) List() error {
 }
 
 func (com *Command) Notes() error {
+	l := logger.New(Name, "Command", "Notes")
 	if com.Project == "" {
+		l.Debug("Will list notes for all projects")
 		return com.runListCommand(com.runListProjectNotes)
 	}
 
+	l.Debug("Will list notes for project ", com.Project)
 	return com.runListProjectNotesAndSubnotes(com.writer, com.Project, 1)
 }
 
