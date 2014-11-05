@@ -26,6 +26,7 @@ func Test_RunDates(t *testing.T) {
 	expected := `2014-10-30
 2014-10-31
 2014-11-01
+2014-11-05
 `
 
 	testCommandRunOutput(t, l, action, expected)
@@ -36,6 +37,7 @@ func Test_RunList(t *testing.T) {
 
 	action := ActionList
 	expected := `TestNotes
+TestNotes.Subproject
 TestTodos
 TestTracks
 `
@@ -66,6 +68,11 @@ Test4
 
 == 2014-10-30T21:36:38.450479686+01:00
 Test5
+
+== TestNotes.Subproject
+
+=== 2014-11-05T22:39:54.162785484+01:00
+Test
 
 `
 
@@ -175,6 +182,11 @@ Test4
 === 2014-10-30T21:36:38.450479686+01:00
 Test5
 
+== TestNotes.Subproject
+
+=== 2014-11-05T22:39:54.162785484+01:00
+Test
+
 `
 
 	testCommandRunOutput(t, l, action, expected)
@@ -215,6 +227,11 @@ Test4
 == 2014-10-30T21:36:38.450479686+01:00
 Test5
 
+== TestNotes.Subproject
+
+=== 2014-11-05T22:39:54.162785484+01:00
+Test
+
 `
 
 	err := command.Run()
@@ -228,6 +245,7 @@ func Test_RunProjects(t *testing.T) {
 
 	action := ActionProjects
 	expected := `TestNotes
+TestNotes.Subproject
 TestTodos
 TestTracks
 `

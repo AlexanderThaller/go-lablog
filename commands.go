@@ -88,7 +88,7 @@ func (com *Command) Run() error {
 	case ActionTodo:
 		return com.runTodo()
 	case ActionTodos:
-		return com.runListCommand(com.runListProjectTodosAndSubtodos)
+		return com.Todos()
 	case ActionTrack:
 		return com.runTrack()
 	case ActionTrackStop:
@@ -229,6 +229,17 @@ func (com *Command) Notes() error {
 
 	l.Debug("Will list notes for project ", com.Project)
 	return com.runListProjectNotesAndSubnotes(com.writer, com.Project, 1)
+}
+
+func (com *Command) Todos() error {
+	l := logger.New(Name, "Command", "Todos")
+	if com.Project == "" {
+		l.Debug("Will list todos for all projects")
+		return com.runListCommand(com.runListProjectTodos)
+	}
+
+	l.Debug("Will list todos for project ", com.Project)
+	return com.runListProjectTodosAndSubtodos(com.writer, com.Project, 1)
 }
 
 func (com *Command) Projects() error {
