@@ -39,7 +39,9 @@ func Test_RunList(t *testing.T) {
 	expected := `TestNotes
 TestNotes.Subproject
 TestTodos
+TestTodos.Subproject
 TestTracks
+TestTracks.Subproject
 `
 
 	testCommandRunOutput(t, l, action, expected)
@@ -115,6 +117,10 @@ func Test_RunListProjectNoNotes(t *testing.T) {
 * Test4
 * Test5
 * Test7
+
+=== TestTodos.Subproject
+
+* Test
 
 `
 
@@ -257,7 +263,9 @@ func Test_RunProjects(t *testing.T) {
 	expected := `TestNotes
 TestNotes.Subproject
 TestTodos
+TestTodos.Subproject
 TestTracks
+TestTracks.Subproject
 `
 
 	testCommandRunOutput(t, l, action, expected)
@@ -278,6 +286,10 @@ func Test_RunTodos(t *testing.T) {
 * Test4
 * Test5
 * Test7
+
+== TestTodos.Subproject
+
+* Test
 
 `
 
@@ -316,6 +328,10 @@ func Test_RunTracks(t *testing.T) {
 * 2014-11-01T00:46:57.953493565+01:00 -- Test7
 * 2014-11-01T00:54:54.778921093+01:00
 
+== TestTracks.Subproject
+
+* 2014-11-05T23:27:37.354857614+01:00 -- Test
+
 `
 
 	testCommandRunOutput(t, l, action, expected)
@@ -336,6 +352,10 @@ func Test_RunTracksActive(t *testing.T) {
 * 2014-11-01T00:46:34.322047221+01:00 -- Test4
 * 2014-11-01T00:46:35.658221386+01:00 -- Test5
 * 2014-11-01T00:46:57.953493565+01:00 -- Test7
+
+== TestTracks.Subproject
+
+* 2014-11-05T23:27:37.354857614+01:00 -- Test
 
 `
 
