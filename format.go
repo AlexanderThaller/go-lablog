@@ -18,7 +18,7 @@ const AsciiDocSettings = `:toc: right
 :idprefix:
 :idseparator: -
 :doctype: article
-:source-highlighter: coderay
+:source-highlighter: pygments
 :listing-caption: Listing`
 
 func FormatAction(action string) string {
