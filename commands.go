@@ -670,7 +670,7 @@ func (com *Command) runWeb() error {
 func (com *Command) webRootHandler(w http.ResponseWriter, r *http.Request) {
 	projects, err := com.getProjects()
 	if err != nil {
-		fmt.Fprintf(w, "Error: ", errgo.Details(err))
+		fmt.Fprintf(w, "Error: %s", errgo.Details(err))
 		return
 	}
 

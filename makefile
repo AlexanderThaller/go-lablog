@@ -2,6 +2,7 @@ NAME = lablog
 
 all:
 	make format
+	make vet
 	make test
 	make build
 
@@ -47,3 +48,9 @@ coverage:
 	go test -coverprofile=coverage.out
 	go tool cover -func=coverage.out
 	go tool cover -html=coverage.out -o=/tmp/coverage.html
+
+lint:
+	golint ./...
+
+vet:
+	go vet

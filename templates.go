@@ -39,13 +39,13 @@ func WriteTemplateHTMLRoot(w http.ResponseWriter, r *http.Request, page RootPage
 	buffer := bytes.NewBufferString("")
 	err := template.Execute(buffer, page)
 	if err != nil {
-		fmt.Fprintf(w, "Error: ", errgo.Details(err))
+		fmt.Fprintf(w, "Error: %s", errgo.Details(err))
 		return
 	}
 
 	output, err := StringToAsciiDoctor(buffer.String())
 	if err != nil {
-		fmt.Fprintf(w, "Error: ", errgo.Details(err))
+		fmt.Fprintf(w, "Error: %s", errgo.Details(err))
 		return
 	}
 
