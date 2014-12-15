@@ -43,7 +43,7 @@ func testCommandRunOutput(t *testing.T, l logger.Logger, action, expected string
 	err := command.Run()
 	got := buffer.String()
 
-	testerr_output(t, l, err, got, expected)
+	testerrOutput(t, l, err, got, expected)
 }
 
 func compareRecord(t *testing.T, l logger.Logger, err error, newrecord, record Record) {
@@ -96,7 +96,7 @@ func test(t *testing.T, l logger.Logger, message string, got, expected interface
 	testerr(t, l, message, errors.New("no error"), got, expected)
 }
 
-func testerr_output(t *testing.T, l logger.Logger, err error, got, expected interface{}) {
+func testerrOutput(t *testing.T, l logger.Logger, err error, got, expected interface{}) {
 	message := "Did not get the expected output"
 	testerr(t, l, message, err, got, expected)
 }

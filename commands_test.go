@@ -114,7 +114,7 @@ func Test_RunNoDataPath(t *testing.T) {
 	got := err.Error()
 	expected := "the datapath can not be empty"
 
-	testerr_output(t, l, err, got, expected)
+	testerrOutput(t, l, err, got, expected)
 }
 
 func Test_RunDates(t *testing.T) {
@@ -152,7 +152,7 @@ func Test_RunListProject(t *testing.T) {
 	err := command.Run()
 	got := buffer.String()
 
-	testerr_output(t, l, err, got, expected)
+	testerrOutput(t, l, err, got, expected)
 }
 
 func Test_RunListProjectNoDataDir(t *testing.T) {
@@ -168,7 +168,7 @@ func Test_RunListProjectNoDataDir(t *testing.T) {
 	err := command.Run()
 	got := buffer.String()
 
-	testerr_output(t, l, err, got, expected)
+	testerrOutput(t, l, err, got, expected)
 }
 
 func Test_RunListProjectNoNotes(t *testing.T) {
@@ -186,7 +186,7 @@ func Test_RunListProjectNoNotes(t *testing.T) {
 	err := command.Run()
 	got := buffer.String()
 
-	testerr_output(t, l, err, got, expected)
+	testerrOutput(t, l, err, got, expected)
 }
 
 func Test_RunListProjectNoNotesNoTodos(t *testing.T) {
@@ -204,7 +204,7 @@ func Test_RunListProjectNoNotesNoTodos(t *testing.T) {
 	err := command.Run()
 	got := buffer.String()
 
-	testerr_output(t, l, err, got, expected)
+	testerrOutput(t, l, err, got, expected)
 }
 
 func Test_RunListProjectNoExists(t *testing.T) {
@@ -221,7 +221,7 @@ func Test_RunListProjectNoExists(t *testing.T) {
 	err := command.Run()
 	got := buffer.String()
 
-	testerr_output(t, l, err, got, expected)
+	testerrOutput(t, l, err, got, expected)
 }
 
 func Test_RunNotes(t *testing.T) {
@@ -264,7 +264,7 @@ func Test_RunNotesProject(t *testing.T) {
 	err := command.Run()
 	got := buffer.String()
 
-	testerr_output(t, l, err, got, expected)
+	testerrOutput(t, l, err, got, expected)
 }
 
 func Test_RunProjects(t *testing.T) {

@@ -41,7 +41,7 @@ TestValue
 	buffer := bytes.NewBufferString("")
 	err := FormatNotes(buffer, "TestProject", ActionNotes, records, 1)
 	got := buffer.String()
-	testerr_output(t, l, err, got, expected)
+	testerrOutput(t, l, err, got, expected)
 }
 
 func Test_FormatRecordsNote(t *testing.T) {
@@ -63,5 +63,5 @@ TestValue
 	buffer := bytes.NewBufferString("")
 	err := FormatRecords(buffer, "TestProject", ActionNotes, records, 1)
 	got := buffer.String()
-	testerr_output(t, l, err, got, expected)
+	testerrOutput(t, l, err, got, expected)
 }
