@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"path"
 	"path/filepath"
@@ -45,13 +46,14 @@ const (
 	ActionNotes           = "notes"
 	ActionProjects        = "projects"
 	ActionRename          = "rename"
-	ActionTodo            = "todo"
 	ActionTodos           = "todos"
-	ActionTrack           = "track"
-	ActionTrackStop       = "trackstop"
-	ActionTracks          = "tracks"
+	ActionTodo            = "todo"
 	ActionTracksActive    = "tracksactive"
 	ActionTracksDurations = "durations"
+	ActionTrackStop       = "trackstop"
+	ActionTracks          = "tracks"
+	ActionTrack           = "track"
+	ActionWeb             = "web"
 )
 
 func NewCommand(writer io.Writer) *Command {
@@ -99,6 +101,8 @@ func (com *Command) Run() error {
 		return com.runListCommand(com.runListProjectTracksActive)
 	case ActionTracksDurations:
 		return com.runListCommand(com.runListProjectTracksDurations)
+	case ActionWeb:
+		return com.runWeb()
 	default:
 		return errgo.New("Do not recognize the action: " + com.Action)
 	}
@@ -652,6 +656,26 @@ func (com *Command) runTodo() error {
 	l.Trace("Todo: ", fmt.Sprintf("%+v", todo))
 
 	return com.Write(todo)
+}
+
+func (com *Command) runWeb() error {
+	http.HandleFunc("/", com.webRootHandler)
+	err := http.ListenAndServe(":8080", nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+func (com *Command) webRootHandler(w http.ResponseWriter, r *http.Request) {
+	projects, err := com.getProjects()
+	if err != nil {
+		fmt.Fprintf(w, "Error: ", errgo.Details(err))
+		return
+	}
+
+	page := RootPage{Projects: projects}
+	WriteTemplateHTMLRoot(w, r, page)
 }
 
 func (com *Command) getProjects() ([]string, error) {

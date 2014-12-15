@@ -9,7 +9,7 @@ import (
 )
 
 const AsciiDocSettings = `:toc: right
-:toclevels: 1
+:toclevels: 2
 :sectanchors:
 :sectlink:
 :icons: font
@@ -17,7 +17,7 @@ const AsciiDocSettings = `:toc: right
 :numbered:
 :idprefix:
 :idseparator: -
-:doctype: article
+:doctype: book
 :source-highlighter: pygments
 :listing-caption: Listing`
 
