@@ -9,14 +9,13 @@ import (
 	"runtime"
 	"time"
 
-	"bytes"
-
 	"bitbucket.org/kardianos/osext"
 	"github.com/AlexanderThaller/logger"
 	"github.com/davecheney/profile"
 	"github.com/jinzhu/now"
 	"github.com/juju/errgo"
 	"github.com/mitchellh/go-homedir"
+	"github.com/spf13/cobra"
 )
 
 var (
@@ -80,7 +79,7 @@ func main() {
 		defer prof.Stop()
 	}
 
-	buffer := bytes.NewBufferString("")
+	/*buffer := bytes.NewBufferString("")
 	command := NewCommand(buffer)
 	command.Action = *flagAction
 	command.Args = flag.Args()
@@ -108,14 +107,32 @@ func main() {
 	command.EndTime = endtime
 
 	l.Trace("Command: ", fmt.Sprintf("%+v", command))
+	*/
+	LablogCmd := &cobra.Command{
+		Use:   "lablog",
+		Short: "lablog helps you keeping notes and todos",
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Println("running now!")
+		},
+	}
+	versionCmd := &cobra.Command{
+		Use:   "version",
+		Short: "Print the version and exit",
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Println(buildVersion, buildTime)
+		},
+	}
+	LablogCmd.AddCommand(versionCmd)
 
-	err = command.Run()
+	LablogCmd.Execute()
+
+	/*err = command.Run()
 	if err != nil {
 		l.Alert("Problem while running command: ", errgo.Details(err))
 		os.Exit(1)
 	}
 
-	fmt.Print(buffer.String())
+	fmt.Print(buffer.String())*/
 }
 
 // configProfile will start profiling based on the default profile
