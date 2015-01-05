@@ -1,6 +1,6 @@
 {
-	"ImportPath": "github.com/AlexanderThaller/lablog",
-	"GoVersion": "go1.3.2",
+	"ImportPath": "github.com/AlexanderThaller/go-lablog",
+	"GoVersion": "go1.4",
 	"Packages": [
 		"./..."
 	],
@@ -18,6 +18,14 @@
 		{
 			"ImportPath": "github.com/davecheney/profile",
 			"Rev": "867e56f7b923dac5d47fd39ac837b329d0313454"
+		},
+		{
+			"ImportPath": "github.com/gorilla/context",
+			"Rev": "215affda49addc4c8ef7e2534915df2c8c35c6cd"
+		},
+		{
+			"ImportPath": "github.com/gorilla/mux",
+			"Rev": "e444e69cbd2e2e3e0749a2f3c717cec491552bbf"
 		},
 		{
 			"ImportPath": "github.com/jinzhu/now",
