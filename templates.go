@@ -38,7 +38,6 @@ func WriteTemplateHTML(w http.ResponseWriter, r *http.Request, page Page) {
 
 func StringToAsciiDoctor(input string) (string, error) {
 	l := logger.New(Name, "StringToAsciiDoctor")
-	l.SetLevel(logger.Debug)
 
 	l.Debug("Starting command")
 	command := exec.Command("asciidoctor", "-")
