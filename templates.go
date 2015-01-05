@@ -11,30 +11,13 @@ import (
 	"github.com/juju/errgo"
 )
 
-const TemplatePageRoot = `= Lablog -- Projects
-
-[cols="4*", options="header"]
-|===
-|Project
-|Notes
-|Todos
-|Tracks
-
-{{ range .Projects }}
-|{{ . }}
-|link:/notes/{{ . }}[Notes]
-|link:/todos/{{ . }}[Todos]
-|link:/tracks/{{ . }}[Tracks]
-{{ end }}
-|===`
-
-type RootPage struct {
-	Projects []string
+type Page interface {
+	Template() string
 }
 
-func WriteTemplateHTMLRoot(w http.ResponseWriter, r *http.Request, page RootPage) {
-	template := template.New("templatehtmlroot")
-	template.Parse(TemplatePageRoot)
+func WriteTemplateHTML(w http.ResponseWriter, r *http.Request, page Page) {
+	template := template.New("templatehtmlpage")
+	template.Parse(page.Template())
 
 	buffer := bytes.NewBufferString("")
 	err := template.Execute(buffer, page)
@@ -83,4 +66,51 @@ func StringToAsciiDoctor(input string) (string, error) {
 
 	l.Debug("Returning output")
 	return string(output), nil
+}
+
+type RootPage struct {
+	Projects []string
+}
+
+const TemplatePageRoot = `= Lablog -- Projects
+
+[cols="4*", options="header"]
+|===
+|Project
+|Notes
+|Todos
+|Tracks
+
+{{ range .Projects }}
+|{{ . }}
+|link:/notes/{{ . }}[Notes]
+|link:/todos/{{ . }}[Todos]
+|link:/tracks/{{ . }}[Tracks]
+{{ end }}
+|===`
+
+func (page RootPage) Template() string {
+	return TemplatePageRoot
+}
+
+type PageNotes struct {
+	Project string
+	Notes   []Note
+}
+
+const TemplatePageNotes = `= Lablog -- {{ .Project }}
+`
+
+func (page PageNotes) Template() string {
+	buffer := bytes.NewBufferString("")
+
+	err := FormatNotes(buffer, page.Project, "Notes", page.Notes, 1)
+	if err != nil {
+		fmt.Fprintf(buffer, "Error: %s", errgo.Details(err))
+		return buffer.String()
+	}
+
+	buffer.WriteString("link:/[Back]")
+
+	return buffer.String()
 }

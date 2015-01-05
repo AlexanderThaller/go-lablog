@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/AlexanderThaller/logger"
+	"github.com/gorilla/mux"
 	"github.com/jinzhu/now"
 	"github.com/juju/errgo"
 )
@@ -659,7 +660,11 @@ func (com *Command) runTodo() error {
 }
 
 func (com *Command) runWeb() error {
-	http.HandleFunc("/", com.webRootHandler)
+	r := mux.NewRouter()
+	r.HandleFunc("/", com.webRootHandler)
+	r.HandleFunc("/notes/{project}", com.webNotesHandler)
+
+	http.Handle("/", r)
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
 		return err
@@ -668,16 +673,29 @@ func (com *Command) runWeb() error {
 	return nil
 }
 func (com *Command) webRootHandler(w http.ResponseWriter, r *http.Request) {
-	projects, err := com.getProjects()
+	projects, err := Projects(com.DataPath, time.Time{}, time.Now())
 	if err != nil {
 		fmt.Fprintf(w, "Error: %s", errgo.Details(err))
 		return
 	}
 
 	page := RootPage{Projects: projects}
-	WriteTemplateHTMLRoot(w, r, page)
+	WriteTemplateHTML(w, r, page)
 }
 
+func (com *Command) webNotesHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	project := vars["project"]
+
+	notes, err := ProjectNotes(project, com.DataPath, time.Time{}, time.Now())
+	if err != nil {
+		fmt.Fprintf(w, "Error: %s", errgo.Details(err))
+		return
+	}
+
+	page := PageNotes{Project: project, Notes: notes}
+	WriteTemplateHTML(w, r, page)
+}
 func (com *Command) getProjects() ([]string, error) {
 	return Projects(com.DataPath, com.StartTime, com.EndTime)
 }

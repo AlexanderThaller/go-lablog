@@ -2,7 +2,7 @@ NAME = lablog
 
 all:
 	make format
-	make vet
+	#make vet
 	make test
 	make build
 
