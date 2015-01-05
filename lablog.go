@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"bytes"
+
 	"bitbucket.org/kardianos/osext"
 	"github.com/AlexanderThaller/logger"
 	"github.com/davecheney/profile"
