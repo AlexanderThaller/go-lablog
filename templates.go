@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"net/http"
 	"os/exec"
 	"text/template"
@@ -49,10 +50,11 @@ func StringToAsciiDoctor(input string) (string, error) {
 	}
 
 	l.Debug("Writing to pipe")
-	_, err = pipe.Write([]byte(input))
+	_, err = io.WriteString(pipe, input)
 	if err != nil {
-		return "", err
+		return "", errgo.Notef(err, "can not write to pipe")
 	}
+	l.Debug("Finished writing to pipe")
 	pipe.Close()
 
 	l.Debug("Reading output")
