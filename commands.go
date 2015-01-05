@@ -692,6 +692,7 @@ func (com *Command) webNotesHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Error: %s", errgo.Details(err))
 		return
 	}
+	sort.Sort(NotesByDate(notes))
 
 	page := PageNotes{Project: project, Notes: notes}
 	WriteTemplateHTML(w, r, page)
