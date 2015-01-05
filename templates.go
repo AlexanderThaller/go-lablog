@@ -98,9 +98,6 @@ type PageNotes struct {
 	Notes   []Note
 }
 
-const TemplatePageNotes = `= Lablog -- {{ .Project }}
-`
-
 func (page PageNotes) Template() string {
 	buffer := bytes.NewBufferString("")
 
@@ -109,8 +106,6 @@ func (page PageNotes) Template() string {
 		fmt.Fprintf(buffer, "Error: %s", errgo.Details(err))
 		return buffer.String()
 	}
-
-	buffer.WriteString("link:/[Back]")
 
 	return buffer.String()
 }

@@ -39,7 +39,7 @@ func FormatHeader(writer io.Writer, project, action string, indent int) {
 	}
 
 	formaction := FormatAction(action)
-	writer.Write([]byte("= " + project + " -- " + string(formaction) + "\n"))
+	writer.Write([]byte("= link:/[" + project + " -- " + string(formaction) + "]\n"))
 	writer.Write([]byte(AsciiDocSettings + "\n\n"))
 }
 

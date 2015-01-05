@@ -145,7 +145,7 @@ func Test_RunListProject(t *testing.T) {
 	command, buffer := testCommand(action)
 	command.Project = "TestNotes"
 
-	expected := "= Lablog -- List\n"
+	expected := "= link:/[Lablog -- List]\n"
 	expected += AsciiDocSettings + "\n\n"
 	expected += ExpectedNotes
 
@@ -179,7 +179,7 @@ func Test_RunListProjectNoNotes(t *testing.T) {
 	command, buffer := testCommand(action)
 	command.Project = "TestTodos"
 
-	expected := "= Lablog -- List\n"
+	expected := "= link:/[Lablog -- List]\n"
 	expected += AsciiDocSettings + "\n\n"
 	expected += ExpectedTodos
 
@@ -197,7 +197,7 @@ func Test_RunListProjectNoNotesNoTodos(t *testing.T) {
 	command, buffer := testCommand(action)
 	command.Project = "TestTracks"
 
-	expected := "= Lablog -- List\n"
+	expected := "= link:/[Lablog -- List]\n"
 	expected += AsciiDocSettings + "\n\n"
 	expected += ExpectedTracksActive
 
@@ -215,7 +215,7 @@ func Test_RunListProjectNoExists(t *testing.T) {
 	command, buffer := testCommand(action)
 	command.Project = "DOES NOT EXIST"
 
-	expected := "= Lablog -- List\n"
+	expected := "= link:/[Lablog -- List]\n"
 	expected += AsciiDocSettings + "\n\n"
 
 	err := command.Run()
@@ -230,7 +230,7 @@ func Test_RunNotes(t *testing.T) {
 
 	action := ActionNotes
 
-	expected := "= Lablog -- Notes\n"
+	expected := "= link:/[Lablog -- Notes]\n"
 	expected += AsciiDocSettings + "\n\n"
 	expected += ExpectedNotes
 
@@ -257,7 +257,7 @@ func Test_RunNotesProject(t *testing.T) {
 	command, buffer := testCommand(action)
 	command.Project = "TestNotes"
 
-	expected := "= Lablog -- Notes\n"
+	expected := "= link:/[Lablog -- Notes]\n"
 	expected += AsciiDocSettings + "\n\n"
 	expected += ExpectedNotes
 
@@ -283,7 +283,7 @@ func Test_RunTodos(t *testing.T) {
 
 	action := ActionTodos
 
-	expected := "= Lablog -- Todos\n"
+	expected := "= link:/[Lablog -- Todos]\n"
 	expected += AsciiDocSettings + "\n\n"
 	expected += ExpectedTodos
 
@@ -306,7 +306,7 @@ func Test_RunTracks(t *testing.T) {
 
 	action := ActionTracks
 
-	expected := "= Lablog -- Tracks\n"
+	expected := "= link:/[Lablog -- Tracks]\n"
 	expected += AsciiDocSettings + "\n\n"
 	expected += ExpectedTracks
 
@@ -319,7 +319,7 @@ func Test_RunTracksActive(t *testing.T) {
 
 	action := ActionTracksActive
 
-	expected := "= Lablog -- TracksActive\n"
+	expected := "= link:/[Lablog -- TracksActive]\n"
 	expected += AsciiDocSettings + "\n\n"
 	expected += ExpectedTracksActive
 
@@ -332,7 +332,7 @@ func Test_RunTracksDurations(t *testing.T) {
 
 	action := ActionTracksDurations
 
-	expected := "= Lablog -- Durations\n"
+	expected := "= link:/[Lablog -- Durations]\n"
 	expected += AsciiDocSettings + "\n\n"
 	expected += ExpectedTracksDurations
 

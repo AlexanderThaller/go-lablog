@@ -11,7 +11,7 @@ import (
 func Test_FormatHeader(t *testing.T) {
 	l := logger.New(Name, "Test", "FormatHeader")
 
-	expected := "= Lablog -- Notes\n"
+	expected := "= link:/[Lablog -- Notes]\n"
 	expected += AsciiDocSettings + "\n\n"
 
 	buffer := bytes.NewBufferString("")
@@ -30,7 +30,7 @@ func Test_FormatNotes(t *testing.T) {
 		TimeStamp: time.Time{},
 		Value:     "TestValue",
 	}
-	expected := "= TestProject -- Notes\n"
+	expected := "= link:/[TestProject -- Notes]\n"
 	expected += AsciiDocSettings + "\n\n"
 	expected += `== 0001-01-01T00:00:00Z
 TestValue
@@ -52,7 +52,7 @@ func Test_FormatRecordsNote(t *testing.T) {
 		TimeStamp: time.Time{},
 		Value:     "TestValue",
 	}
-	expected := "= TestProject -- Notes\n"
+	expected := "= link:/[TestProject -- Notes]\n"
 	expected += AsciiDocSettings + "\n\n"
 	expected += `== 0001-01-01T00:00:00Z
 TestValue
