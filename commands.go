@@ -54,7 +54,6 @@ const (
 	ActionTrackStop       = "trackstop"
 	ActionTracks          = "tracks"
 	ActionTrack           = "track"
-	ActionWeb             = "web"
 )
 
 func NewCommand(writer io.Writer) *Command {
@@ -102,8 +101,6 @@ func (com *Command) Run() error {
 		return com.runListCommand(com.runListProjectTracksActive)
 	case ActionTracksDurations:
 		return com.runListCommand(com.runListProjectTracksDurations)
-	case ActionWeb:
-		return com.runWeb()
 	default:
 		return errgo.New("Do not recognize the action: " + com.Action)
 	}
@@ -659,13 +656,13 @@ func (com *Command) runTodo() error {
 	return com.Write(todo)
 }
 
-func (com *Command) runWeb() error {
+func (com *Command) RunWeb(binding string) error {
 	r := mux.NewRouter()
 	r.HandleFunc("/", com.webRootHandler)
 	r.HandleFunc("/notes/{project}", com.webNotesHandler)
 
 	http.Handle("/", r)
-	err := http.ListenAndServe(":8080", nil)
+	err := http.ListenAndServe(binding, nil)
 	if err != nil {
 		return err
 	}

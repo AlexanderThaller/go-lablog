@@ -50,7 +50,6 @@ func init() {
 		home = ""
 		l.Warning("Can not get homedir: ", err)
 	}
-	flagDataPath = flag.String("datapath", home+"/.lablog", "The path to the datafolder")
 
 	flag.Parse()
 
@@ -123,6 +122,21 @@ func main() {
 		},
 	}
 	LablogCmd.AddCommand(versionCmd)
+  webCmd := &cobra.Command{
+    Use: "web",
+    Short: "Will launch a webapp which allows browsing the data",
+    Run: func(cmd *cobra.Command, args []string) {
+	    buffer := bytes.NewBufferString("")
+	    command := NewCommand(buffer)
+      command.DataPath = datapath
+
+      command.RunWeb(binding)
+    },
+  }
+  LablogCmd.Flags().StringVarP(&binding, "bind", "b", ":57333",
+    "Where the webserver will listen to requests.")
+  LablogCmd.Flags().StringVarP(&datapath, "datapath", "p", ""
+    "From where the webserver will read the data")
 
 	LablogCmd.Execute()
 
