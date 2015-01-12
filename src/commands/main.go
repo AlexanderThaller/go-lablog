@@ -20,4 +20,5 @@ func Execute() {
 func AddCommands() {
 	lablogCmd.AddCommand(cmdVersion)
 	lablogCmd.AddCommand(cmdWeb)
+	lablogCmd.AddCommand(cmdNote)
 }
