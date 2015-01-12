@@ -23,6 +23,7 @@ func (com *Command) runWeb() error {
 
 	return nil
 }
+
 func (com *Command) webRootHandler(w http.ResponseWriter, r *http.Request) {
 	projects, err := Projects(com.DataPath, time.Time{}, time.Now())
 	if err != nil {

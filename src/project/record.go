@@ -1,4 +1,4 @@
-package main
+package project
 
 import (
 	"sort"
@@ -10,6 +10,11 @@ import (
 
 const (
 	RecordTimeStampFormat = time.RFC3339Nano
+
+	ActionNote         = "note"
+	ActionTodo         = "todo"
+	ActionTrack        = "track"
+	ActionTracksActive = "tracksactive"
 )
 
 type Record interface {
