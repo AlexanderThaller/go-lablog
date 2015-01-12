@@ -669,31 +669,7 @@ func (com *Command) RunWeb(binding string) error {
 
 	return nil
 }
-func (com *Command) webRootHandler(w http.ResponseWriter, r *http.Request) {
-	projects, err := Projects(com.DataPath, time.Time{}, time.Now())
-	if err != nil {
-		fmt.Fprintf(w, "Error: %s", errgo.Details(err))
-		return
-	}
 
-	page := RootPage{Projects: projects}
-	WriteTemplateHTML(w, r, page)
-}
-
-func (com *Command) webNotesHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	project := vars["project"]
-
-	notes, err := ProjectNotes(project, com.DataPath, time.Time{}, time.Now())
-	if err != nil {
-		fmt.Fprintf(w, "Error: %s", errgo.Details(err))
-		return
-	}
-	sort.Sort(NotesByDate(notes))
-
-	page := PageNotes{Project: project, Notes: notes}
-	WriteTemplateHTML(w, r, page)
-}
 func (com *Command) getProjects() ([]string, error) {
 	return Projects(com.DataPath, com.StartTime, com.EndTime)
 }
