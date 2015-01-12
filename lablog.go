@@ -9,6 +9,8 @@ import (
 	"runtime"
 	"time"
 
+	"bytes"
+
 	"bitbucket.org/kardianos/osext"
 	"github.com/AlexanderThaller/logger"
 	"github.com/davecheney/profile"
@@ -45,12 +47,6 @@ func init() {
 	l := logger.New(Name, "init")
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	home, err := homedir.Dir()
-	if err != nil {
-		home = ""
-		l.Warning("Can not get homedir: ", err)
-	}
-
 	flag.Parse()
 
 	priority, err := logger.ParsePriority(*flagLogLevel)
@@ -76,6 +72,21 @@ func main() {
 		}
 
 		defer prof.Stop()
+	}
+
+	err := run()
+	if err != nil {
+		l.Alert("Problem while running: ", errgo.Details(err))
+		os.Exit(1)
+	}
+}
+
+func run() error {
+	var err error
+
+	homepath, err := homedir.Dir()
+	if err != nil {
+		return errgo.Notef(err, "can not get homedir")
 	}
 
 	/*buffer := bytes.NewBufferString("")
@@ -107,46 +118,53 @@ func main() {
 
 	l.Trace("Command: ", fmt.Sprintf("%+v", command))
 	*/
+
 	LablogCmd := &cobra.Command{
-		Use:   "lablog",
-		Short: "lablog helps you keeping notes and todos",
-		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println("running now!")
-		},
+		Use:  "lablog",
+		Long: "lablog helps you keeping notes and todos.",
 	}
-	versionCmd := &cobra.Command{
-		Use:   "version",
-		Short: "Print the version and exit",
+	LablogCmd.AddCommand(versionCmd())
+	LablogCmd.AddCommand(webCmd(homepath))
+
+	//	fmt.Print(buffer.String())
+
+	LablogCmd.Execute()
+
+	return err
+}
+
+func versionCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:  "version",
+		Long: "Print the version and exit.",
 		Run: func(cmd *cobra.Command, args []string) {
 			fmt.Println(buildVersion, buildTime)
 		},
 	}
-	LablogCmd.AddCommand(versionCmd)
-  webCmd := &cobra.Command{
-    Use: "web",
-    Short: "Will launch a webapp which allows browsing the data",
-    Run: func(cmd *cobra.Command, args []string) {
-	    buffer := bytes.NewBufferString("")
-	    command := NewCommand(buffer)
-      command.DataPath = datapath
+}
 
-      command.RunWeb(binding)
-    },
-  }
-  LablogCmd.Flags().StringVarP(&binding, "bind", "b", ":57333",
-    "Where the webserver will listen to requests.")
-  LablogCmd.Flags().StringVarP(&datapath, "datapath", "p", ""
-    "From where the webserver will read the data")
+func webCmd(homepath string) *cobra.Command {
+	var binding string
+	var datapath string
 
-	LablogCmd.Execute()
+	cmd := &cobra.Command{
+		Use:   "web",
+		Short: "Will launch a webapp which allows browsing the data",
+		Run: func(cmd *cobra.Command, args []string) {
+			buffer := bytes.NewBufferString("")
+			command := NewCommand(buffer)
+			command.DataPath = datapath
 
-	/*err = command.Run()
-	if err != nil {
-		l.Alert("Problem while running command: ", errgo.Details(err))
-		os.Exit(1)
+			command.RunWeb(binding)
+		},
 	}
+	cmd.Flags().StringVarP(&binding, "bind", "b", ":57333",
+		"Where the webserver will listen to requests.")
+	cmd.Flags().StringVarP(&datapath, "datapath", "p",
+		path.Join(homepath, ".lablog"),
+		"From where the webserver will read the data.")
 
-	fmt.Print(buffer.String())*/
+	return cmd
 }
 
 // configProfile will start profiling based on the default profile
