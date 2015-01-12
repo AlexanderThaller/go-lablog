@@ -6,15 +6,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func getCmdVersion() *cobra.Command {
-	cmdVersion.Flags().BoolVarP(&flagVersionBuildTime, "build", "b", false,
-		"also print when the software was build")
-	cmdVersion.Flags().BoolVarP(&flagVersionBuildHash, "git", "g", false,
-		"also print with which git version the software was build")
-
-	return cmdVersion
-}
-
 var cmdVersion = &cobra.Command{
 	Use:   "version",
 	Short: "Print the version number of aptly-manager",
@@ -36,3 +27,10 @@ var cmdVersion = &cobra.Command{
 
 var flagVersionBuildTime bool
 var flagVersionBuildHash bool
+
+func init() {
+	cmdVersion.Flags().BoolVarP(&flagVersionBuildTime, "build", "b", false,
+		"also print when the software was build")
+	cmdVersion.Flags().BoolVarP(&flagVersionBuildHash, "git", "g", false,
+		"also print with which git version the software was build")
+}

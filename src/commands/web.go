@@ -7,13 +7,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func getCmdWeb() *cobra.Command {
-	cmdWeb.Flags().StringVarP(&flagWebBind, "bind", "b", ":8080",
-		"the address and port to bind to")
-
-	return cmdWeb
-}
-
 var cmdWeb = &cobra.Command{
 	Use:   "web",
 	Short: "Serve the lablog data as a webpage",
@@ -22,7 +15,7 @@ var cmdWeb = &cobra.Command{
 		l := logger.New("commands", "web")
 		l.Notice("listening on " + flagWebBind)
 
-		web.DataDir = flagMainDataDir
+		web.DataDir = flagLablogDataDir
 		err := web.Listen(flagWebBind)
 		if err != nil {
 			l.Alert("can not serve content: ", errgo.Details(err))
@@ -31,3 +24,8 @@ var cmdWeb = &cobra.Command{
 }
 
 var flagWebBind string
+
+func init() {
+	cmdWeb.Flags().StringVarP(&flagWebBind, "bind", "b", ":8080",
+		"the address and port to bind to")
+}
