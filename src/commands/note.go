@@ -2,8 +2,12 @@ package commands
 
 import (
 	"os"
+	"strings"
+	"time"
 
+	"github.com/AlexanderThaller/lablog/src/project"
 	"github.com/AlexanderThaller/logger"
+	"github.com/juju/errgo"
 	"github.com/spf13/cobra"
 )
 
@@ -28,10 +32,18 @@ var cmdNote = &cobra.Command{
 			os.Exit(1)
 		}
 
-		project := args[0]
-		text := args[1:]
+		note := project.Note{
+			Project:   args[0],
+			Value:     strings.Join(args[1:], " "),
+			TimeStamp: time.Now(),
+		}
 
-		l.Debug("Project: ", project)
-		l.Debug("Text: ", text[0])
+		l.Debug("Note: ", note)
+
+		err := project.WriteRecord(flagLablogDataDir, note)
+		if err != nil {
+			l.Alert("can not write note: ", errgo.Details(err))
+			os.Exit(1)
+		}
 	},
 }

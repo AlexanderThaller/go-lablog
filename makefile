@@ -7,8 +7,8 @@ all:
 	make build
 
 format:
-	find . -name "*.go" -type f -exec gofmt -s=true -w=true {} \;
-	find . -name "*.go" -type f -exec goimports -w=true {} \;
+	find . -name "*.go" -not -path './Godeps/*' -type f -exec gofmt -s=true -w=true {} \;
+	find . -name "*.go" -not -path './Godeps/*' -type f -exec goimports -w=true {} \;
 
 test:
 	go test

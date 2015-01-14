@@ -189,7 +189,6 @@ func (s *State) AddTask(t Task) error {
 	return nil
 }
 
-
 // RunTasks runs all pending tasks registered via AddTask.
 // This is called by the pipe running functions and generally
 // there's no reason to call it directly.
@@ -231,7 +230,7 @@ func (s *State) RunTasks() error {
 		}
 	}
 
-	for _ = range s.pendingTasks {
+	for range s.pendingTasks {
 		var err error
 		select {
 		case err = <-done:

@@ -335,3 +335,7 @@ func (duration DurationsByValue) Swap(i, j int) {
 func (duration DurationsByValue) Less(i, j int) bool {
 	return duration[i].Value < duration[j].Value
 }
+
+func WriteRecord(datadir string, record Record) error {
+	return errgo.New("not implemented")
+}
