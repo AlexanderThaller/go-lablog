@@ -1,6 +1,16 @@
 package commands
 
-import "github.com/spf13/cobra"
+import (
+	"bytes"
+	"fmt"
+	"os"
+	"time"
+
+	"github.com/AlexanderThaller/lablog/src/project"
+	"github.com/AlexanderThaller/logger"
+	"github.com/juju/errgo"
+	"github.com/spf13/cobra"
+)
 
 var cmdList = &cobra.Command{
 	Use:   "list (dates|notes|projects|todos|tracks)",
@@ -58,6 +68,9 @@ var cmdListTracksDurations = &cobra.Command{
 	Run:   runListTracksDurations,
 }
 
+var flagListStartTime time.Time
+var flagListEndTime time.Time
+
 func init() {
 	cmdList.AddCommand(cmdListDates)
 	cmdList.AddCommand(cmdListNotes)
@@ -67,6 +80,9 @@ func init() {
 	cmdListTracks.AddCommand(cmdListTracksActive)
 	cmdListTracks.AddCommand(cmdListTracksDurations)
 	cmdList.AddCommand(cmdListTracks)
+
+	flagListStartTime = time.Time{}
+	flagListEndTime = time.Now()
 }
 
 func runListDates(cmd *cobra.Command, args []string) {
@@ -79,6 +95,22 @@ func runListNotes(cmd *cobra.Command, args []string) {
 }
 
 func runListProjects(cmd *cobra.Command, args []string) {
+	l := logger.New("commands", "list", "projects")
+
+	output := bytes.NewBufferString("")
+
+	projects, err := project.Projects(flagLablogDataDir,
+		flagListStartTime, flagListEndTime)
+	if err != nil {
+		l.Alert("can not get projects: ", errgo.Details(err))
+		os.Exit(1)
+	}
+
+	for _, project := range projects {
+		output.WriteString(project + "\n")
+	}
+
+	fmt.Print(output.String())
 }
 
 func runListTodos(cmd *cobra.Command, args []string) {
