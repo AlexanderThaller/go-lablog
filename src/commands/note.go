@@ -40,7 +40,7 @@ var cmdNote = &cobra.Command{
 
 		l.Debug("Note: ", note)
 
-		err := project.WriteRecord(flagLablogDataDir, note)
+		err := project.WriteRecord(note, flagLablogDataDir, "git", true)
 		if err != nil {
 			l.Alert("can not write note: ", errgo.Details(err))
 			os.Exit(1)
