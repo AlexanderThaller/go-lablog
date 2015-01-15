@@ -18,7 +18,13 @@ func Execute() {
 }
 
 func AddCommands() {
+	lablogCmd.AddCommand(cmdDone)
+	lablogCmd.AddCommand(cmdList)
+	lablogCmd.AddCommand(cmdMerge)
+	lablogCmd.AddCommand(cmdNote)
+	lablogCmd.AddCommand(cmdRename)
+	lablogCmd.AddCommand(cmdTodo)
+	lablogCmd.AddCommand(cmdTrack)
 	lablogCmd.AddCommand(cmdVersion)
 	lablogCmd.AddCommand(cmdWeb)
-	lablogCmd.AddCommand(cmdNote)
 }
