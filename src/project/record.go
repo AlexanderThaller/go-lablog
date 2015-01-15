@@ -340,7 +340,9 @@ func (duration DurationsByValue) Less(i, j int) bool {
 	return duration[i].Value < duration[j].Value
 }
 
-func WriteRecord(record Record, datadir, scmtype string, autocommit bool) error {
+func WriteRecord(record Record, datadir, scmtype string,
+	autocommit, autopush bool) error {
+
 	if datadir == "" {
 		return errgo.New("datapath can not be empty")
 	}
@@ -373,6 +375,13 @@ func WriteRecord(record Record, datadir, scmtype string, autocommit bool) error 
 		err = Commit(record, datadir, scmtype)
 		if err != nil {
 			return errgo.Notef(err, "can not commit")
+		}
+	}
+
+	if autopush {
+		err = scm.Push(scmtype, datadir)
+		if err != nil {
+			return errgo.Notef(err, "can not push")
 		}
 	}
 

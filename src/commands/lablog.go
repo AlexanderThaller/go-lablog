@@ -21,7 +21,7 @@ var flagLablogDataDir string
 var flagLablogLogLevel string
 
 func init() {
-	l := logger.New("commands")
+	l := logger.New("commands", "lablog", "init")
 	homepath, err := homedir.Dir()
 	if err != nil {
 		l.Alert("can not get homepath: ", errgo.Details(err))
