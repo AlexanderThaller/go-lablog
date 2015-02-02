@@ -1,5 +1,16 @@
 package commands
 
+import (
+	"os"
+
+	"github.com/AlexanderThaller/logger"
+	"github.com/juju/errgo"
+)
+
+func init() {
+	logger.SetLevel(".", logger.Trace)
+}
+
 //BuildName represents the name of the software
 var BuildName string
 
@@ -27,4 +38,12 @@ func AddCommands() {
 	lablogCmd.AddCommand(cmdTrack)
 	lablogCmd.AddCommand(cmdVersion)
 	lablogCmd.AddCommand(cmdWeb)
+}
+
+func errexit(l logger.Logger, err error, message string) {
+	if err != nil {
+		l.Alert(message, ": ", err)
+		l.Debug(message, ": ", errgo.Details(err))
+		os.Exit(1)
+	}
 }
