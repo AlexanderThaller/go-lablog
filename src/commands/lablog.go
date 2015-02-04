@@ -15,6 +15,7 @@ var lablogCmd = &cobra.Command{
 	Short: BuildName + " makes taking notes and todos simple",
 	Long: BuildName + ` orders notes and todos into projects and subprojects
   without dictating a specific format`,
+	Run: runListProjects,
 }
 
 var flagLablogDataDir string
