@@ -1,6 +1,11 @@
 package commands
 
-import "github.com/spf13/cobra"
+import (
+	"os"
+
+	"github.com/AlexanderThaller/logger"
+	"github.com/spf13/cobra"
+)
 
 var cmdTodo = &cobra.Command{
 	Use:   "todo [project] [text]",
@@ -10,4 +15,7 @@ var cmdTodo = &cobra.Command{
 }
 
 func runTodo(cmd *cobra.Command, args []string) {
+	l := logger.New("commands", "todo")
+	l.Alert("not implemented")
+	os.Exit(1)
 }

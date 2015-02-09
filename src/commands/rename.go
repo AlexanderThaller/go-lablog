@@ -1,6 +1,11 @@
 package commands
 
-import "github.com/spf13/cobra"
+import (
+	"os"
+
+	"github.com/AlexanderThaller/logger"
+	"github.com/spf13/cobra"
+)
 
 var cmdRename = &cobra.Command{
 	Use:   "rename [src] [dst]",
@@ -10,4 +15,7 @@ var cmdRename = &cobra.Command{
 }
 
 func runRename(cmd *cobra.Command, args []string) {
+	l := logger.New("commands", "rename")
+	l.Alert("not implemented")
+	os.Exit(1)
 }

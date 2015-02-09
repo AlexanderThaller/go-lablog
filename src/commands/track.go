@@ -1,12 +1,17 @@
 package commands
 
-import "github.com/spf13/cobra"
+import (
+	"os"
+
+	"github.com/AlexanderThaller/logger"
+	"github.com/spf13/cobra"
+)
 
 var cmdTrack = &cobra.Command{
-	Use:   "track (start|stop) (project)",
+	Use:   "track (command) [project]",
 	Short: "Track projects",
 	Long:  `Track projects`,
-	Run:   runTrack,
+	Run:   runTrackToggle,
 }
 
 var cmdTrackStart = &cobra.Command{
@@ -23,16 +28,32 @@ var cmdTrackStop = &cobra.Command{
 	Run:   runTrackStop,
 }
 
+var cmdTrackToggle = &cobra.Command{
+	Use:   "toggle (project)",
+	Short: "Toggle Track projects",
+	Long:  `Toggle Track projects`,
+	Run:   runTrackToggle,
+}
+
 func init() {
 	cmdTrack.AddCommand(cmdTrackStart)
 	cmdTrack.AddCommand(cmdTrackStop)
 }
 
-func runTrack(cmd *cobra.Command, args []string) {
+func runTrackToggle(cmd *cobra.Command, args []string) {
+	l := logger.New("commands", "track", "toggle")
+	l.Alert("not implemented")
+	os.Exit(1)
 }
 
 func runTrackStart(cmd *cobra.Command, args []string) {
+	l := logger.New("commands", "track", "start")
+	l.Alert("not implemented")
+	os.Exit(1)
 }
 
 func runTrackStop(cmd *cobra.Command, args []string) {
+	l := logger.New("commands", "track", "stop")
+	l.Alert("not implemented")
+	os.Exit(1)
 }

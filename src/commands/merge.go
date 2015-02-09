@@ -1,6 +1,11 @@
 package commands
 
-import "github.com/spf13/cobra"
+import (
+	"os"
+
+	"github.com/AlexanderThaller/logger"
+	"github.com/spf13/cobra"
+)
 
 var cmdMerge = &cobra.Command{
 	Use:   "merge [src] [dst]",
@@ -10,4 +15,7 @@ var cmdMerge = &cobra.Command{
 }
 
 func runMerge(cmd *cobra.Command, args []string) {
+	l := logger.New("commands", "done")
+	l.Alert("not implemented")
+	os.Exit(1)
 }
