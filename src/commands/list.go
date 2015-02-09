@@ -5,7 +5,7 @@ import (
 	"os"
 	"sort"
 
-	"github.com/AlexanderThaller/lablog/src/entries"
+	"github.com/AlexanderThaller/lablog/src/data"
 	"github.com/AlexanderThaller/logger"
 	"github.com/spf13/cobra"
 )
@@ -86,13 +86,13 @@ func runListNotes(cmd *cobra.Command, args []string) {
 
 func runListProjects(cmd *cobra.Command, args []string) {
 	l := logger.New("commands", "list", "projects")
-	projects, err := entries.Projects(flagLablogDataDir)
+	projects, err := data.Projects(flagLablogDataDir)
 	errexit(l, err, "can not get projects")
 
-	sort.Sort(entries.ProjectsByName(projects))
+	sort.Sort(data.ProjectsByName(projects))
 
 	for _, project := range projects {
-		fmt.Println(project.Name())
+		fmt.Println(project.Name)
 	}
 }
 
