@@ -9,8 +9,8 @@ import (
 
 var cmdTodo = &cobra.Command{
 	Use:   "todo [project] [text]",
-	Short: "Todo projects",
-	Long:  `Todo projects`,
+	Short: "Todo projects.",
+	Long:  `Todo projects.`,
 	Run:   runTodo,
 }
 

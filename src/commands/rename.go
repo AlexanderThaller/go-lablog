@@ -9,8 +9,8 @@ import (
 
 var cmdRename = &cobra.Command{
 	Use:   "rename [src] [dst]",
-	Short: "Rename project from src to dst",
-	Long:  "Rename project from src to dst",
+	Short: "Rename project from src to dst.",
+	Long:  "Rename project from src to dst.",
 	Run:   runRename,
 }
 

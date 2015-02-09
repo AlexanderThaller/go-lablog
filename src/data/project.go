@@ -8,6 +8,7 @@ import (
 	"github.com/juju/errgo"
 )
 
+// Projects returns all projects which can be read from the given datadir.
 func Projects(datadir string) ([]Project, error) {
 	names, err := projectNames(datadir)
 	if err != nil {
@@ -26,10 +27,12 @@ func Projects(datadir string) ([]Project, error) {
 	return projects, nil
 }
 
+// Project represents a project.
 type Project struct {
 	Name string
 }
 
+// ProjectsByName allows sorting project slices by name.
 type ProjectsByName []Project
 
 func (by ProjectsByName) Len() int {

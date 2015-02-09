@@ -10,8 +10,8 @@ import (
 
 var cmdWeb = &cobra.Command{
 	Use:   "web",
-	Short: "Serve the lablog data as a webpage",
-	Long:  `Will listen and serve all notes and todos formatted as html`,
+	Short: "Serve the lablog data as a webpage.",
+	Long:  `Will listen and serve all notes and todos formatted as html.`,
 	Run:   runWeb,
 }
 
@@ -19,7 +19,7 @@ var flagWebBind string
 
 func init() {
 	cmdWeb.Flags().StringVarP(&flagWebBind, "bind", "b", ":8080",
-		"the address and port to bind to")
+		"The address and port to bind to.")
 }
 
 func runWeb(cmd *cobra.Command, args []string) {

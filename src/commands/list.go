@@ -12,57 +12,57 @@ import (
 
 var cmdList = &cobra.Command{
 	Use:   "list (command)",
-	Short: "List projects, notes, todos, dates, tracks, etc., see help for all options",
-	Long:  "List projects, notes, todos, dates, tracks, etc., see help for all options",
+	Short: "List projects, notes, todos, dates, tracks, etc., see help for all options.",
+	Long:  "List projects, notes, todos, dates, tracks, etc., see help for all options.",
 	Run:   runListProjects,
 }
 
 var cmdListDates = &cobra.Command{
 	Use:   "dates",
-	Short: "List dates",
-	Long:  `List dates`,
+	Short: "List dates.",
+	Long:  `List dates.`,
 	Run:   runListDates,
 }
 
 var cmdListNotes = &cobra.Command{
 	Use:   "notes",
-	Short: "List notes",
-	Long:  `List notes`,
+	Short: "List notes.",
+	Long:  `List notes.`,
 	Run:   runListNotes,
 }
 
 var cmdListProjects = &cobra.Command{
 	Use:   "projects",
-	Short: "List projects",
-	Long:  `List projects`,
+	Short: "List projects.",
+	Long:  `List projects.`,
 	Run:   runListProjects,
 }
 
 var cmdListTodos = &cobra.Command{
 	Use:   "todos",
-	Short: "List todos",
-	Long:  `List todos`,
+	Short: "List todos.",
+	Long:  `List todos.`,
 	Run:   runListTodos,
 }
 
 var cmdListTracks = &cobra.Command{
 	Use:   "tracks",
-	Short: "List tracks",
-	Long:  `List tracks`,
+	Short: "List tracks.",
+	Long:  `List tracks.`,
 	Run:   runListTracks,
 }
 
 var cmdListTracksActive = &cobra.Command{
 	Use:   "active",
-	Short: "List tracks",
-	Long:  `List tracks`,
+	Short: "List tracks.",
+	Long:  `List tracks.`,
 	Run:   runListTracksActive,
 }
 
 var cmdListTracksDurations = &cobra.Command{
 	Use:   "durations",
-	Short: "List durations",
-	Long:  `List durations`,
+	Short: "List durations.",
+	Long:  `List durations.`,
 	Run:   runListDurations,
 }
 

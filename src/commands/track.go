@@ -9,29 +9,29 @@ import (
 
 var cmdTrack = &cobra.Command{
 	Use:   "track (command) [project]",
-	Short: "Track projects",
-	Long:  `Track projects`,
+	Short: "Track projects.",
+	Long:  `Track projects.`,
 	Run:   runTrackToggle,
 }
 
 var cmdTrackStart = &cobra.Command{
 	Use:   "start (project)",
-	Short: "Start Track projects",
-	Long:  `Start Track projects`,
+	Short: "Start Track projects.",
+	Long:  `Start Track projects.`,
 	Run:   runTrackStart,
 }
 
 var cmdTrackStop = &cobra.Command{
 	Use:   "stop (project)",
-	Short: "Stop Track projects",
-	Long:  `Stop Track projects`,
+	Short: "Stop Track projects.",
+	Long:  `Stop Track projects.`,
 	Run:   runTrackStop,
 }
 
 var cmdTrackToggle = &cobra.Command{
 	Use:   "toggle (project)",
-	Short: "Toggle Track projects",
-	Long:  `Toggle Track projects`,
+	Short: "Toggle Track projects.",
+	Long:  `Toggle Track projects.`,
 	Run:   runTrackToggle,
 }
 

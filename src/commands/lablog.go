@@ -12,9 +12,9 @@ import (
 
 var lablogCmd = &cobra.Command{
 	Use:   BuildName,
-	Short: BuildName + " makes taking notes and todos simple",
+	Short: BuildName + " makes taking notes and todos simple.",
 	Long: BuildName + ` orders notes and todos into projects and subprojects
-  without dictating a specific format`,
+  without dictating a specific format.`,
 	Run: runListProjects,
 }
 var flagLablogDataDir string
@@ -29,5 +29,5 @@ func init() {
 
 	datadir := path.Join(homepath, ".lablog")
 	lablogCmd.PersistentFlags().StringVarP(&flagLablogDataDir, "datadir", "d",
-		datadir, "The path to the datadir we will use with lablog")
+		datadir, "The path to the datadir we will use with lablog.")
 }
