@@ -2,12 +2,11 @@ package errors_test
 
 import (
 	"fmt"
+	"github.com/juju/errgo/errors"
 	"io/ioutil"
 	"runtime"
 	"strings"
 	"testing"
-
-	"github.com/juju/errgo/errors"
 )
 
 var (

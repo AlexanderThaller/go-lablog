@@ -6,42 +6,13 @@
 	],
 	"Deps": [
 		{
-			"ImportPath": "bitbucket.org/kardianos/osext",
-			"Comment": "null-15",
-			"Rev": "44140c5fc69ecf1102c5ef451d73cd98ef59b178"
-		},
-		{
 			"ImportPath": "github.com/AlexanderThaller/logger",
-			"Comment": "1.1.0-6-g2f014ea",
-			"Rev": "2f014ea8b2a96158b0bd097b22b49d9235cee894"
-		},
-		{
-			"ImportPath": "github.com/davecheney/profile",
-			"Rev": "867e56f7b923dac5d47fd39ac837b329d0313454"
-		},
-		{
-			"ImportPath": "github.com/gorilla/context",
-			"Rev": "215affda49addc4c8ef7e2534915df2c8c35c6cd"
-		},
-		{
-			"ImportPath": "github.com/gorilla/mux",
-			"Rev": "e444e69cbd2e2e3e0749a2f3c717cec491552bbf"
-		},
-		{
-			"ImportPath": "github.com/jinzhu/now",
-			"Rev": "caef738a54cb159a5fe083e01609bc6873a84501"
+			"Comment": "1.1.0-8-g24123e4",
+			"Rev": "24123e4bfa9432ef59adaa9255c285c298a6b1ab"
 		},
 		{
 			"ImportPath": "github.com/juju/errgo",
 			"Rev": "26caa7d4884f6048c5687fa44c410e5d5d95e554"
-		},
-		{
-			"ImportPath": "github.com/mitchellh/go-homedir",
-			"Rev": "7d2d8c8a4e078ce3c58736ab521a40b37a504c52"
-		},
-		{
-			"ImportPath": "github.com/sergi/go-diff/diffmatchpatch",
-			"Rev": "97b2266dfe4bd4ea1b81a463322f04f8b724801e"
 		},
 		{
 			"ImportPath": "github.com/spf13/cobra",
@@ -50,10 +21,6 @@
 		{
 			"ImportPath": "github.com/spf13/pflag",
 			"Rev": "463bdc838f2b35e9307e91d480878bda5fff7232"
-		},
-		{
-			"ImportPath": "gopkg.in/pipe.v2",
-			"Rev": "3c2ca4d525447ec8b2f606a6974f9c9f40831f26"
 		}
 	]
 }
