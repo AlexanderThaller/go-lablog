@@ -3,14 +3,15 @@ package commands
 import (
 	"fmt"
 
-	"github.com/spf13/cobra"
+	"github.com/AlexanderThaller/cobra"
 )
 
 var cmdVersion = &cobra.Command{
-	Use:   "version",
-	Short: "Print the version number of aptly-manager.",
-	Long:  `All software has versions. This is aptly-manager's.`,
-	Run:   runVersion,
+	Use:    "version",
+	Short:  "Print the version number of aptly-manager.",
+	Long:   `All software has versions. This is aptly-manager's.`,
+	Run:    runVersion,
+	PreRun: setLogLevel,
 }
 
 var flagVersionBuildTime bool

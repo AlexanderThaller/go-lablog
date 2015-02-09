@@ -5,17 +5,19 @@ import (
 	"strings"
 	"time"
 
+	"github.com/AlexanderThaller/cobra"
 	"github.com/AlexanderThaller/lablog/src/data"
 	"github.com/AlexanderThaller/logger"
 	"github.com/jinzhu/now"
-	"github.com/spf13/cobra"
 )
 
 var cmdNote = &cobra.Command{
-	Use:   "note [project] [text]",
-	Short: "Create a new note for the project.",
-	Long:  `Create a note which will record the current timestamp and the given text for the given project.`,
-	Run:   runNote,
+	Use:     "note [project] [text]",
+	Short:   "Create a new note for the project.",
+	Long:    `Create a note which will record the current timestamp and the given text for the given project.`,
+	Run:     runNote,
+	PreRun:  setLogLevel,
+	PostRun: finished,
 }
 
 var flagNoteTimeStamp time.Time

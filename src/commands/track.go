@@ -3,15 +3,16 @@ package commands
 import (
 	"os"
 
+	"github.com/AlexanderThaller/cobra"
 	"github.com/AlexanderThaller/logger"
-	"github.com/spf13/cobra"
 )
 
 var cmdTrack = &cobra.Command{
-	Use:   "track (command) [project]",
-	Short: "Track projects.",
-	Long:  `Track projects.`,
-	Run:   runTrackToggle,
+	Use:    "track (command) [project]",
+	Short:  "Track projects.",
+	Long:   `Track projects.`,
+	Run:    runTrackToggle,
+	PreRun: setLogLevel,
 }
 
 var cmdTrackStart = &cobra.Command{

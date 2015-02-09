@@ -3,13 +3,10 @@ package commands
 import (
 	"os"
 
+	"github.com/AlexanderThaller/cobra"
 	"github.com/AlexanderThaller/logger"
 	"github.com/juju/errgo"
 )
-
-func init() {
-	logger.SetLevel(".", logger.Trace)
-}
 
 //BuildName represents the name of the software
 var BuildName string
@@ -24,11 +21,6 @@ var BuildHash string
 var BuildTime string
 
 func Execute() {
-	AddCommands()
-	lablogCmd.Execute()
-}
-
-func AddCommands() {
 	lablogCmd.AddCommand(cmdList)
 	lablogCmd.AddCommand(cmdMerge)
 	lablogCmd.AddCommand(cmdNote)
@@ -37,6 +29,8 @@ func AddCommands() {
 	lablogCmd.AddCommand(cmdTrack)
 	lablogCmd.AddCommand(cmdVersion)
 	lablogCmd.AddCommand(cmdWeb)
+
+	lablogCmd.Execute()
 }
 
 func errexit(l logger.Logger, err error, message string) {
@@ -45,4 +39,21 @@ func errexit(l logger.Logger, err error, message string) {
 		l.Debug(message, ": ", errgo.Details(err))
 		os.Exit(1)
 	}
+}
+
+func setLogLevel(cmd *cobra.Command, args []string) {
+	l := logger.New("commands", "setLogLevel")
+	prio, err := logger.ParsePriority(flagLablogLogLevel)
+	errexit(l, err, "can not parse loglevel")
+
+	logger.SetLevel(".", prio)
+	l.Debug("New loglevel is: ", flagLablogLogLevel)
+
+	l.Debug("Args: ", args)
+}
+
+func finished(cmd *cobra.Command, args []string) {
+	l := logger.New("commands", "finished")
+	l.Debug("Args: ", args)
+	l.Info("Finished")
 }
