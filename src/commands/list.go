@@ -1,16 +1,19 @@
 package commands
 
 import (
+	"fmt"
 	"os"
+	"sort"
 
+	"github.com/AlexanderThaller/lablog/src/entries"
 	"github.com/AlexanderThaller/logger"
 	"github.com/spf13/cobra"
 )
 
 var cmdList = &cobra.Command{
 	Use:   "list (command)",
-	Short: "List x",
-	Long:  `List x`,
+	Short: "List projects, notes, todos, dates, tracks, etc., see help for all options",
+	Long:  "List projects, notes, todos, dates, tracks, etc., see help for all options",
 	Run:   runListProjects,
 }
 
@@ -83,8 +86,14 @@ func runListNotes(cmd *cobra.Command, args []string) {
 
 func runListProjects(cmd *cobra.Command, args []string) {
 	l := logger.New("commands", "list", "projects")
-	l.Alert("not implemented")
-	os.Exit(1)
+	projects, err := entries.Projects(flagLablogDataDir)
+	errexit(l, err, "can not get projects")
+
+	sort.Sort(entries.ProjectsByName(projects))
+
+	for _, project := range projects {
+		fmt.Println(project.Name())
+	}
 }
 
 func runListTodos(cmd *cobra.Command, args []string) {
