@@ -1,4 +1,4 @@
-package main
+package project
 
 import (
 	"bufio"
@@ -409,7 +409,7 @@ func ProjectDates(project, datapath string, start, end time.Time) ([]string, err
 }
 
 func ProjectActiveTracks(project, datapath string) ([]Track, error) {
-	l := logger.New(Name, "Command", "Get", "Project", "ActiveTracks")
+	l := logger.New("project", "Get", "Project", "ActiveTracks")
 
 	tracks, err := ProjectTracks(project, datapath, time.Time{}, time.Now())
 	if err != nil {

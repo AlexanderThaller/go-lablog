@@ -1,15 +1,15 @@
-package main
+package web
 
 import (
 	"bytes"
 	"fmt"
-	"io"
 	"net/http"
-	"os/exec"
 	"text/template"
 
+	"github.com/AlexanderThaller/lablog/src/project"
 	"github.com/AlexanderThaller/logger"
 	"github.com/juju/errgo"
+	"gopkg.in/pipe.v2"
 )
 
 type Page interface {
@@ -37,29 +37,17 @@ func WriteTemplateHTML(w http.ResponseWriter, r *http.Request, page Page) {
 }
 
 func StringToAsciiDoctor(input string) (string, error) {
-	l := logger.New(Name, "StringToAsciiDoctor")
+	l := logger.New("web", "StringToAsciiDoctor")
 
-	l.Debug("Starting command")
-	command := exec.Command("asciidoctor", "-")
-
-	l.Debug("Opening pipe to command")
-	pipe, err := command.StdinPipe()
-	if err != nil {
-		return "", err
-	}
-
-	l.Debug("Writing to pipe")
-	_, err = io.WriteString(pipe, input)
-	if err != nil {
-		return "", errgo.Notef(err, "can not write to pipe")
-	}
-	l.Debug("Finished writing to pipe")
-	pipe.Close()
+	p := pipe.Line(
+		pipe.Print(input),
+		pipe.Exec("asciidoctor", "-"),
+	)
 
 	l.Debug("Reading output")
-	output, err := command.CombinedOutput()
+	output, err := pipe.CombinedOutput(p)
 	if err != nil {
-		err = errgo.New("problem while getting raw snapshots: " + err.Error() +
+		err = errgo.New("problem while getting asciidoc output: " + err.Error() +
 			" - " + string(output))
 
 		return "", err
@@ -96,13 +84,13 @@ func (page RootPage) Template() string {
 
 type PageNotes struct {
 	Project string
-	Notes   []Note
+	Notes   []project.Note
 }
 
 func (page PageNotes) Template() string {
 	buffer := bytes.NewBufferString("")
 
-	err := FormatNotes(buffer, page.Project, "Notes", page.Notes, 1)
+	err := project.FormatNotes(buffer, page.Project, "Notes", page.Notes, 1)
 	if err != nil {
 		fmt.Fprintf(buffer, "Error: %s", errgo.Details(err))
 		return buffer.String()

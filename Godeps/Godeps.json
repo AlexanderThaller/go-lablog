@@ -1,5 +1,5 @@
 {
-	"ImportPath": "github.com/AlexanderThaller/go-lablog",
+	"ImportPath": "github.com/AlexanderThaller/lablog",
 	"GoVersion": "go1.4",
 	"Packages": [
 		"./..."
@@ -42,6 +42,18 @@
 		{
 			"ImportPath": "github.com/sergi/go-diff/diffmatchpatch",
 			"Rev": "97b2266dfe4bd4ea1b81a463322f04f8b724801e"
+		},
+		{
+			"ImportPath": "github.com/spf13/cobra",
+			"Rev": "e1e66f7b4e667751cf530ddb6e72b79d6eeb0235"
+		},
+		{
+			"ImportPath": "github.com/spf13/pflag",
+			"Rev": "463bdc838f2b35e9307e91d480878bda5fff7232"
+		},
+		{
+			"ImportPath": "gopkg.in/pipe.v2",
+			"Rev": "3c2ca4d525447ec8b2f606a6974f9c9f40831f26"
 		}
 	]
 }

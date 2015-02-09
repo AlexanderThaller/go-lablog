@@ -1,15 +1,24 @@
-package main
+package project
 
 import (
+	"encoding/csv"
+	"os"
+	"path/filepath"
 	"sort"
 	"strconv"
 	"time"
 
+	"github.com/AlexanderThaller/lablog/src/scm"
 	"github.com/juju/errgo"
 )
 
 const (
 	RecordTimeStampFormat = time.RFC3339Nano
+
+	ActionNote         = "note"
+	ActionTodo         = "todo"
+	ActionTrack        = "track"
+	ActionTracksActive = "tracksactive"
 )
 
 type Record interface {
@@ -329,4 +338,74 @@ func (duration DurationsByValue) Swap(i, j int) {
 
 func (duration DurationsByValue) Less(i, j int) bool {
 	return duration[i].Value < duration[j].Value
+}
+
+func WriteRecord(record Record, datadir, scmtype string,
+	autocommit, autopush bool) error {
+
+	if datadir == "" {
+		return errgo.New("datapath can not be empty")
+	}
+
+	project := record.GetProject()
+	if project == "" {
+		return errgo.New("project name can not be empty")
+	}
+
+	err := os.MkdirAll(datadir, 0750)
+	if err != nil {
+		return errgo.Notef(err, "can not create datadir")
+	}
+
+	filepath := filepath.Join(datadir, project+".csv")
+	file, err := os.OpenFile(filepath, os.O_RDWR|os.O_APPEND|os.O_CREATE, 0640)
+	if err != nil {
+		return errgo.Notef(err, "can not open file for writing")
+	}
+	defer file.Close()
+
+	writer := csv.NewWriter(file)
+	err = writer.Write(record.CSV())
+	if err != nil {
+		return errgo.Notef(err, "can not write record")
+	}
+	writer.Flush()
+
+	if autocommit {
+		err = Commit(record, datadir, scmtype)
+		if err != nil {
+			return errgo.Notef(err, "can not commit")
+		}
+	}
+
+	if autopush {
+		err = scm.Push(scmtype, datadir)
+		if err != nil {
+			return errgo.Notef(err, "can not push")
+		}
+	}
+
+	return nil
+}
+
+func Commit(record Record, datadir, scmtype string) error {
+	if scmtype == "" {
+		return errgo.New("scm can not be empty")
+	}
+
+	filename := record.GetProject() + ".csv"
+	err := scm.Add(scmtype, datadir, filename)
+	if err != nil {
+		return errgo.Notef(err, "can not add record to scm")
+	}
+
+	message := record.GetProject() + " - "
+	message += record.GetAction() + " - "
+	message += record.GetTimeStamp()
+	err = scm.Commit(scmtype, datadir, message)
+	if err != nil {
+		return errgo.Notef(err, "can not commit record to scm")
+	}
+
+	return nil
 }
