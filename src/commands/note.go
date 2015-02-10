@@ -56,7 +56,6 @@ func runNote(cmd *cobra.Command, args []string) {
 	}
 
 	l.Trace("Note: ", note)
-
-	l.Alert("not implemented")
-	os.Exit(1)
+	err := data.Record(note)
+	errexit(l, err, "can not record note")
 }
