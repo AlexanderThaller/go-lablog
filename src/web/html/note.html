@@ -1,5 +1,7 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
+<meta charset="utf-8">
 <title>Take a note</title>
 
 <style>
@@ -7,8 +9,10 @@
 </style>
 </head>
 <body>
-<form action="/put/note" method="post" novalidate>
-  Project: <input type="text" name="Project">
+<a href="/">Back</a><br>
+
+<form action="/note/record" method="post" novalidate>
+  Project: <input type="text" name="Project" value="{{.Project}}">
   <br>
   <textarea id="input_text" name="Text" rows="15"></textarea>
   <br>

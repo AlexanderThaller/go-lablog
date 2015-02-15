@@ -3,6 +3,7 @@ package web
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 
 	"github.com/AlexanderThaller/logger"
 	"github.com/gorilla/mux"
@@ -19,10 +20,11 @@ func Listen(datadir, binding string) error {
 	_datadir = datadir
 
 	router := mux.NewRouter()
-	router.HandleFunc("/new/note", NoteFormPresenterHandler)
-	router.HandleFunc("/new/note/", NoteFormPresenterHandler)
-	router.HandleFunc("/put/note", NoteFormParserHandler)
-	router.HandleFunc("/put/note/", NoteFormParserHandler)
+	router.HandleFunc("/", listProjects)
+	router.HandleFunc("/note", noteForm)
+	router.HandleFunc("/note/", noteForm)
+	router.HandleFunc("/note/record", noteParser)
+	router.HandleFunc("/note/record", noteParser)
 
 	http.Handle("/", router)
 
@@ -39,4 +41,18 @@ func printerr(l logger.Logger, w http.ResponseWriter, err error) {
 	fmt.Fprintf(w, errgo.Details(err))
 
 	return
+}
+
+func defquery(r *http.Request, key, defvalue string) string {
+	queries, err := url.ParseQuery(r.URL.RawQuery)
+	if err != nil {
+		return defvalue
+	}
+
+	value, exists := queries[key]
+	if !exists {
+		return defvalue
+	}
+
+	return value[0]
 }

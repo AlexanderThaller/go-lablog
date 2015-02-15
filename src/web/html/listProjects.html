@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Projects</title>
+<style>
+.table a {
+  display:block;
+  text-decoration:none;
+}
+</style>
+</head>
+<body>
+<table class="table">
+  <thead>
+    <th>Name</th>
+    <th>Take Note</th>
+  </thead>
+  <tr>
+    <td></td>
+    <td style="text-align:center"><a href="/note">◇</a></td>
+  {{ range $project := . }}
+  <tr>
+    <td>{{ $project.Name }}</td>
+    <td style="text-align:center"><a href="/note?project={{ $project.Name }}">◇</a></td>
+  </tr>
+  {{ end }}
+</table>
+</body>
+</html>
