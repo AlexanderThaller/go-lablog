@@ -74,6 +74,16 @@ var cmdListTracksDurations = &cobra.Command{
 	PreRun: setLogLevel,
 }
 
+func init() {
+	cmdList.AddCommand(cmdListDates)
+	cmdList.AddCommand(cmdListNotes)
+	cmdList.AddCommand(cmdListProjects)
+	cmdList.AddCommand(cmdListTodos)
+	cmdList.AddCommand(cmdListTracks)
+	cmdList.AddCommand(cmdListTracksActive)
+	cmdList.AddCommand(cmdListTracksDurations)
+}
+
 func runListDates(cmd *cobra.Command, args []string) {
 	l := logger.New("commands", "list", "dates")
 	l.Alert("not implemented")
@@ -88,8 +98,36 @@ func runListDurations(cmd *cobra.Command, args []string) {
 
 func runListNotes(cmd *cobra.Command, args []string) {
 	l := logger.New("commands", "list", "notes")
-	l.Alert("not implemented")
-	os.Exit(1)
+
+	var projects []data.Project
+
+	if len(args) == 0 {
+		var err error
+		projects, err = data.Projects(flagLablogDataDir)
+		errexit(l, err, "can not get projects")
+	} else {
+		for _, arg := range args {
+			project := data.Project{
+				Name:    arg,
+				Datadir: flagLablogDataDir,
+			}
+
+			projects = append(projects, project)
+		}
+	}
+
+	sort.Sort(data.ProjectsByName(projects))
+
+	fmt.Println("= Notes\n")
+	for _, project := range projects {
+		notes, err := project.Notes()
+		errexit(l, err, "can not get notes from project "+project.Name)
+
+		sort.Sort(data.NotesByTimeStamp(notes))
+		for _, note := range notes {
+			fmt.Println(note.Format(1))
+		}
+	}
 }
 
 func runListProjects(cmd *cobra.Command, args []string) {
