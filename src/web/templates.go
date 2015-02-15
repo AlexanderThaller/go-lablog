@@ -51,6 +51,8 @@ func NoteFormParserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	l.Info("Recording new note: ", note)
+
 	err = data.Record(_datadir, note)
 	if err != nil {
 		printerr(l, w, errgo.Notef(err, "can not record note"))

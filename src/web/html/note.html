@@ -1,12 +1,16 @@
 <html>
 <head>
 <title>Take a note</title>
+
+<style>
+#input_text { width: 90% }
+</style>
 </head>
 <body>
 <form action="/put/note" method="post" novalidate>
   Project: <input type="text" name="Project">
   <br>
-  <textarea name="Text" cols="70" rows="25"></textarea>
+  <textarea id="input_text" name="Text" rows="15"></textarea>
   <br>
   Timestamp: <input type="text" name="TimeStamp">
   <br>
