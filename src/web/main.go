@@ -20,7 +20,9 @@ func Listen(datadir, binding string) error {
 
 	router := mux.NewRouter()
 	router.HandleFunc("/new/note", NoteFormPresenterHandler)
+	router.HandleFunc("/new/note/", NoteFormPresenterHandler)
 	router.HandleFunc("/put/note", NoteFormParserHandler)
+	router.HandleFunc("/put/note/", NoteFormParserHandler)
 
 	http.Handle("/", router)
 

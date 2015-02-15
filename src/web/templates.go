@@ -58,4 +58,6 @@ func NoteFormParserHandler(w http.ResponseWriter, r *http.Request) {
 		printerr(l, w, errgo.Notef(err, "can not record note"))
 		return
 	}
+
+	http.Redirect(w, r, "/new/note", 302)
 }
