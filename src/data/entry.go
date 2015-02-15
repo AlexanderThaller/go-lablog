@@ -1,5 +1,10 @@
 package data
 
+import "time"
+
+const EntryCSVTimeStampFormat = time.RFC3339Nano
+
 type Entry interface {
-	CSV() string
+	ValueArray() []string
+	GetProject() Project
 }

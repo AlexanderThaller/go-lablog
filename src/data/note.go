@@ -1,9 +1,6 @@
 package data
 
-import (
-	"fmt"
-	"time"
-)
+import "time"
 
 type Note struct {
 	Project
@@ -11,6 +8,14 @@ type Note struct {
 	Text      string
 }
 
-func (note Note) CSV() string {
-	return fmt.Sprintf("%+v", note)
+func (note Note) ValueArray() []string {
+	return []string{
+		note.TimeStamp.Format(EntryCSVTimeStampFormat),
+		"note",
+		note.Text,
+	}
+}
+
+func (note Note) GetProject() Project {
+	return note.Project
 }
