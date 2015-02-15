@@ -28,3 +28,5 @@ lablog
 profile
 coverage.out
 benchmarks
+
+*bindata.go*

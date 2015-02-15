@@ -1,6 +1,9 @@
 package data
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 type Note struct {
 	Project
@@ -9,5 +12,5 @@ type Note struct {
 }
 
 func (note Note) CSV() string {
-	return ""
+	return fmt.Sprintf("%+v", note)
 }

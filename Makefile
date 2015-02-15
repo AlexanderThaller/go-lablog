@@ -1,10 +1,14 @@
 NAME = lablog
 
 all:
+	make generate
 	make format
 	#make vet
 	make test
 	make build
+
+generate:
+	cd src/web/; go-bindata -pkg="web" html/
 
 format:
 	find . -name "*.go" -not -path './Godeps/*' -type f -exec gofmt -s=true -w=true {} \;
