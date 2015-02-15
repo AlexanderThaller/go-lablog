@@ -56,6 +56,6 @@ func runNote(cmd *cobra.Command, args []string) {
 	}
 
 	l.Trace("Note: ", note)
-	err := data.Record(note)
+	err := data.Record(flagLablogDataDir, note)
 	errexit(l, err, "can not record note")
 }

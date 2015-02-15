@@ -13,7 +13,11 @@ const (
 	Name = "web"
 )
 
+var _datadir string
+
 func Listen(datadir, binding string) error {
+	_datadir = datadir
+
 	router := mux.NewRouter()
 	router.HandleFunc("/new/note", NoteFormPresenterHandler)
 	router.HandleFunc("/put/note", NoteFormParserHandler)
