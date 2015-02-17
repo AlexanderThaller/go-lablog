@@ -1,12 +1,14 @@
 package commands
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"sort"
 
 	"github.com/AlexanderThaller/cobra"
 	"github.com/AlexanderThaller/lablog/src/data"
+	"github.com/AlexanderThaller/lablog/src/format"
 	"github.com/AlexanderThaller/logger"
 )
 
@@ -117,17 +119,11 @@ func runListNotes(cmd *cobra.Command, args []string) {
 	}
 
 	sort.Sort(data.ProjectsByName(projects))
+	buffer := new(bytes.Buffer)
+	err := format.Projects(buffer, projects)
+	errexit(l, err, "can not format projects")
 
-	fmt.Println("= Notes\n")
-	for _, project := range projects {
-		notes, err := project.Notes()
-		errexit(l, err, "can not get notes from project "+project.Name)
-
-		sort.Sort(data.NotesByTimeStamp(notes))
-		for _, note := range notes {
-			fmt.Println(note.Format(1))
-		}
-	}
+	fmt.Print(buffer.String())
 }
 
 func runListProjects(cmd *cobra.Command, args []string) {

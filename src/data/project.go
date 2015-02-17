@@ -144,3 +144,11 @@ func (project Project) File() (*os.File, error) {
 
 	return file, nil
 }
+
+func (project Project) Format(indent uint) string {
+	indentchar := strings.Repeat("=", int(indent))
+
+	out := indentchar + "= " + project.Name + "\n"
+
+	return out
+}

@@ -1,6 +1,10 @@
 package data
 
-import "time"
+import (
+	"regexp"
+	"strings"
+	"time"
+)
 
 type Note struct {
 	Project
@@ -21,15 +25,12 @@ func (note Note) GetProject() Project {
 }
 
 func (note Note) Format(indent uint) string {
-	var indentchar string
-	for i := uint(0); i < indent; i++ {
-		indentchar += "="
-	}
+	indentchar := strings.Repeat("=", int(indent))
+	reg, _ := regexp.Compile("(?m)^=")
 
-	out := indentchar + "= " + note.Project.Name + "\n"
-	out += indentchar + "== " + note.TimeStamp.Format(EntryCSVTimeStampFormat) + "\n"
-	out += note.Text
-	out += "\n"
+	out := indentchar + "== " + note.TimeStamp.Format(EntryCSVTimeStampFormat) + "\n"
+	out += reg.ReplaceAllString(note.Text, indentchar+"===")
+	out += "\n\n"
 
 	return out
 }
