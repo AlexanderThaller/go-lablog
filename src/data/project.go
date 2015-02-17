@@ -145,10 +145,7 @@ func (project Project) File() (*os.File, error) {
 	return file, nil
 }
 
-func (project Project) Format(indent uint) string {
+func (project Project) Format(writer io.Writer, indent uint) {
 	indentchar := strings.Repeat("=", int(indent))
-
-	out := indentchar + "= " + project.Name + "\n"
-
-	return out
+	io.WriteString(writer, indentchar+"= "+project.Name+"\n")
 }

@@ -21,7 +21,7 @@
     <td style="text-align:center"><a href="/note">◇</a></td>
   {{ range $project := . }}
   <tr>
-    <td>{{ $project.Name }}</td>
+    <td><a href="/list/notes?project={{ $project.Name }}">{{ $project.Name }}</a></td>
     <td style="text-align:center"><a href="/note?project={{ $project.Name }}">◇</a></td>
   </tr>
   {{ end }}

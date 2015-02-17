@@ -23,7 +23,6 @@ const AsciiDocSettings = `:toc: right
 
 func Projects(writer io.Writer, projects []data.Project) error {
 	io.WriteString(writer, AsciiDocSettings+"\n\n")
-
 	io.WriteString(writer, "= Notes\n\n")
 
 	for _, project := range projects {
@@ -32,11 +31,11 @@ func Projects(writer io.Writer, projects []data.Project) error {
 			return errgo.Notef(err, "can not get notes from project "+project.Name)
 		}
 
-		io.WriteString(writer, project.Format(1))
+		project.Format(writer, 1)
 
 		sort.Sort(data.NotesByTimeStamp(notes))
 		for _, note := range notes {
-			io.WriteString(writer, note.Format(1))
+			note.Format(writer, 1)
 		}
 	}
 

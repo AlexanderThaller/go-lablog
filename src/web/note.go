@@ -54,7 +54,7 @@ func noteForm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	project := defquery(r, "project", "")
-	note := Note{Project: project}
+	note := Note{Project: project[0]}
 
 	l.Info("Serving noteform")
 	err = tmpl.Execute(w, note)

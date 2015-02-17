@@ -1,6 +1,7 @@
 package data
 
 import (
+	"io"
 	"regexp"
 	"strings"
 	"time"
@@ -24,15 +25,13 @@ func (note Note) GetProject() Project {
 	return note.Project
 }
 
-func (note Note) Format(indent uint) string {
+func (note Note) Format(writer io.Writer, indent uint) {
 	indentchar := strings.Repeat("=", int(indent))
 	reg, _ := regexp.Compile("(?m)^=")
 
-	out := indentchar + "== " + note.TimeStamp.Format(EntryCSVTimeStampFormat) + "\n"
-	out += reg.ReplaceAllString(note.Text, indentchar+"===")
-	out += "\n\n"
-
-	return out
+	io.WriteString(writer, indentchar+"== "+note.TimeStamp.Format(EntryCSVTimeStampFormat)+"\n")
+	io.WriteString(writer, reg.ReplaceAllString(note.Text, indentchar+"==="))
+	io.WriteString(writer, "\n\n")
 }
 
 // NotesByTimeStamp allows sorting project slices by name.

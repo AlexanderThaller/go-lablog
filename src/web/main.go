@@ -25,6 +25,8 @@ func Listen(datadir, binding string) error {
 	router.HandleFunc("/note/", noteForm)
 	router.HandleFunc("/note/record", noteParser)
 	router.HandleFunc("/note/record", noteParser)
+	router.HandleFunc("/list/notes", listNotes)
+	router.HandleFunc("/list/notes/", listNotes)
 
 	http.Handle("/", router)
 
@@ -43,16 +45,16 @@ func printerr(l logger.Logger, w http.ResponseWriter, err error) {
 	return
 }
 
-func defquery(r *http.Request, key, defvalue string) string {
+func defquery(r *http.Request, key, defvalue string) []string {
 	queries, err := url.ParseQuery(r.URL.RawQuery)
 	if err != nil {
-		return defvalue
+		return []string{defvalue}
 	}
 
 	value, exists := queries[key]
 	if !exists {
-		return defvalue
+		return []string{defvalue}
 	}
 
-	return value[0]
+	return value
 }

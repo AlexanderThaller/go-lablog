@@ -6,6 +6,7 @@ import (
 	"sort"
 
 	"github.com/AlexanderThaller/lablog/src/data"
+	"github.com/AlexanderThaller/lablog/src/format"
 	"github.com/AlexanderThaller/logger"
 	"github.com/juju/errgo"
 )
@@ -36,6 +37,29 @@ func listProjects(w http.ResponseWriter, r *http.Request) {
 	err = tmpl.Execute(w, projects)
 	if err != nil {
 		printerr(l, w, errgo.Notef(err, "can not execute projects html template"))
+		return
+	}
+}
+
+func listNotes(w http.ResponseWriter, r *http.Request) {
+	l := logger.New(Name, "listProjects")
+
+	projargs := defquery(r, "project", "")
+
+	var projects []data.Project
+	for _, arg := range projargs {
+		project := data.Project{
+			Name:    arg,
+			Datadir: _datadir,
+		}
+
+		projects = append(projects, project)
+	}
+
+	sort.Sort(data.ProjectsByName(projects))
+	err := format.Projects(w, projects)
+	if err != nil {
+		printerr(l, w, errgo.Notef(err, "can not format projects"))
 		return
 	}
 }
