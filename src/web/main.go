@@ -47,15 +47,15 @@ func printerr(l logger.Logger, w http.ResponseWriter, err error) {
 	return
 }
 
-func defquery(r *http.Request, key, defvalue string) []string {
+func defquery(r *http.Request, key string, defvalue ...string) []string {
 	queries, err := url.ParseQuery(r.URL.RawQuery)
 	if err != nil {
-		return []string{defvalue}
+		return defvalue
 	}
 
 	value, exists := queries[key]
 	if !exists {
-		return []string{defvalue}
+		return defvalue
 	}
 
 	return value

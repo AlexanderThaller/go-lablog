@@ -1,6 +1,7 @@
 package web
 
 import (
+	"bytes"
 	"html/template"
 	"net/http"
 	"sort"
@@ -44,7 +45,7 @@ func listProjects(w http.ResponseWriter, r *http.Request) {
 func listNotes(w http.ResponseWriter, r *http.Request) {
 	l := logger.New(Name, "listProjects")
 
-	args := defquery(r, "project", "")
+	args := defquery(r, "project")
 	projects, err := data.ProjectsOrArgs(args, _datadir)
 	if err != nil {
 		printerr(l, w, errgo.Notef(err, "can not get projects or args"))
@@ -52,9 +53,17 @@ func listNotes(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sort.Sort(data.ProjectsByName(projects))
-	err = format.ProjectsNotes(w, projects)
+
+	var buffer = new(bytes.Buffer)
+	err = format.ProjectsNotes(buffer, projects)
 	if err != nil {
 		printerr(l, w, errgo.Notef(err, "can not format projects"))
+		return
+	}
+
+	err = format.AsciiDoctor(buffer, w)
+	if err != nil {
+		printerr(l, w, errgo.Notef(err, "can not format with asciidoctor"))
 		return
 	}
 }
@@ -62,7 +71,7 @@ func listNotes(w http.ResponseWriter, r *http.Request) {
 func listTodos(w http.ResponseWriter, r *http.Request) {
 	l := logger.New(Name, "listProjects")
 
-	args := defquery(r, "project", "")
+	args := defquery(r, "project")
 	projects, err := data.ProjectsOrArgs(args, _datadir)
 	if err != nil {
 		printerr(l, w, errgo.Notef(err, "can not get projects or args"))

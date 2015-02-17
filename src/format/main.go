@@ -1,7 +1,9 @@
 package format
 
 import (
+	"bytes"
 	"io"
+	"os/exec"
 	"sort"
 
 	"github.com/AlexanderThaller/lablog/src/data"
@@ -77,4 +79,21 @@ func Notes(writer io.Writer, notes []data.Note) {
 	for _, note := range notes {
 		note.Format(writer, 2)
 	}
+}
+
+func AsciiDoctor(reader io.Reader, writer io.Writer) error {
+	stderr := new(bytes.Buffer)
+
+	command := exec.Command("asciidoctor", "-")
+	command.Stdin = reader
+	command.Stdout = writer
+	command.Stderr = stderr
+
+	err := command.Run()
+	if err != nil {
+		return errgo.Notef(errgo.Notef(err, "can not run asciidoctor"),
+			stderr.String())
+	}
+
+	return nil
 }
