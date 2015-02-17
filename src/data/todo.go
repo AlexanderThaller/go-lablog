@@ -35,7 +35,8 @@ func (todo Todo) Format(writer io.Writer, indent uint) {
 		return
 	}
 
-	io.WriteString(writer, "* "+todo.Text+"\n")
+	io.WriteString(writer, "* "+todo.Text)
+	io.WriteString(writer, "\n")
 }
 
 // TodosByName allows sorting todo slices by name.

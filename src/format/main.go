@@ -58,6 +58,7 @@ func ProjectsTodos(writer io.Writer, projects []data.Project) error {
 
 		project.Format(writer, 1)
 		Todos(writer, todos)
+		io.WriteString(writer, "\n")
 	}
 
 	return nil

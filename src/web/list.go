@@ -43,7 +43,7 @@ func listProjects(w http.ResponseWriter, r *http.Request) {
 }
 
 func listNotes(w http.ResponseWriter, r *http.Request) {
-	l := logger.New(Name, "listProjects")
+	l := logger.New(Name, "listNotes")
 
 	args := defquery(r, "project")
 	projects, err := data.ProjectsOrArgs(args, _datadir)
@@ -78,10 +78,17 @@ func listTodos(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var buffer = new(bytes.Buffer)
 	sort.Sort(data.ProjectsByName(projects))
-	err = format.ProjectsNotes(w, projects)
+	err = format.ProjectsTodos(buffer, projects)
 	if err != nil {
 		printerr(l, w, errgo.Notef(err, "can not format projects"))
+		return
+	}
+
+	err = format.AsciiDoctor(buffer, w)
+	if err != nil {
+		printerr(l, w, errgo.Notef(err, "can not format with asciidoctor"))
 		return
 	}
 }
