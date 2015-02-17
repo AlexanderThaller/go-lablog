@@ -5,12 +5,15 @@ import (
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/jinzhu/now"
+	"github.com/juju/errgo"
 )
 
 type Note struct {
 	Project
-	TimeStamp time.Time
 	Text      string
+	TimeStamp time.Time
 }
 
 func (note Note) ValueArray() []string {
@@ -34,7 +37,7 @@ func (note Note) Format(writer io.Writer, indent uint) {
 	io.WriteString(writer, "\n\n")
 }
 
-// NotesByTimeStamp allows sorting project slices by name.
+// NotesByTimeStamp allows sorting project slices by timestamp.
 type NotesByTimeStamp []Note
 
 func (by NotesByTimeStamp) Len() int {
@@ -47,4 +50,19 @@ func (by NotesByTimeStamp) Swap(i, j int) {
 
 func (by NotesByTimeStamp) Less(i, j int) bool {
 	return by[i].TimeStamp.Before(by[j].TimeStamp)
+}
+
+func ParseNote(project Project, values []string) (Note, error) {
+	timestamp, err := now.Parse(values[0])
+	if err != nil {
+		return Note{}, errgo.Notef(err, "can not parse timestamp from csv")
+	}
+
+	note := Note{
+		Project:   project,
+		Text:      values[2],
+		TimeStamp: timestamp,
+	}
+
+	return note, nil
 }

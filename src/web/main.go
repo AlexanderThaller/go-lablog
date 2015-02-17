@@ -27,6 +27,8 @@ func Listen(datadir, binding string) error {
 	router.HandleFunc("/note/record", noteParser)
 	router.HandleFunc("/list/notes", listNotes)
 	router.HandleFunc("/list/notes/", listNotes)
+	router.HandleFunc("/list/todos", listTodos)
+	router.HandleFunc("/list/todos/", listTodos)
 
 	http.Handle("/", router)
 

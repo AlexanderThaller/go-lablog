@@ -101,26 +101,13 @@ func runListDurations(cmd *cobra.Command, args []string) {
 func runListNotes(cmd *cobra.Command, args []string) {
 	l := logger.New("commands", "list", "notes")
 
-	var projects []data.Project
-
-	if len(args) == 0 {
-		var err error
-		projects, err = data.Projects(flagLablogDataDir)
-		errexit(l, err, "can not get projects")
-	} else {
-		for _, arg := range args {
-			project := data.Project{
-				Name:    arg,
-				Datadir: flagLablogDataDir,
-			}
-
-			projects = append(projects, project)
-		}
-	}
+	projects, err := data.ProjectsOrArgs(args, flagLablogDataDir)
+	errexit(l, err, "can not get projects")
 
 	sort.Sort(data.ProjectsByName(projects))
+
 	buffer := new(bytes.Buffer)
-	err := format.Projects(buffer, projects)
+	err = format.ProjectsNotes(buffer, projects)
 	errexit(l, err, "can not format projects")
 
 	fmt.Print(buffer.String())
@@ -140,8 +127,17 @@ func runListProjects(cmd *cobra.Command, args []string) {
 
 func runListTodos(cmd *cobra.Command, args []string) {
 	l := logger.New("commands", "list", "todos")
-	l.Alert("not implemented")
-	os.Exit(1)
+
+	projects, err := data.ProjectsOrArgs(args, flagLablogDataDir)
+	errexit(l, err, "can not get projects")
+
+	sort.Sort(data.ProjectsByName(projects))
+
+	buffer := new(bytes.Buffer)
+	err = format.ProjectsTodos(buffer, projects)
+	errexit(l, err, "can not format projects")
+
+	fmt.Print(buffer.String())
 }
 
 func runListTracks(cmd *cobra.Command, args []string) {

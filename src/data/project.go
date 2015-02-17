@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/jinzhu/now"
 	"github.com/juju/errgo"
 )
 
@@ -114,19 +113,49 @@ func (project Project) Notes() ([]Note, error) {
 			continue
 		}
 
-		timestamp, err := now.Parse(csv[0])
+		note, err := ParseNote(project, csv)
 		if err != nil {
-			return nil, errgo.Notef(err, "can not parse timestamp from csv")
-		}
-
-		note := Note{
-			TimeStamp: timestamp,
-			Text:      csv[2],
-			Project:   project,
+			return nil, errgo.Notef(err, "can not parse note from csv")
 		}
 
 		out = append(out, note)
 	}
+
+	return out, nil
+}
+
+func (project Project) Todos() ([]Todo, error) {
+	file, err := project.File()
+	if err != nil {
+		return nil, errgo.Notef(err, "can not open project file")
+	}
+	defer file.Close()
+
+	parser := csv.NewReader(file)
+	parser.FieldsPerRecord = 4
+
+	var out []Todo
+
+	for {
+		csv, err := parser.Read()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+
+			// an error would mean that the csv line is not a todo so we can skip it
+			continue
+		}
+
+		todo, err := ParseTodo(project, csv)
+		if err != nil {
+			return nil, errgo.Notef(err, "can not parse todo from csv")
+		}
+
+		out = append(out, todo)
+	}
+
+	out = FilterTodos(out)
 
 	return out, nil
 }
@@ -148,4 +177,27 @@ func (project Project) File() (*os.File, error) {
 func (project Project) Format(writer io.Writer, indent uint) {
 	indentchar := strings.Repeat("=", int(indent))
 	io.WriteString(writer, indentchar+"= "+project.Name+"\n")
+}
+
+func ProjectsOrArgs(args []string, datadir string) ([]Project, error) {
+	var projects []Project
+
+	if len(args) == 0 {
+		var err error
+		projects, err = Projects(datadir)
+		if err != nil {
+			return nil, errgo.Notef(err, "can not get projects")
+		}
+	} else {
+		for _, arg := range args {
+			project := Project{
+				Name:    arg,
+				Datadir: datadir,
+			}
+
+			projects = append(projects, project)
+		}
+	}
+
+	return projects, nil
 }

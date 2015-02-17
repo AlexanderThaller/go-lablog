@@ -44,20 +44,33 @@ func listProjects(w http.ResponseWriter, r *http.Request) {
 func listNotes(w http.ResponseWriter, r *http.Request) {
 	l := logger.New(Name, "listProjects")
 
-	projargs := defquery(r, "project", "")
-
-	var projects []data.Project
-	for _, arg := range projargs {
-		project := data.Project{
-			Name:    arg,
-			Datadir: _datadir,
-		}
-
-		projects = append(projects, project)
+	args := defquery(r, "project", "")
+	projects, err := data.ProjectsOrArgs(args, _datadir)
+	if err != nil {
+		printerr(l, w, errgo.Notef(err, "can not get projects or args"))
+		return
 	}
 
 	sort.Sort(data.ProjectsByName(projects))
-	err := format.Projects(w, projects)
+	err = format.ProjectsNotes(w, projects)
+	if err != nil {
+		printerr(l, w, errgo.Notef(err, "can not format projects"))
+		return
+	}
+}
+
+func listTodos(w http.ResponseWriter, r *http.Request) {
+	l := logger.New(Name, "listProjects")
+
+	args := defquery(r, "project", "")
+	projects, err := data.ProjectsOrArgs(args, _datadir)
+	if err != nil {
+		printerr(l, w, errgo.Notef(err, "can not get projects or args"))
+		return
+	}
+
+	sort.Sort(data.ProjectsByName(projects))
+	err = format.ProjectsNotes(w, projects)
 	if err != nil {
 		printerr(l, w, errgo.Notef(err, "can not format projects"))
 		return
