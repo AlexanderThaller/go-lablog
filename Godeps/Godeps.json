@@ -6,17 +6,37 @@
 	],
 	"Deps": [
 		{
+			"ImportPath": "github.com/AlexanderThaller/cobra",
+			"Rev": "930089b7da2ed5c949d13da581c51f0f140a4d3f"
+		},
+		{
 			"ImportPath": "github.com/AlexanderThaller/logger",
 			"Comment": "1.1.0-8-g24123e4",
 			"Rev": "24123e4bfa9432ef59adaa9255c285c298a6b1ab"
+		},
+		{
+			"ImportPath": "github.com/gorilla/context",
+			"Rev": "215affda49addc4c8ef7e2534915df2c8c35c6cd"
+		},
+		{
+			"ImportPath": "github.com/gorilla/mux",
+			"Rev": "e444e69cbd2e2e3e0749a2f3c717cec491552bbf"
+		},
+		{
+			"ImportPath": "github.com/gorilla/schema",
+			"Rev": "c8422571edf3131506bab7df27e18980fe2598d5"
+		},
+		{
+			"ImportPath": "github.com/jinzhu/now",
+			"Rev": "caef738a54cb159a5fe083e01609bc6873a84501"
 		},
 		{
 			"ImportPath": "github.com/juju/errgo",
 			"Rev": "26caa7d4884f6048c5687fa44c410e5d5d95e554"
 		},
 		{
-			"ImportPath": "github.com/spf13/cobra",
-			"Rev": "e1e66f7b4e667751cf530ddb6e72b79d6eeb0235"
+			"ImportPath": "github.com/mitchellh/go-homedir",
+			"Rev": "7d2d8c8a4e078ce3c58736ab521a40b37a504c52"
 		},
 		{
 			"ImportPath": "github.com/spf13/pflag",

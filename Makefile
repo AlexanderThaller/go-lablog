@@ -37,6 +37,9 @@ callgraph:
 memograph:
 	go tool pprof --pdf "$(NAME)" mem.pprof > memograph.pdf
 
+dependencies_get:
+	go get -u github.com/jteeuwen/go-bindata/...
+
 dependencies_save:
 	godep save ./...
 
