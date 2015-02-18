@@ -3,7 +3,6 @@ NAME = lablog
 all:
 	make generate
 	make format
-	#make vet
 	make test
 	make build
 
@@ -11,7 +10,6 @@ generate:
 	cd src/web/; go-bindata -pkg="web" html/
 
 format:
-	find . -name "*.go" -not -path './Godeps/*' -type f -exec gofmt -s=true -w=true {} \;
 	find . -name "*.go" -not -path './Godeps/*' -type f -exec goimports -w=true {} \;
 
 test:
@@ -20,31 +18,40 @@ test:
 build:
 	go build -ldflags "-X main.buildTime `date +%s` -X main.buildVersion `git describe --always`" -o "$(NAME)"
 
+install:
+	make format
+	make test
+	make build
+	cp "$(NAME)" /usr/local/bin
+
+uninstall:
+	rm "/usr/local/bin/$(NAME)"
+
 clean:
 	rm "$(NAME)"
 	rm *.pprof
 	rm *.pdf
 
-install:
-	cp "$(NAME)" /usr/local/bin
+dependencies_get:
+	go get golang.org/x/tools/cmd/goimports
+	go get github.com/tools/godep
+	go get github.com/alecthomas/gometalinter
+	gometalinter --install
+	go get -u github.com/jteeuwen/go-bindata/...
 
-uninstall:
-	rm "/usr/local/bin/$(NAME)"
+dependencies_save:
+	make dependencies_get
+	godep save ./...
+
+dependencies_restore:
+	make dependencies_get
+	godep restore ./...
 
 callgraph:
 	go tool pprof --pdf "$(NAME)" cpu.pprof > callgraph.pdf
 
 memograph:
 	go tool pprof --pdf "$(NAME)" mem.pprof > memograph.pdf
-
-dependencies_get:
-	go get -u github.com/jteeuwen/go-bindata/...
-
-dependencies_save:
-	godep save ./...
-
-dependencies_restore:
-	godep restore ./...
 
 bench:
 	mkdir -p benchmarks/`git describe --always`/
@@ -57,7 +64,5 @@ coverage:
 	go tool cover -html=coverage.out -o=/tmp/coverage.html
 
 lint:
-	golint ./...
-
-vet:
-	go vet
+	rm -rf Godeps/
+	gometalinter ./...; git checkout -- Godeps/
