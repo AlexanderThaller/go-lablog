@@ -30,6 +30,14 @@ func (todo Todo) GetProject() Project {
 	return todo.Project
 }
 
+func (todo Todo) Type() string {
+	return "todo"
+}
+
+func (todo Todo) GetTimeStamp() time.Time {
+	return todo.TimeStamp
+}
+
 func (todo Todo) Format(writer io.Writer, indent uint) {
 	if todo.InActive {
 		return

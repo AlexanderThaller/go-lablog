@@ -7,6 +7,7 @@ import (
 
 	"github.com/AlexanderThaller/cobra"
 	"github.com/AlexanderThaller/lablog/src/data"
+	"github.com/AlexanderThaller/lablog/src/scm"
 	"github.com/AlexanderThaller/logger"
 	"github.com/jinzhu/now"
 )
@@ -58,4 +59,7 @@ func runNote(cmd *cobra.Command, args []string) {
 	l.Trace("Note: ", note)
 	err := data.Record(flagLablogDataDir, note)
 	errexit(l, err, "can not record note")
+
+	err = scm.Commit(flagLablogDataDir, note)
+	errexit(l, err, "can not commit entry")
 }

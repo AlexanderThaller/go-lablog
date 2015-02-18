@@ -24,6 +24,7 @@ func init() {
 func runWeb(cmd *cobra.Command, args []string) {
 	l := logger.New("commands", "web")
 
+	l.Notice("Listening on ", flagWebBind)
 	err := web.Listen(flagLablogDataDir, flagWebBind)
 	errexit(l, err, "can not serve content")
 }

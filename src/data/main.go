@@ -33,7 +33,7 @@ func Record(datadir string, entry Entry) error {
 	writer := csv.NewWriter(file)
 	err = writer.Write(entry.ValueArray())
 	if err != nil {
-		return errgo.Notef(err, "can not write record")
+		return errgo.Notef(err, "can not write entry")
 	}
 	writer.Flush()
 

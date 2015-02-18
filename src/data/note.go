@@ -28,6 +28,14 @@ func (note Note) GetProject() Project {
 	return note.Project
 }
 
+func (note Note) Type() string {
+	return "note"
+}
+
+func (note Note) GetTimeStamp() time.Time {
+	return note.TimeStamp
+}
+
 func (note Note) Format(writer io.Writer, indent uint) {
 	indentchar := strings.Repeat("=", int(indent))
 	reg, _ := regexp.Compile("(?m)^=")

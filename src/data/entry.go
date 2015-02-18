@@ -15,4 +15,6 @@ func init() {
 type Entry interface {
 	ValueArray() []string
 	GetProject() Project
+	Type() string
+	GetTimeStamp() time.Time
 }
