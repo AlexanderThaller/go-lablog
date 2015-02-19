@@ -13,9 +13,12 @@ import (
 )
 
 type Note struct {
-	Project   string
-	TimeStamp string
-	Text      string
+	FormAction string
+	FormButton string
+	Project    string
+	Text       string
+	TimeStamp  string
+	Title      string
 }
 
 func (note Note) ToData() (data.Note, error) {
@@ -41,7 +44,7 @@ func (note Note) ToData() (data.Note, error) {
 func noteForm(w http.ResponseWriter, r *http.Request) {
 	l := logger.New(Name, "noteForm")
 
-	rawtmpl, err := html_note_html_bytes()
+	rawtmpl, err := html_entry_form_html_bytes()
 	if err != nil {
 		printerr(l, w, errgo.Notef(err, "can not read note html"))
 		return
@@ -54,7 +57,12 @@ func noteForm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	project := defquery(r, "project", "")
-	note := Note{Project: project[0]}
+	note := Note{
+		FormAction: "/note/record",
+		FormButton: "Add note",
+		Project:    project[0],
+		Title:      "Take a note",
+	}
 
 	l.Info("Serving noteform")
 	err = tmpl.Execute(w, note)
@@ -92,7 +100,7 @@ func noteParser(w http.ResponseWriter, r *http.Request) {
 
 	l.Info("Recording new note: ", note)
 
-	err = data.Record(_datadir, note)
+	err = recordAndCommit(_datadir, note)
 	if err != nil {
 		printerr(l, w, errgo.Notef(err, "can not record note"))
 		return

@@ -50,8 +50,8 @@ func Commit(datadir string, entry data.Entry) error {
 //file.
 func Signature() (*git.Signature, error) {
 	sig := git.Signature{
-		Name:  "Rand Om Hacker",
-		Email: "random@hacker.com",
+		Name:  "Alexander Thaller",
+		Email: "alexander.thaller@atraveo.de",
 	}
 
 	return &sig, nil

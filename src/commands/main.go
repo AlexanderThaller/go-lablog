@@ -2,9 +2,13 @@ package commands
 
 import (
 	"os"
+	"time"
 
 	"github.com/AlexanderThaller/cobra"
+	"github.com/AlexanderThaller/lablog/src/data"
+	"github.com/AlexanderThaller/lablog/src/scm"
 	"github.com/AlexanderThaller/logger"
+	"github.com/jinzhu/now"
 	"github.com/juju/errgo"
 )
 
@@ -33,7 +37,7 @@ func Execute() {
 	lablogCmd.Execute()
 }
 
-func errexit(l logger.Logger, err error, message string) {
+func errexit(l logger.Logger, err error, message ...string) {
 	if err != nil {
 		l.Alert(message, ": ", err)
 		l.Debug(message, ": ", errgo.Details(err))
@@ -56,4 +60,25 @@ func finished(cmd *cobra.Command, args []string) {
 	l := logger.New("commands", "finished")
 	l.Debug("Args: ", args)
 	l.Info("Finished")
+}
+
+func recordAndCommit(l logger.Logger, datadir string, entry data.Entry) {
+	err := data.Record(datadir, entry)
+	errexit(l, err, "can not record note")
+
+	err = scm.Commit(datadir, entry)
+	errexit(l, err, "can not commit entry")
+}
+
+func defaultOrRawTimestamp(timestamp time.Time, raw string) (time.Time, error) {
+	if timestamp.String() == raw {
+		return timestamp, nil
+	}
+
+	parsed, err := now.Parse(raw)
+	if err != nil {
+		return time.Time{}, errgo.Notef(err, "can not parse timestamp")
+	}
+
+	return parsed, nil
 }

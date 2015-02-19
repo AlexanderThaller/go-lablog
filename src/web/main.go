@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/AlexanderThaller/lablog/src/data"
+	"github.com/AlexanderThaller/lablog/src/scm"
 	"github.com/AlexanderThaller/logger"
 	"github.com/gorilla/mux"
 	"github.com/juju/errgo"
@@ -25,6 +27,10 @@ func Listen(datadir, binding string) error {
 	router.HandleFunc("/note/", noteForm)
 	router.HandleFunc("/note/record", noteParser)
 	router.HandleFunc("/note/record", noteParser)
+	router.HandleFunc("/todo", todoForm)
+	router.HandleFunc("/todo/", todoForm)
+	router.HandleFunc("/todo/record", todoParser)
+	router.HandleFunc("/todo/record", todoParser)
 	router.HandleFunc("/list/notes", listNotes)
 	router.HandleFunc("/list/notes/", listNotes)
 	router.HandleFunc("/list/todos", listTodos)
@@ -59,4 +65,18 @@ func defquery(r *http.Request, key string, defvalue ...string) []string {
 	}
 
 	return value
+}
+
+func recordAndCommit(datadir string, entry data.Entry) error {
+	err := data.Record(datadir, entry)
+	if err != nil {
+		return errgo.Notef(err, "can not record note")
+	}
+
+	err = scm.Commit(datadir, entry)
+	if err != nil {
+		return errgo.Notef(err, "can not commit entry")
+	}
+
+	return nil
 }

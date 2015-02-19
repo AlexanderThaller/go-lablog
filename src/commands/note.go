@@ -7,9 +7,7 @@ import (
 
 	"github.com/AlexanderThaller/cobra"
 	"github.com/AlexanderThaller/lablog/src/data"
-	"github.com/AlexanderThaller/lablog/src/scm"
 	"github.com/AlexanderThaller/logger"
-	"github.com/jinzhu/now"
 )
 
 var cmdNote = &cobra.Command{
@@ -42,13 +40,8 @@ func runNote(cmd *cobra.Command, args []string) {
 	project := args[0]
 	text := strings.Join(args[1:], " ")
 
-	timestamp := flagNoteTimeStamp
-	if flagNoteTimeStamp.String() != flagNoteTimeStampRaw {
-		stamp, err := now.Parse(flagNoteTimeStampRaw)
-		errexit(l, err, "can not parse timestamp")
-
-		timestamp = stamp
-	}
+	timestamp, err := defaultOrRawTimestamp(flagNoteTimeStamp, flagNoteTimeStampRaw)
+	errexit(l, err, "can not get timestamp")
 
 	note := data.Note{
 		Project:   data.Project{Name: project},
@@ -57,9 +50,5 @@ func runNote(cmd *cobra.Command, args []string) {
 	}
 
 	l.Trace("Note: ", note)
-	err := data.Record(flagLablogDataDir, note)
-	errexit(l, err, "can not record note")
-
-	err = scm.Commit(flagLablogDataDir, note)
-	errexit(l, err, "can not commit entry")
+	recordAndCommit(l, flagLablogDataDir, note)
 }

@@ -155,8 +155,6 @@ func (project Project) Todos() ([]Todo, error) {
 		out = append(out, todo)
 	}
 
-	out = FilterTodos(out)
-
 	return out, nil
 }
 

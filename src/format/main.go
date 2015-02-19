@@ -52,6 +52,8 @@ func ProjectsTodos(writer io.Writer, projects []data.Project) error {
 			return errgo.Notef(err, "can not get todos from project "+project.Name)
 		}
 
+		todos = data.FilterTodos(todos)
+
 		if len(todos) == 0 {
 			continue
 		}
