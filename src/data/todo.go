@@ -11,7 +11,7 @@ import (
 )
 
 type Todo struct {
-	NotActive bool
+	Done bool
 	Project
 	Text      string
 	TimeStamp time.Time
@@ -22,7 +22,7 @@ func (todo Todo) ValueArray() []string {
 		todo.TimeStamp.Format(EntryCSVTimeStampFormat),
 		"todo",
 		todo.Text,
-		strconv.FormatBool(todo.NotActive),
+		strconv.FormatBool(todo.Done),
 	}
 }
 
@@ -39,7 +39,7 @@ func (todo Todo) GetTimeStamp() time.Time {
 }
 
 func (todo Todo) Format(writer io.Writer, indent uint) {
-	if todo.NotActive {
+	if todo.Done {
 		return
 	}
 
@@ -83,7 +83,7 @@ func FilterTodos(todos []Todo) []Todo {
 	filter := make(map[Todo]bool)
 
 	for _, todo := range todos {
-		filter[todo] = todo.NotActive
+		filter[todo] = todo.Done
 	}
 
 	var out []Todo
@@ -110,7 +110,7 @@ func ParseTodo(project Project, values []string) (Todo, error) {
 	}
 
 	todo := Todo{
-		NotActive: inactive,
+		Done:      inactive,
 		Project:   project,
 		Text:      values[2],
 		TimeStamp: timestamp,

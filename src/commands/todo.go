@@ -77,7 +77,7 @@ func runTodoStart(cmd *cobra.Command, args []string) {
 	errexit(l, err, "can not get timestamp")
 
 	todo := data.Todo{
-		NotActive: false,
+		Done:      false,
 		Project:   data.Project{Name: project},
 		Text:      text,
 		TimeStamp: timestamp,
