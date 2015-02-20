@@ -3,6 +3,7 @@ package web
 import (
 	"bytes"
 	"html/template"
+	"io"
 	"net/http"
 	"sort"
 
@@ -62,11 +63,14 @@ func listNotes(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var buffer = new(bytes.Buffer)
+
 	err = format.ProjectsNotes(buffer, projects, start, end)
 	if err != nil {
 		printerr(l, w, errgo.Notef(err, "can not format projects"))
 		return
 	}
+
+	io.WriteString(buffer, `link:/[Back]`)
 
 	err = format.AsciiDoctor(buffer, w)
 	if err != nil {
@@ -99,6 +103,8 @@ func listTodos(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	io.WriteString(buffer, `link:/[Back]`)
+
 	err = format.AsciiDoctor(buffer, w)
 	if err != nil {
 		printerr(l, w, errgo.Notef(err, "can not format with asciidoctor"))
@@ -130,6 +136,8 @@ func listEntries(w http.ResponseWriter, r *http.Request) {
 		printerr(l, w, errgo.Notef(err, "can not format projects"))
 		return
 	}
+
+	io.WriteString(buffer, `link:/[Back]`)
 
 	err = format.AsciiDoctor(buffer, w)
 	if err != nil {
