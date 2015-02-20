@@ -85,9 +85,15 @@ func listTodos(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	start, end, err := startEndFromQueries(r)
+	if err != nil {
+		printerr(l, w, errgo.Notef(err, "can not get start or end time"))
+		return
+	}
+
 	var buffer = new(bytes.Buffer)
 	sort.Sort(data.ProjectsByName(projects))
-	err = format.ProjectsTodos(buffer, projects)
+	err = format.ProjectsTodos(buffer, projects, start, end)
 	if err != nil {
 		printerr(l, w, errgo.Notef(err, "can not format projects"))
 		return

@@ -123,3 +123,31 @@ func ParseTodo(project Project, values []string) (Todo, error) {
 
 	return todo, nil
 }
+
+func FilterTodosBeforeTimeStamp(todos []Todo, start time.Time) []Todo {
+	var out []Todo
+
+	for _, todo := range todos {
+		if todo.TimeStamp.Before(start) {
+			continue
+		}
+
+		out = append(out, todo)
+	}
+
+	return out
+}
+
+func FilterTodosAfterTimeStamp(todos []Todo, end time.Time) []Todo {
+	var out []Todo
+
+	for _, todo := range todos {
+		if todo.TimeStamp.After(end) {
+			continue
+		}
+
+		out = append(out, todo)
+	}
+
+	return out
+}

@@ -47,7 +47,7 @@ func ProjectsNotes(writer io.Writer, projects []data.Project, start, end time.Ti
 	return nil
 }
 
-func ProjectsTodos(writer io.Writer, projects []data.Project) error {
+func ProjectsTodos(writer io.Writer, projects []data.Project, start, end time.Time) error {
 	io.WriteString(writer, AsciiDocSettings+"\n\n")
 
 	for _, project := range projects {
@@ -56,6 +56,8 @@ func ProjectsTodos(writer io.Writer, projects []data.Project) error {
 			return errgo.Notef(err, "can not get todos from project "+project.Name)
 		}
 
+		todos = data.FilterTodosBeforeTimeStamp(todos, start)
+		todos = data.FilterTodosAfterTimeStamp(todos, end)
 		todos = data.FilterTodosLatest(todos)
 		todos = data.FilterTodosAreDone(todos)
 

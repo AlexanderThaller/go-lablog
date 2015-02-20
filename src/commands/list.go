@@ -156,7 +156,7 @@ func runListTodos(cmd *cobra.Command, args []string) {
 	sort.Sort(data.ProjectsByName(projects))
 
 	buffer := new(bytes.Buffer)
-	err = format.ProjectsTodos(buffer, projects)
+	err = format.ProjectsTodos(buffer, projects, flagListStart, flagListEnd)
 	errexit(l, err, "can not format projects")
 
 	fmt.Print(buffer.String())
