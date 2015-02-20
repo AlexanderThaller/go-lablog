@@ -1,10 +1,12 @@
 package scm
 
 import (
+	"bytes"
+	"os/exec"
+	"time"
+
 	"github.com/AlexanderThaller/lablog/src/data"
-	"github.com/AlexanderThaller/logger"
 	"github.com/juju/errgo"
-	git "github.com/libgit2/git2go"
 )
 
 const (
@@ -15,87 +17,56 @@ const (
 //Commit will add and commit the given entry into the repository that lays unter
 //the given datadir.
 func Commit(datadir string, entry data.Entry) error {
-	l := logger.New(Name, "Commit")
+	filename := entry.GetProject().Name + ".csv"
 
-	repo, tree, parent, err := openRepository(datadir, entry.GetProject().Name+
-		".csv")
+	err := gitAdd(datadir, filename)
 	if err != nil {
-		return errgo.Notef(err, "can not open repository")
+		return errgo.Notef(err, "can not add file to repository")
 	}
 
 	message := entry.GetProject().Name + " - " + entry.Type() + " - " +
 		entry.GetTimeStamp().Format(data.EntryCSVTimeStampFormat)
 
-	sig, err := Signature()
+	err = gitCommit(datadir, message)
 	if err != nil {
-		return errgo.Notef(err, "can not get signature")
+		return errgo.Notef(err, "can not commit file to repository")
 	}
-
-	var commitID *git.Oid
-	if parent == nil {
-		commitID, err = repo.CreateCommit("HEAD", sig, sig, message, tree)
-	} else {
-		commitID, err = repo.CreateCommit("HEAD", sig, sig, message, tree, parent)
-	}
-	if err != nil {
-		return errgo.Notef(err, "can not create commit")
-	}
-
-	l.Trace("CommitID: ", commitID)
 
 	return nil
 }
 
-//Signature returns the signature of the current user based on the .gitconfig
-//file.
-func Signature() (*git.Signature, error) {
-	sig := git.Signature{
-		Name:  "Alexander Thaller",
-		Email: "alexander.thaller@atraveo.de",
+func gitAdd(datadir, filename string) error {
+	command := exec.Command("git", "add", filename)
+	command.Dir = datadir
+
+	stderr := new(bytes.Buffer)
+	command.Stderr = stderr
+
+	err := command.Run()
+	if err != nil {
+		return errgo.Notef(errgo.Notef(err, "can not add file with git"),
+			stderr.String())
 	}
 
-	return &sig, nil
+	// Give git time to add everything and remove the lockfile.
+	time.Sleep(5 * time.Millisecond)
+	return nil
 }
 
-func openRepository(datadir, filename string) (repo *git.Repository, tree *git.Tree, parent *git.Commit, err error) {
-	repo, err = git.OpenRepository(datadir)
+func gitCommit(datadir, message string) error {
+	command := exec.Command("git", "commit", "-m", message)
+	command.Dir = datadir
+
+	stderr := new(bytes.Buffer)
+	command.Stderr = stderr
+
+	err := command.Run()
 	if err != nil {
-		err = errgo.Notef(err, "can not open repository")
-		return
+		return errgo.Notef(errgo.Notef(err, "can not add file with git"),
+			stderr.String())
 	}
 
-	index, err := repo.Index()
-	if err != nil {
-		err = errgo.Notef(err, "can not get index of repository")
-		return
-	}
-
-	err = index.AddByPath(filename)
-	if err != nil {
-		err = errgo.Notef(err, "can not add project file to index of repository")
-		return
-	}
-
-	treeID, err := index.WriteTree()
-	if err != nil {
-		err = errgo.Notef(err, "can not write tree of index")
-		return
-	}
-
-	currBranch, err := repo.Head()
-	if err == nil {
-		parent, err = repo.LookupCommit(currBranch.Target())
-		if err != nil {
-			err = errgo.Notef(err, "can not get current tip")
-			return
-		}
-	}
-
-	tree, err = repo.LookupTree(treeID)
-	if err != nil {
-		err = errgo.Notef(err, "can not get tree from treeID")
-		return
-	}
-
-	return
+	// Give git time to commit everything and remove the lockfile.
+	time.Sleep(5 * time.Millisecond)
+	return nil
 }
