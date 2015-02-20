@@ -7,40 +7,37 @@ import (
 
 	"github.com/AlexanderThaller/cobra"
 	"github.com/AlexanderThaller/lablog/src/data"
+	"github.com/AlexanderThaller/lablog/src/helper"
 	"github.com/AlexanderThaller/logger"
 	"github.com/juju/errgo"
 )
 
 var cmdTodo = &cobra.Command{
-	Use:    "todo [project] [text]",
-	Short:  "Todo projects.",
-	Long:   `Todo projects.`,
-	Run:    runTodoToggle,
-	PreRun: setLogLevel,
+	Use:   "todo [project] [text]",
+	Short: "Todo projects.",
+	Long:  `Todo projects.`,
+	Run:   runTodoToggle,
 }
 
 var cmdTodoStart = &cobra.Command{
-	Use:    "start [project] [text]",
-	Short:  "Start todo for project",
-	Long:   `Start todo for project`,
-	Run:    runTodoStart,
-	PreRun: setLogLevel,
+	Use:   "start [project] [text]",
+	Short: "Start todo for project",
+	Long:  `Start todo for project`,
+	Run:   runTodoStart,
 }
 
 var cmdTodoStop = &cobra.Command{
-	Use:    "stop [project] [text]",
-	Short:  "Stop todo for project",
-	Long:   `Stop todo for project`,
-	Run:    runTodoStop,
-	PreRun: setLogLevel,
+	Use:   "stop [project] [text]",
+	Short: "Stop todo for project",
+	Long:  `Stop todo for project`,
+	Run:   runTodoStop,
 }
 
 var cmdTodoToggle = &cobra.Command{
-	Use:    "toggle [project] [text]",
-	Short:  "Toggle todo for project",
-	Long:   `Toggle todo for project`,
-	Run:    runTodoToggle,
-	PreRun: setLogLevel,
+	Use:   "toggle [project] [text]",
+	Short: "Toggle todo for project",
+	Long:  `Toggle todo for project`,
+	Run:   runTodoToggle,
 }
 
 var flagTodoTimeStamp time.Time
@@ -48,13 +45,9 @@ var flagTodoTimeStampRaw string
 
 func init() {
 	flagTodoTimeStamp = time.Now()
+
 	cmdTodo.PersistentFlags().StringVarP(&flagTodoTimeStampRaw, "timestamp", "t",
 		flagTodoTimeStamp.String(), "The timestamp for which to record the todo.")
-
-	cmdTodo.AddCommand(cmdTodoStart)
-	cmdTodo.AddCommand(cmdTodoStop)
-	cmdTodo.AddCommand(cmdTodoToggle)
-
 }
 
 func runTodoToggle(cmd *cobra.Command, args []string) {
@@ -73,7 +66,7 @@ func runTodoStart(cmd *cobra.Command, args []string) {
 	project := args[0]
 	text := strings.Join(args[1:], " ")
 
-	timestamp, err := defaultOrRawTimestamp(flagTodoTimeStamp, flagTodoTimeStampRaw)
+	timestamp, err := helper.DefaultOrRawTimestamp(flagTodoTimeStamp, flagTodoTimeStampRaw)
 	errexit(l, err, "can not get timestamp")
 
 	todo := data.Todo{

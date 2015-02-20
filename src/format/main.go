@@ -5,6 +5,7 @@ import (
 	"io"
 	"os/exec"
 	"sort"
+	"time"
 
 	"github.com/AlexanderThaller/lablog/src/data"
 	"github.com/juju/errgo"
@@ -23,7 +24,7 @@ const AsciiDocSettings = `:toc: right
 :source-highlighter: pygments
 :listing-caption: Listing`
 
-func ProjectsNotes(writer io.Writer, projects []data.Project) error {
+func ProjectsNotes(writer io.Writer, projects []data.Project, start, end time.Time) error {
 	io.WriteString(writer, AsciiDocSettings+"\n\n")
 
 	for _, project := range projects {
@@ -31,6 +32,9 @@ func ProjectsNotes(writer io.Writer, projects []data.Project) error {
 		if err != nil {
 			return errgo.Notef(err, "can not get notes from project "+project.Name)
 		}
+
+		notes = data.FilterNotesBeforeTimeStamp(notes, start)
+		notes = data.FilterNotesAfterTimeStamp(notes, end)
 
 		if len(notes) == 0 {
 			continue

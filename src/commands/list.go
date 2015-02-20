@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"time"
 
 	"github.com/AlexanderThaller/cobra"
 	"github.com/AlexanderThaller/lablog/src/data"
 	"github.com/AlexanderThaller/lablog/src/format"
+	"github.com/AlexanderThaller/lablog/src/helper"
 	"github.com/AlexanderThaller/logger"
 )
 
@@ -17,7 +19,7 @@ var cmdList = &cobra.Command{
 	Short:  "List projects, notes, todos, dates, tracks, etc., see help for all options.",
 	Long:   "List projects, notes, todos, dates, tracks, etc., see help for all options.",
 	Run:    runListProjects,
-	PreRun: setLogLevel,
+	PreRun: runListParseTimeStamps,
 }
 
 var cmdListDates = &cobra.Command{
@@ -25,7 +27,7 @@ var cmdListDates = &cobra.Command{
 	Short:  "List dates.",
 	Long:   `List dates.`,
 	Run:    runListDates,
-	PreRun: setLogLevel,
+	PreRun: runListParseTimeStamps,
 }
 
 var cmdListNotes = &cobra.Command{
@@ -33,7 +35,7 @@ var cmdListNotes = &cobra.Command{
 	Short:  "List notes.",
 	Long:   `List notes.`,
 	Run:    runListNotes,
-	PreRun: setLogLevel,
+	PreRun: runListParseTimeStamps,
 }
 
 var cmdListProjects = &cobra.Command{
@@ -41,7 +43,7 @@ var cmdListProjects = &cobra.Command{
 	Short:  "List projects.",
 	Long:   `List projects.`,
 	Run:    runListProjects,
-	PreRun: setLogLevel,
+	PreRun: runListParseTimeStamps,
 }
 
 var cmdListTodos = &cobra.Command{
@@ -49,7 +51,7 @@ var cmdListTodos = &cobra.Command{
 	Short:  "List todos.",
 	Long:   `List todos.`,
 	Run:    runListTodos,
-	PreRun: setLogLevel,
+	PreRun: runListParseTimeStamps,
 }
 
 var cmdListTracks = &cobra.Command{
@@ -57,7 +59,7 @@ var cmdListTracks = &cobra.Command{
 	Short:  "List tracks.",
 	Long:   `List tracks.`,
 	Run:    runListTracks,
-	PreRun: setLogLevel,
+	PreRun: runListParseTimeStamps,
 }
 
 var cmdListTracksActive = &cobra.Command{
@@ -65,7 +67,7 @@ var cmdListTracksActive = &cobra.Command{
 	Short:  "List tracks.",
 	Long:   `List tracks.`,
 	Run:    runListTracksActive,
-	PreRun: setLogLevel,
+	PreRun: runListParseTimeStamps,
 }
 
 var cmdListTracksDurations = &cobra.Command{
@@ -73,17 +75,37 @@ var cmdListTracksDurations = &cobra.Command{
 	Short:  "List durations.",
 	Long:   `List durations.`,
 	Run:    runListDurations,
-	PreRun: setLogLevel,
+	PreRun: runListParseTimeStamps,
 }
 
+var flagListStart time.Time
+var flagListStartRaw string
+var flagListEnd time.Time
+var flagListEndRaw string
+
 func init() {
-	cmdList.AddCommand(cmdListDates)
-	cmdList.AddCommand(cmdListNotes)
-	cmdList.AddCommand(cmdListProjects)
-	cmdList.AddCommand(cmdListTodos)
-	cmdList.AddCommand(cmdListTracks)
-	cmdList.AddCommand(cmdListTracksActive)
-	cmdList.AddCommand(cmdListTracksDurations)
+	flagListStart = time.Time{}
+	flagListEnd = time.Now()
+
+	cmdList.PersistentFlags().StringVarP(&flagListStartRaw, "start", "s",
+		flagListStart.String(),
+		"The timestamp after which entries have to be taken to be displayes.")
+
+	cmdList.PersistentFlags().StringVarP(&flagListEndRaw, "end", "e",
+		flagListEnd.String(),
+		"The timestamp before which entries have to be taken to be displayes.")
+}
+
+func runListParseTimeStamps(cmd *cobra.Command, args []string) {
+	l := logger.New("commands", "list", "ParseTimeStamps")
+
+	start, err := helper.DefaultOrRawTimestamp(flagListStart, flagListStartRaw)
+	errexit(l, err, "can not get start timestamp")
+	flagListStart = start
+
+	end, err := helper.DefaultOrRawTimestamp(flagListEnd, flagListEndRaw)
+	errexit(l, err, "can not get end timestamp")
+	flagListEnd = end
 }
 
 func runListDates(cmd *cobra.Command, args []string) {
@@ -107,7 +129,7 @@ func runListNotes(cmd *cobra.Command, args []string) {
 	sort.Sort(data.ProjectsByName(projects))
 
 	buffer := new(bytes.Buffer)
-	err = format.ProjectsNotes(buffer, projects)
+	err = format.ProjectsNotes(buffer, projects, flagListStart, flagListEnd)
 	errexit(l, err, "can not format projects")
 
 	fmt.Print(buffer.String())

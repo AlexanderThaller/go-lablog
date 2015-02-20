@@ -5,9 +5,11 @@ import (
 	"html/template"
 	"net/http"
 	"sort"
+	"time"
 
 	"github.com/AlexanderThaller/lablog/src/data"
 	"github.com/AlexanderThaller/lablog/src/format"
+	"github.com/AlexanderThaller/lablog/src/helper"
 	"github.com/AlexanderThaller/logger"
 	"github.com/juju/errgo"
 )
@@ -46,6 +48,7 @@ func listNotes(w http.ResponseWriter, r *http.Request) {
 	l := logger.New(Name, "listNotes")
 
 	args := defquery(r, "project")
+
 	projects, err := data.ProjectsOrArgs(args, _datadir)
 	if err != nil {
 		printerr(l, w, errgo.Notef(err, "can not get projects or args"))
@@ -54,8 +57,24 @@ func listNotes(w http.ResponseWriter, r *http.Request) {
 
 	sort.Sort(data.ProjectsByName(projects))
 
+	timenow := time.Now()
+	startRaw := defquery(r, "start", time.Time{}.String())
+	endRaw := defquery(r, "end", timenow.String())
+
+	start, err := helper.DefaultOrRawTimestamp(time.Time{}, startRaw[0])
+	if err != nil {
+		printerr(l, w, errgo.Notef(err, "can not get start time"))
+		return
+	}
+
+	end, err := helper.DefaultOrRawTimestamp(timenow, endRaw[0])
+	if err != nil {
+		printerr(l, w, errgo.Notef(err, "can not get end time"))
+		return
+	}
+
 	var buffer = new(bytes.Buffer)
-	err = format.ProjectsNotes(buffer, projects)
+	err = format.ProjectsNotes(buffer, projects, start, end)
 	if err != nil {
 		printerr(l, w, errgo.Notef(err, "can not format projects"))
 		return

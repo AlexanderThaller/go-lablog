@@ -2,13 +2,11 @@ package commands
 
 import (
 	"os"
-	"time"
 
 	"github.com/AlexanderThaller/cobra"
 	"github.com/AlexanderThaller/lablog/src/data"
 	"github.com/AlexanderThaller/lablog/src/scm"
 	"github.com/AlexanderThaller/logger"
-	"github.com/jinzhu/now"
 	"github.com/juju/errgo"
 )
 
@@ -33,6 +31,21 @@ func Execute() {
 	lablogCmd.AddCommand(cmdTrack)
 	lablogCmd.AddCommand(cmdVersion)
 	lablogCmd.AddCommand(cmdWeb)
+
+	cmdList.AddCommand(cmdListDates)
+	cmdList.AddCommand(cmdListNotes)
+	cmdList.AddCommand(cmdListProjects)
+	cmdList.AddCommand(cmdListTodos)
+	cmdList.AddCommand(cmdListTracks)
+	cmdList.AddCommand(cmdListTracksActive)
+	cmdList.AddCommand(cmdListTracksDurations)
+
+	cmdTodo.AddCommand(cmdTodoStart)
+	cmdTodo.AddCommand(cmdTodoStop)
+	cmdTodo.AddCommand(cmdTodoToggle)
+
+	cmdTrack.AddCommand(cmdTrackStart)
+	cmdTrack.AddCommand(cmdTrackStop)
 
 	lablogCmd.Execute()
 }
@@ -68,17 +81,4 @@ func recordAndCommit(l logger.Logger, datadir string, entry data.Entry) {
 
 	err = scm.Commit(datadir, entry)
 	errexit(l, err, "can not commit entry")
-}
-
-func defaultOrRawTimestamp(timestamp time.Time, raw string) (time.Time, error) {
-	if timestamp.String() == raw {
-		return timestamp, nil
-	}
-
-	parsed, err := now.Parse(raw)
-	if err != nil {
-		return time.Time{}, errgo.Notef(err, "can not parse timestamp")
-	}
-
-	return parsed, nil
 }

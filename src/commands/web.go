@@ -7,11 +7,10 @@ import (
 )
 
 var cmdWeb = &cobra.Command{
-	Use:    "web",
-	Short:  "Serve the lablog data as a webpage.",
-	Long:   `Will listen and serve all notes and todos formatted as html.`,
-	Run:    runWeb,
-	PreRun: setLogLevel,
+	Use:   "web",
+	Short: "Serve the lablog data as a webpage.",
+	Long:  `Will listen and serve all notes and todos formatted as html.`,
+	Run:   runWeb,
 }
 
 var flagWebBind string

@@ -74,3 +74,31 @@ func ParseNote(project Project, values []string) (Note, error) {
 
 	return note, nil
 }
+
+func FilterNotesBeforeTimeStamp(notes []Note, start time.Time) []Note {
+	var out []Note
+
+	for _, note := range notes {
+		if note.TimeStamp.Before(start) {
+			continue
+		}
+
+		out = append(out, note)
+	}
+
+	return out
+}
+
+func FilterNotesAfterTimeStamp(notes []Note, end time.Time) []Note {
+	var out []Note
+
+	for _, note := range notes {
+		if note.TimeStamp.After(end) {
+			continue
+		}
+
+		out = append(out, note)
+	}
+
+	return out
+}

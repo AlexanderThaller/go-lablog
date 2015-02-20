@@ -8,11 +8,10 @@ import (
 )
 
 var cmdRename = &cobra.Command{
-	Use:    "rename [src] [dst]",
-	Short:  "Rename project from src to dst.",
-	Long:   "Rename project from src to dst.",
-	Run:    runRename,
-	PreRun: setLogLevel,
+	Use:   "rename [src] [dst]",
+	Short: "Rename project from src to dst.",
+	Long:  "Rename project from src to dst.",
+	Run:   runRename,
 }
 
 func runRename(cmd *cobra.Command, args []string) {

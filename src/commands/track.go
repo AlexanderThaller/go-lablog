@@ -8,11 +8,10 @@ import (
 )
 
 var cmdTrack = &cobra.Command{
-	Use:    "track (command) [project]",
-	Short:  "Track projects.",
-	Long:   `Track projects.`,
-	Run:    runTrackToggle,
-	PreRun: setLogLevel,
+	Use:   "track (command) [project]",
+	Short: "Track projects.",
+	Long:  `Track projects.`,
+	Run:   runTrackToggle,
 }
 
 var cmdTrackStart = &cobra.Command{
@@ -34,11 +33,6 @@ var cmdTrackToggle = &cobra.Command{
 	Short: "Toggle Track projects.",
 	Long:  `Toggle Track projects.`,
 	Run:   runTrackToggle,
-}
-
-func init() {
-	cmdTrack.AddCommand(cmdTrackStart)
-	cmdTrack.AddCommand(cmdTrackStop)
 }
 
 func runTrackToggle(cmd *cobra.Command, args []string) {

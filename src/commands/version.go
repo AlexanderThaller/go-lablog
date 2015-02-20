@@ -7,11 +7,10 @@ import (
 )
 
 var cmdVersion = &cobra.Command{
-	Use:    "version",
-	Short:  "Print the version number of aptly-manager.",
-	Long:   `All software has versions. This is aptly-manager's.`,
-	Run:    runVersion,
-	PreRun: setLogLevel,
+	Use:   "version",
+	Short: "Print the version number of aptly-manager.",
+	Long:  `All software has versions. This is aptly-manager's.`,
+	Run:   runVersion,
 }
 
 var flagVersionBuildTime bool

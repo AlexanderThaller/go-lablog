@@ -7,6 +7,7 @@ import (
 
 	"github.com/AlexanderThaller/cobra"
 	"github.com/AlexanderThaller/lablog/src/data"
+	"github.com/AlexanderThaller/lablog/src/helper"
 	"github.com/AlexanderThaller/logger"
 )
 
@@ -15,7 +16,6 @@ var cmdNote = &cobra.Command{
 	Short:   "Create a new note for the project.",
 	Long:    `Create a note which will record the current timestamp and the given text for the given project.`,
 	Run:     runNote,
-	PreRun:  setLogLevel,
 	PostRun: finished,
 }
 
@@ -40,7 +40,7 @@ func runNote(cmd *cobra.Command, args []string) {
 	project := args[0]
 	text := strings.Join(args[1:], " ")
 
-	timestamp, err := defaultOrRawTimestamp(flagNoteTimeStamp, flagNoteTimeStampRaw)
+	timestamp, err := helper.DefaultOrRawTimestamp(flagNoteTimeStamp, flagNoteTimeStampRaw)
 	errexit(l, err, "can not get timestamp")
 
 	note := data.Note{

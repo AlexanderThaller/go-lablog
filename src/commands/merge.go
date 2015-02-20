@@ -8,11 +8,10 @@ import (
 )
 
 var cmdMerge = &cobra.Command{
-	Use:    "merge [src] [dst]",
-	Short:  "Merge all entries of src project into the dst project.",
-	Long:   "Merge all entries of src project into the dst project.",
-	Run:    runMerge,
-	PreRun: setLogLevel,
+	Use:   "merge [src] [dst]",
+	Short: "Merge all entries of src project into the dst project.",
+	Long:  "Merge all entries of src project into the dst project.",
+	Run:   runMerge,
 }
 
 func runMerge(cmd *cobra.Command, args []string) {
