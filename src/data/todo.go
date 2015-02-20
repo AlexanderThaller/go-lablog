@@ -56,7 +56,7 @@ func (by TodosByName) Swap(i, j int) {
 }
 
 func (by TodosByName) Less(i, j int) bool {
-	return by[i].Name < by[j].Name
+	return by[i].Text < by[j].Text
 }
 
 // TodosByTimeStamp allows sorting todo slices by timestamp.
