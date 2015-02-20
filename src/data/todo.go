@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/AlexanderThaller/logger"
 	"github.com/jinzhu/now"
 	"github.com/juju/errgo"
 )
@@ -73,36 +74,6 @@ func (by TodosByTimeStamp) Less(i, j int) bool {
 	return by[i].TimeStamp.Before(by[j].TimeStamp)
 }
 
-func FilterTodosLatest(todos []Todo) []Todo {
-	sort.Sort(TodosByTimeStamp(todos))
-
-	filter := make(map[string]Todo)
-	for _, todo := range todos {
-		filter[todo.Name] = todo
-	}
-
-	var out []Todo
-	for _, todo := range filter {
-		out = append(out, todo)
-	}
-
-	return out
-}
-
-func FilterTodosAreDone(todos []Todo) []Todo {
-	var out []Todo
-
-	for _, todo := range todos {
-		if todo.Done {
-			continue
-		}
-
-		out = append(out, todo)
-	}
-
-	return out
-}
-
 func ParseTodo(project Project, values []string) (Todo, error) {
 	timestamp, err := now.Parse(values[0])
 	if err != nil {
@@ -122,6 +93,41 @@ func ParseTodo(project Project, values []string) (Todo, error) {
 	}
 
 	return todo, nil
+}
+
+func FilterTodosLatest(todos []Todo) []Todo {
+	l := logger.New(Name, "todo", "FilterTodosLatest")
+
+	sort.Sort(TodosByTimeStamp(todos))
+
+	filter := make(map[string]Todo)
+	for _, todo := range todos {
+		l.Trace("Todo: ", todo)
+		filter[todo.Text] = todo
+	}
+
+	l.Trace("Filter: ", filter)
+
+	var out []Todo
+	for _, todo := range filter {
+		out = append(out, todo)
+	}
+
+	return out
+}
+
+func FilterTodosAreNotDone(todos []Todo) []Todo {
+	var out []Todo
+
+	for _, todo := range todos {
+		if todo.Done {
+			continue
+		}
+
+		out = append(out, todo)
+	}
+
+	return out
 }
 
 func FilterTodosBeforeTimeStamp(todos []Todo, start time.Time) []Todo {

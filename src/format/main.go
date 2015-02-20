@@ -11,6 +11,10 @@ import (
 	"github.com/juju/errgo"
 )
 
+const (
+	Name = "format"
+)
+
 const AsciiDocSettings = `:toc: right
 :toclevels: 2
 :sectanchors:
@@ -44,7 +48,7 @@ func ProjectsEntries(writer io.Writer, projects []data.Project, start, end time.
 		todos = data.FilterTodosBeforeTimeStamp(todos, start)
 		todos = data.FilterTodosAfterTimeStamp(todos, end)
 		todos = data.FilterTodosLatest(todos)
-		todos = data.FilterTodosAreDone(todos)
+		todos = data.FilterTodosAreNotDone(todos)
 
 		project.Format(writer, 1)
 		if len(todos) != 0 {
@@ -95,7 +99,7 @@ func ProjectsTodos(writer io.Writer, projects []data.Project, start, end time.Ti
 		todos = data.FilterTodosBeforeTimeStamp(todos, start)
 		todos = data.FilterTodosAfterTimeStamp(todos, end)
 		todos = data.FilterTodosLatest(todos)
-		todos = data.FilterTodosAreDone(todos)
+		todos = data.FilterTodosAreNotDone(todos)
 
 		if len(todos) == 0 {
 			continue

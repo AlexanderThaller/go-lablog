@@ -65,13 +65,10 @@ func setLogLevel(cmd *cobra.Command, args []string) {
 
 	logger.SetLevel(".", prio)
 	l.Debug("New loglevel is: ", flagLablogLogLevel)
-
-	l.Debug("Args: ", args)
 }
 
 func finished(cmd *cobra.Command, args []string) {
 	l := logger.New("commands", "finished")
-	l.Debug("Args: ", args)
 	l.Info("Finished")
 }
 
