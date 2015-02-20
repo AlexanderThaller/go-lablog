@@ -19,9 +19,6 @@ build:
 	go build -ldflags "-X main.buildTime `date +%s` -X main.buildVersion `git describe --always`" -o "$(NAME)"
 
 install:
-	make format
-	make test
-	make build
 	cp "$(NAME)" /usr/local/bin
 
 uninstall:
