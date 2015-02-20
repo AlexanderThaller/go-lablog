@@ -41,7 +41,7 @@ func Execute() {
 	cmdList.AddCommand(cmdListTracksDurations)
 
 	cmdTodo.AddCommand(cmdTodoStart)
-	cmdTodo.AddCommand(cmdTodoStop)
+	cmdTodo.AddCommand(cmdTodoDone)
 	cmdTodo.AddCommand(cmdTodoToggle)
 
 	cmdTrack.AddCommand(cmdTrackStart)

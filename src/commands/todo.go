@@ -26,11 +26,11 @@ var cmdTodoStart = &cobra.Command{
 	Run:   runTodoStart,
 }
 
-var cmdTodoStop = &cobra.Command{
-	Use:   "stop [project] [text]",
-	Short: "Stop todo for project",
-	Long:  `Stop todo for project`,
-	Run:   runTodoStop,
+var cmdTodoDone = &cobra.Command{
+	Use:   "done [project] [text]",
+	Short: "Done todo for project",
+	Long:  `Done todo for project`,
+	Run:   runTodoDone,
 }
 
 var cmdTodoToggle = &cobra.Command{
@@ -80,8 +80,26 @@ func runTodoStart(cmd *cobra.Command, args []string) {
 	recordAndCommit(l, flagLablogDataDir, todo)
 }
 
-func runTodoStop(cmd *cobra.Command, args []string) {
+func runTodoDone(cmd *cobra.Command, args []string) {
 	l := logger.New("commands", "todo", "stop")
-	l.Alert("not implemented")
-	os.Exit(1)
+
+	if len(args) < 2 {
+		errexit(l, errgo.New("need at least two arguments to run"))
+	}
+
+	project := args[0]
+	text := strings.Join(args[1:], " ")
+
+	timestamp, err := helper.DefaultOrRawTimestamp(flagTodoTimeStamp, flagTodoTimeStampRaw)
+	errexit(l, err, "can not get timestamp")
+
+	todo := data.Todo{
+		Done:      true,
+		Project:   data.Project{Name: project},
+		Text:      text,
+		TimeStamp: timestamp,
+	}
+
+	l.Trace("Todo: ", todo)
+	recordAndCommit(l, flagLablogDataDir, todo)
 }

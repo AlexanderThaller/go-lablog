@@ -39,10 +39,6 @@ func (todo Todo) GetTimeStamp() time.Time {
 }
 
 func (todo Todo) Format(writer io.Writer, indent uint) {
-	if todo.Done {
-		return
-	}
-
 	io.WriteString(writer, "* "+todo.Text)
 	io.WriteString(writer, "\n")
 }
@@ -77,18 +73,27 @@ func (by TodosByTimeStamp) Less(i, j int) bool {
 	return by[i].TimeStamp.Before(by[j].TimeStamp)
 }
 
-func FilterTodos(todos []Todo) []Todo {
+func FilterTodosLatest(todos []Todo) []Todo {
 	sort.Sort(TodosByTimeStamp(todos))
 
-	filter := make(map[Todo]bool)
-
+	filter := make(map[string]Todo)
 	for _, todo := range todos {
-		filter[todo] = todo.Done
+		filter[todo.Name] = todo
 	}
 
 	var out []Todo
-	for todo, inActive := range filter {
-		if inActive {
+	for _, todo := range filter {
+		out = append(out, todo)
+	}
+
+	return out
+}
+
+func FilterTodosAreDone(todos []Todo) []Todo {
+	var out []Todo
+
+	for _, todo := range todos {
+		if todo.Done {
 			continue
 		}
 

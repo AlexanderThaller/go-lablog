@@ -8,6 +8,10 @@ import (
 	"github.com/juju/errgo"
 )
 
+const (
+	Name = "data"
+)
+
 func Record(datadir string, entry Entry) error {
 	if datadir == "" {
 		return errgo.New("datadir can not be emtpy")
