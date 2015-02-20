@@ -78,6 +78,14 @@ var cmdListTracksDurations = &cobra.Command{
 	PreRun: runListParseTimeStamps,
 }
 
+var cmdListEntries = &cobra.Command{
+	Use:    "entries",
+	Short:  "List all entries (notes, todos, tracks).",
+	Long:   `List all entries (notes, todos, trackss).`,
+	Run:    runListEntries,
+	PreRun: runListParseTimeStamps,
+}
+
 var flagListStart time.Time
 var flagListStartRaw string
 var flagListEnd time.Time
@@ -172,4 +180,19 @@ func runListTracksActive(cmd *cobra.Command, args []string) {
 	l := logger.New("commands", "list", "active")
 	l.Alert("not implemented")
 	os.Exit(1)
+}
+
+func runListEntries(cmd *cobra.Command, args []string) {
+	l := logger.New("commands", "list", "entries")
+
+	projects, err := data.ProjectsOrArgs(args, flagLablogDataDir)
+	errexit(l, err, "can not get projects")
+
+	sort.Sort(data.ProjectsByName(projects))
+
+	buffer := new(bytes.Buffer)
+	err = format.ProjectsEntries(buffer, projects, flagListStart, flagListEnd)
+	errexit(l, err, "can not format projects")
+
+	fmt.Print(buffer.String())
 }

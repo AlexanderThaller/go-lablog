@@ -24,6 +24,42 @@ const AsciiDocSettings = `:toc: right
 :source-highlighter: pygments
 :listing-caption: Listing`
 
+func ProjectsEntries(writer io.Writer, projects []data.Project, start, end time.Time) error {
+	io.WriteString(writer, AsciiDocSettings+"\n\n")
+
+	for _, project := range projects {
+		notes, err := project.Notes()
+		if err != nil {
+			return errgo.Notef(err, "can not get notes from project "+project.Name)
+		}
+
+		notes = data.FilterNotesBeforeTimeStamp(notes, start)
+		notes = data.FilterNotesAfterTimeStamp(notes, end)
+
+		todos, err := project.Todos()
+		if err != nil {
+			return errgo.Notef(err, "can not get todos from project "+project.Name)
+		}
+
+		todos = data.FilterTodosBeforeTimeStamp(todos, start)
+		todos = data.FilterTodosAfterTimeStamp(todos, end)
+		todos = data.FilterTodosLatest(todos)
+		todos = data.FilterTodosAreDone(todos)
+
+		project.Format(writer, 1)
+		if len(todos) != 0 {
+			Todos(writer, todos)
+			io.WriteString(writer, "\n")
+		}
+
+		if len(notes) != 0 {
+			Notes(writer, notes)
+		}
+	}
+
+	return nil
+}
+
 func ProjectsNotes(writer io.Writer, projects []data.Project, start, end time.Time) error {
 	io.WriteString(writer, AsciiDocSettings+"\n\n")
 

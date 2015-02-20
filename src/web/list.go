@@ -105,3 +105,35 @@ func listTodos(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func listEntries(w http.ResponseWriter, r *http.Request) {
+	l := logger.New(Name, "listProjects")
+
+	args := defquery(r, "project")
+	projects, err := data.ProjectsOrArgs(args, _datadir)
+	if err != nil {
+		printerr(l, w, errgo.Notef(err, "can not get projects or args"))
+		return
+	}
+
+	start, end, err := startEndFromQueries(r)
+	if err != nil {
+		printerr(l, w, errgo.Notef(err, "can not get start or end time"))
+		return
+	}
+
+	var buffer = new(bytes.Buffer)
+	sort.Sort(data.ProjectsByName(projects))
+
+	err = format.ProjectsEntries(buffer, projects, start, end)
+	if err != nil {
+		printerr(l, w, errgo.Notef(err, "can not format projects"))
+		return
+	}
+
+	err = format.AsciiDoctor(buffer, w)
+	if err != nil {
+		printerr(l, w, errgo.Notef(err, "can not format with asciidoctor"))
+		return
+	}
+}

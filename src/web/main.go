@@ -33,6 +33,8 @@ func Listen(datadir, binding string) error {
 	router.HandleFunc("/todo/", todoForm)
 	router.HandleFunc("/todo/record", todoParser)
 	router.HandleFunc("/todo/record", todoParser)
+	router.HandleFunc("/list/entries", listEntries)
+	router.HandleFunc("/list/entries/", listEntries)
 	router.HandleFunc("/list/notes", listNotes)
 	router.HandleFunc("/list/notes/", listNotes)
 	router.HandleFunc("/list/todos", listTodos)

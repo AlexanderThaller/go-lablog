@@ -18,12 +18,12 @@
     <th>Todo</th>
   </thead>
   <tr>
-    <td><a href="/list/notes">All</a></td>
+    <td><a style="text-align:center" href="/list/entries">*</a></td>
     <td style="text-align:center"><a href="/note">◇</a></td>
     <td style="text-align:center"><a href="/todo">◇</a></td>
   {{ range $project := . }}
   <tr>
-    <td><a href="/list/notes?project={{ $project.Name }}">{{ $project.Name }}</a></td>
+    <td><a href="/list/entries?project={{ $project.Name }}">{{ $project.Name }}</a></td>
     <td style="text-align:center"><a href="/note?project={{ $project.Name }}">◇</a></td>
     <td style="text-align:center"><a href="/todo?project={{ $project.Name }}">◇</a></td>
   </tr>
