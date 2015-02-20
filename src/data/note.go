@@ -102,3 +102,17 @@ func FilterNotesAfterTimeStamp(notes []Note, end time.Time) []Note {
 
 	return out
 }
+
+func FilterNotesNotEmpty(notes []Note) []Note {
+	var out []Note
+
+	for _, note := range notes {
+		if strings.TrimSpace(note.Text) == "" {
+			continue
+		}
+
+		out = append(out, note)
+	}
+
+	return out
+}

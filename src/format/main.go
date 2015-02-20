@@ -128,6 +128,8 @@ func Todos(writer io.Writer, todos []data.Todo) {
 func Notes(writer io.Writer, notes []data.Note) {
 	io.WriteString(writer, "=== Notes\n\n")
 
+	notes = data.FilterNotesNotEmpty(notes)
+
 	sort.Sort(data.NotesByTimeStamp(notes))
 	for _, note := range notes {
 		note.Format(writer, 2)
