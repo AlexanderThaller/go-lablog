@@ -33,6 +33,7 @@ func Execute() {
 	lablogCmd.AddCommand(cmdWeb)
 
 	cmdList.AddCommand(cmdListDates)
+	cmdList.AddCommand(cmdListEntries)
 	cmdList.AddCommand(cmdListNotes)
 	cmdList.AddCommand(cmdListProjects)
 	cmdList.AddCommand(cmdListTodos)

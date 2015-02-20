@@ -30,6 +30,7 @@ const AsciiDocSettings = `:toc: right
 
 func ProjectsEntries(writer io.Writer, projects []data.Project, start, end time.Time) error {
 	io.WriteString(writer, AsciiDocSettings+"\n\n")
+	io.WriteString(writer, "= Entries \n\n")
 
 	for _, project := range projects {
 		notes, err := project.Notes()
@@ -66,6 +67,7 @@ func ProjectsEntries(writer io.Writer, projects []data.Project, start, end time.
 
 func ProjectsNotes(writer io.Writer, projects []data.Project, start, end time.Time) error {
 	io.WriteString(writer, AsciiDocSettings+"\n\n")
+	io.WriteString(writer, "= Notes \n\n")
 
 	for _, project := range projects {
 		notes, err := project.Notes()
@@ -89,6 +91,7 @@ func ProjectsNotes(writer io.Writer, projects []data.Project, start, end time.Ti
 
 func ProjectsTodos(writer io.Writer, projects []data.Project, start, end time.Time) error {
 	io.WriteString(writer, AsciiDocSettings+"\n\n")
+	io.WriteString(writer, "= Todos \n\n")
 
 	for _, project := range projects {
 		todos, err := project.Todos()
