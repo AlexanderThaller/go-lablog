@@ -157,3 +157,17 @@ func FilterTodosAfterTimeStamp(todos []Todo, end time.Time) []Todo {
 
 	return out
 }
+
+func FilterTodosByText(todos []Todo, text string) []Todo {
+	var out []Todo
+
+	for _, todo := range todos {
+		if todo.Text != text {
+			continue
+		}
+
+		out = append(out, todo)
+	}
+
+	return out
+}
