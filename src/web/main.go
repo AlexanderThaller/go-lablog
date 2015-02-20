@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/AlexanderThaller/lablog/src/data"
+	"github.com/AlexanderThaller/lablog/src/helper"
 	"github.com/AlexanderThaller/lablog/src/scm"
 	"github.com/AlexanderThaller/logger"
 	"github.com/gorilla/mux"
@@ -79,4 +81,22 @@ func recordAndCommit(datadir string, entry data.Entry) error {
 	}
 
 	return nil
+}
+
+func startEndFromQueries(r *http.Request) (time.Time, time.Time, error) {
+	timenow := time.Now()
+	startRaw := defquery(r, "start", time.Time{}.String())
+	endRaw := defquery(r, "end", timenow.String())
+
+	start, err := helper.DefaultOrRawTimestamp(time.Time{}, startRaw[0])
+	if err != nil {
+		return time.Time{}, time.Time{}, errgo.Notef(err, "can not get start time")
+	}
+
+	end, err := helper.DefaultOrRawTimestamp(timenow, endRaw[0])
+	if err != nil {
+		return time.Time{}, time.Time{}, errgo.Notef(err, "can not get end time")
+	}
+
+	return start, end, nil
 }
