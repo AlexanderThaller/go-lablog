@@ -3,103 +3,117 @@ package commands
 import (
 	"bytes"
 	"fmt"
-	"io"
 	"os"
 	"sort"
 	"time"
 
-	"github.com/AlexanderThaller/lablog/src/project"
+	"github.com/AlexanderThaller/cobra"
+	"github.com/AlexanderThaller/lablog/src/data"
+	"github.com/AlexanderThaller/lablog/src/format"
+	"github.com/AlexanderThaller/lablog/src/helper"
 	"github.com/AlexanderThaller/logger"
-	"github.com/jinzhu/now"
-	"github.com/juju/errgo"
-	"github.com/spf13/cobra"
 )
 
 var cmdList = &cobra.Command{
-	Use:   "list (command)",
-	Short: "List x",
-	Long:  `List x`,
-	Run:   runListProjects,
+	Use:    "list (command)",
+	Short:  "List projects, notes, todos, dates, tracks, etc., see help for all options.",
+	Long:   "List projects, notes, todos, dates, tracks, etc., see help for all options.",
+	Run:    runListProjects,
+	PreRun: runListParseTimeStamps,
 }
 
 var cmdListDates = &cobra.Command{
-	Use:   "dates",
-	Short: "List dates",
-	Long:  `List dates`,
-	Run:   runListDates,
+	Use:    "dates",
+	Short:  "List dates.",
+	Long:   `List dates.`,
+	Run:    runListDates,
+	PreRun: runListParseTimeStamps,
 }
 
 var cmdListNotes = &cobra.Command{
-	Use:   "notes",
-	Short: "List notes",
-	Long:  `List notes`,
-	Run:   runListNotes,
+	Use:    "notes",
+	Short:  "List notes.",
+	Long:   `List notes.`,
+	Run:    runListNotes,
+	PreRun: runListParseTimeStamps,
 }
 
 var cmdListProjects = &cobra.Command{
-	Use:   "projects",
-	Short: "List projects",
-	Long:  `List projects`,
-	Run:   runListProjects,
+	Use:    "projects",
+	Short:  "List projects.",
+	Long:   `List projects.`,
+	Run:    runListProjects,
+	PreRun: runListParseTimeStamps,
 }
 
 var cmdListTodos = &cobra.Command{
-	Use:   "todos",
-	Short: "List todos",
-	Long:  `List todos`,
-	Run:   runListTodos,
+	Use:    "todos",
+	Short:  "List todos.",
+	Long:   `List todos.`,
+	Run:    runListTodos,
+	PreRun: runListParseTimeStamps,
 }
 
 var cmdListTracks = &cobra.Command{
-	Use:   "tracks",
-	Short: "List tracks",
-	Long:  `List tracks`,
-	Run:   runListTracks,
+	Use:    "tracks",
+	Short:  "List tracks.",
+	Long:   `List tracks.`,
+	Run:    runListTracks,
+	PreRun: runListParseTimeStamps,
 }
 
 var cmdListTracksActive = &cobra.Command{
-	Use:   "active",
-	Short: "List tracks",
-	Long:  `List tracks`,
-	Run:   runListTracksActive,
+	Use:    "active",
+	Short:  "List tracks.",
+	Long:   `List tracks.`,
+	Run:    runListTracksActive,
+	PreRun: runListParseTimeStamps,
 }
 
 var cmdListTracksDurations = &cobra.Command{
-	Use:   "durations",
-	Short: "List durations",
-	Long:  `List durations`,
-	Run:   runListDurations,
+	Use:    "durations",
+	Short:  "List durations.",
+	Long:   `List durations.`,
+	Run:    runListDurations,
+	PreRun: runListParseTimeStamps,
 }
 
-var flagListStartTime time.Time
-var flagListEndTime time.Time
-var flagListStartTimeRaw string
-var flagListEndTimeRaw string
-var flagListProject string
-var flagListNoSubprojects bool
+var cmdListEntries = &cobra.Command{
+	Use:    "entries",
+	Short:  "List all entries (notes, todos, tracks).",
+	Long:   `List all entries (notes, todos, trackss).`,
+	Run:    runListEntries,
+	PreRun: runListParseTimeStamps,
+}
+
+var flagListStart time.Time
+var flagListStartRaw string
+var flagListEnd time.Time
+var flagListEndRaw string
 
 func init() {
-	cmdList.AddCommand(cmdListDates)
-	cmdList.AddCommand(cmdListNotes)
-	cmdList.AddCommand(cmdListProjects)
-	cmdList.AddCommand(cmdListTodos)
+	flagListStart = time.Time{}
+	flagListEnd = time.Now()
 
-	cmdListTracks.AddCommand(cmdListTracksActive)
-	cmdListTracks.AddCommand(cmdListTracksDurations)
-	cmdList.AddCommand(cmdListTracks)
+	cmdList.PersistentFlags().StringVarP(&flagListStartRaw, "start", "s",
+		flagListStart.String(),
+		"The timestamp after which entries have to be taken to be displayes.")
 
-	cmdList.PersistentFlags().StringVarP(&flagListProject, "projects", "p",
-		"", "The project to list for")
-	cmdList.PersistentFlags().BoolVarP(&flagListNoSubprojects, "nosubprojects", "s",
-		false, "Don't print subprojects if true")
+	cmdList.PersistentFlags().StringVarP(&flagListEndRaw, "end", "e",
+		flagListEnd.String(),
+		"The timestamp before which entries have to be taken to be displayes.")
+}
 
-	flagListStartTime = time.Time{}
-	flagListEndTime = time.Now()
+func runListParseTimeStamps(cmd *cobra.Command, args []string) {
+	l := logger.New("commands", "list", "ParseTimeStamps")
 
-	cmdList.PersistentFlags().StringVarP(&flagListStartTimeRaw, "from", "f",
-		flagListStartTime.String(), "Only list entries that are after this timestamp.")
-	cmdList.PersistentFlags().StringVarP(&flagListEndTimeRaw, "to", "t",
-		flagListEndTime.String(), "Only list entries that are before this timestamp.")
+	start, err := helper.DefaultOrRawTimestamp(flagListStart, flagListStartRaw)
+	errexit(l, err, "can not get start timestamp")
+	flagListStart = start
+
+	end, err := helper.DefaultOrRawTimestamp(flagListEnd, flagListEndRaw)
+	errexit(l, err, "can not get end timestamp")
+	flagListEnd = end
 }
 
 func runListDates(cmd *cobra.Command, args []string) {
@@ -117,45 +131,43 @@ func runListDurations(cmd *cobra.Command, args []string) {
 func runListNotes(cmd *cobra.Command, args []string) {
 	l := logger.New("commands", "list", "notes")
 
-	output := bytes.NewBufferString("")
+	projects, err := data.ProjectsOrArgs(args, flagLablogDataDir)
+	errexit(l, err, "can not get projects")
 
-	if flagListProject == "" {
-		err := runListCommand(output, runListProjectNotes)
-		errexit(l, err, "can not list notes for projects")
-	} else {
-		err := runListCommand(output, runListProjectNotesAndSubnotes, flagListProject)
-		errexit(l, err, "can not list notes for project")
-	}
+	sort.Sort(data.ProjectsByName(projects))
 
-	fmt.Print(output.String())
+	buffer := new(bytes.Buffer)
+	err = format.ProjectsNotes(buffer, projects, flagListStart, flagListEnd)
+	errexit(l, err, "can not format projects")
+
+	fmt.Print(buffer.String())
 }
 
 func runListProjects(cmd *cobra.Command, args []string) {
 	l := logger.New("commands", "list", "projects")
+	projects, err := data.Projects(flagLablogDataDir)
+	errexit(l, err, "can not get projects")
 
-	output := bytes.NewBufferString("")
-
-	starttime, endtime, err := parseFromToTimestamp()
-	errexit(l, err, "can not parse from or to timestamp")
-
-	projects, err := project.Projects(flagLablogDataDir,
-		starttime, endtime)
-	if err != nil {
-		l.Alert("can not get projects: ", errgo.Details(err))
-		os.Exit(1)
-	}
+	sort.Sort(data.ProjectsByName(projects))
 
 	for _, project := range projects {
-		output.WriteString(project + "\n")
+		fmt.Println(project.Name)
 	}
-
-	fmt.Print(output.String())
 }
 
 func runListTodos(cmd *cobra.Command, args []string) {
 	l := logger.New("commands", "list", "todos")
-	l.Alert("not implemented")
-	os.Exit(1)
+
+	projects, err := data.ProjectsOrArgs(args, flagLablogDataDir)
+	errexit(l, err, "can not get projects")
+
+	sort.Sort(data.ProjectsByName(projects))
+
+	buffer := new(bytes.Buffer)
+	err = format.ProjectsTodos(buffer, projects, flagListStart, flagListEnd)
+	errexit(l, err, "can not format projects")
+
+	fmt.Print(buffer.String())
 }
 
 func runListTracks(cmd *cobra.Command, args []string) {
@@ -170,113 +182,17 @@ func runListTracksActive(cmd *cobra.Command, args []string) {
 	os.Exit(1)
 }
 
-type listCommand func(io.Writer, string, int) error
+func runListEntries(cmd *cobra.Command, args []string) {
+	l := logger.New("commands", "list", "entries")
 
-func runListCommand(writer io.Writer, command listCommand, projects ...string) error {
-	l := logger.New("commands", "list", "runListCommand")
+	projects, err := data.ProjectsOrArgs(args, flagLablogDataDir)
+	errexit(l, err, "can not get projects")
 
-	starttime, endtime, err := parseFromToTimestamp()
-	errexit(l, err, "can not parse from or to timestamp")
+	sort.Sort(data.ProjectsByName(projects))
 
-	l.Trace("Length of projects: ", len(projects))
-	if len(projects) == 0 {
-		l.Debug("Trying to get projects")
+	buffer := new(bytes.Buffer)
+	err = format.ProjectsEntries(buffer, projects, flagListStart, flagListEnd)
+	errexit(l, err, "can not format projects")
 
-		projcts, err := project.Projects(flagLablogDataDir, starttime,
-			endtime)
-		if err != nil {
-			return errgo.Notef(err, "can not get projects")
-		}
-		projects = projcts
-	}
-
-	l.Debug("Will now format the header")
-	project.FormatHeader(writer, "Lablog", "list", 1)
-
-	l.Debug("Will now run the command for projects")
-	for _, project := range projects {
-		l.Trace("Run the command for the project ", project)
-		err := command(writer, project, 2)
-		if err != nil {
-			return errgo.Notef(err, "problem while running list command")
-		}
-	}
-	l.Debug("Finished running the command")
-
-	return nil
-}
-
-func runListProjectNotes(writer io.Writer, proj string, indent int) error {
-	l := logger.New("commands", "list", "runListProjectNotes")
-
-	starttime, endtime, err := parseFromToTimestamp()
-	errexit(l, err, "can not parse from or to timestamp")
-
-	notes, err := project.ProjectNotes(proj, flagLablogDataDir,
-		starttime, endtime)
-	if err != nil {
-		return errgo.Notef(err, "can not get notes")
-	}
-
-	sort.Sort(project.NotesByDate(notes))
-
-	err = project.FormatNotes(writer, proj, "list", notes, indent)
-	if err != nil {
-		return errgo.Notef(err, "can not format notes")
-	}
-
-	return nil
-}
-
-func runListProjectNotesAndSubnotes(writer io.Writer, proj string, indent int) error {
-	starttime, endtime, err := parseFromToTimestamp()
-	if err != nil {
-		return errgo.Notef(err, "can not parse from or to timestamp")
-	}
-
-	err = runListProjectNotes(writer, proj, indent)
-	if err != nil {
-		return errgo.Notef(err, "can not write project notes")
-	}
-
-	if flagListNoSubprojects {
-		return nil
-	}
-
-	subprojects, err := project.ProjectSubprojects(proj, flagLablogDataDir,
-		starttime, endtime)
-	if err != nil {
-		return errgo.Notef(err, "can not get subprojects")
-	}
-
-	for _, subproj := range subprojects {
-		err := runListProjectNotes(writer, subproj, indent)
-		if err != nil {
-			return errgo.Notef(err, "can not list notes for subproject")
-		}
-	}
-
-	return nil
-}
-
-func parseFromToTimestamp() (time.Time, time.Time, error) {
-	start := flagListStartTime
-	end := flagListEndTime
-
-	var err error
-	if flagListStartTime.String() != flagListStartTimeRaw {
-		start, err = now.Parse(flagListStartTimeRaw)
-		if err != nil {
-			return time.Time{}, time.Time{}, errgo.Notef(err, "can not parse start time")
-		}
-	}
-
-	if flagListEndTime.String() != flagListEndTimeRaw {
-		end, err = now.Parse(flagListEndTimeRaw)
-		if err != nil {
-			return time.Time{}, time.Time{}, errgo.Notef(err, "can not parse end time")
-		}
-	}
-
-	return start, end, nil
+	fmt.Print(buffer.String())
 }

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>{{.Title}}</title>
+</head>
+<body>
+<a href="/">Back</a><br>
+
+<form action="{{.FormAction}}" method="post" novalidate>
+  Project: <input style="width:50%" type="text" name="Project" value="{{.Project}}">
+  <br>
+  <textarea style="width:90%" name="Text" rows="15"></textarea>
+  <br>
+  Timestamp: <input style="width:50%" type="text" name="TimeStamp">
+  <br>
+
+  <br><br>
+
+  <input type="submit" value="{{.FormButton}}" />
+
+</form>
+</body>
+</html>

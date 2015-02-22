@@ -3,54 +3,102 @@ package web
 import (
 	"fmt"
 	"net/http"
-	"sort"
+	"net/url"
 	"time"
 
-	"github.com/AlexanderThaller/lablog/src/project"
+	"github.com/AlexanderThaller/lablog/src/data"
+	"github.com/AlexanderThaller/lablog/src/helper"
+	"github.com/AlexanderThaller/lablog/src/scm"
+	"github.com/AlexanderThaller/logger"
 	"github.com/gorilla/mux"
 	"github.com/juju/errgo"
 )
 
-// DataDir is the path to the datadir for lablog from which we will get the
-// project data.
-var DataDir string
+const (
+	Name = "web"
+)
 
-func Listen(binding string) error {
+var _datadir string
+
+func Listen(datadir, binding string) error {
+	_datadir = datadir
+
 	router := mux.NewRouter()
-	router.HandleFunc("/", webRootHandler)
-	router.HandleFunc("/notes/{project}", webNotesHandler)
+	router.HandleFunc("/", listProjects)
+	router.HandleFunc("/note", noteForm)
+	router.HandleFunc("/note/", noteForm)
+	router.HandleFunc("/note/record", noteParser)
+	router.HandleFunc("/note/record", noteParser)
+	router.HandleFunc("/todo", todoForm)
+	router.HandleFunc("/todo/", todoForm)
+	router.HandleFunc("/todo/record", todoParser)
+	router.HandleFunc("/todo/record", todoParser)
+	router.HandleFunc("/list/entries", listEntries)
+	router.HandleFunc("/list/entries/", listEntries)
+	router.HandleFunc("/list/notes", listNotes)
+	router.HandleFunc("/list/notes/", listNotes)
+	router.HandleFunc("/list/todos", listTodos)
+	router.HandleFunc("/list/todos/", listTodos)
 
 	http.Handle("/", router)
+
 	err := http.ListenAndServe(binding, nil)
 	if err != nil {
-		return err
+		return errgo.Notef(err, "can not listen on binding")
 	}
 
 	return nil
 }
 
-func webRootHandler(w http.ResponseWriter, r *http.Request) {
-	projects, err := project.Projects(DataDir, time.Time{}, time.Now())
-	if err != nil {
-		fmt.Fprintf(w, "can not get projects: %s", errgo.Details(err))
-		return
-	}
+func printerr(l logger.Logger, w http.ResponseWriter, err error) {
+	l.Error(errgo.Details(err))
+	fmt.Fprintf(w, errgo.Details(err))
 
-	page := RootPage{Projects: projects}
-	WriteTemplateHTML(w, r, page)
+	return
 }
 
-func webNotesHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	proj := vars["project"]
-
-	notes, err := project.ProjectNotes(proj, DataDir, time.Time{}, time.Now())
+func defquery(r *http.Request, key string, defvalue ...string) []string {
+	queries, err := url.ParseQuery(r.URL.RawQuery)
 	if err != nil {
-		fmt.Fprintf(w, "can not get project notes: %s", errgo.Details(err))
-		return
+		return defvalue
 	}
-	sort.Sort(project.NotesByDate(notes))
 
-	page := PageNotes{Project: proj, Notes: notes}
-	WriteTemplateHTML(w, r, page)
+	value, exists := queries[key]
+	if !exists {
+		return defvalue
+	}
+
+	return value
+}
+
+func recordAndCommit(datadir string, entry data.Entry) error {
+	err := data.Record(datadir, entry)
+	if err != nil {
+		return errgo.Notef(err, "can not record note")
+	}
+
+	err = scm.Commit(datadir, entry)
+	if err != nil {
+		return errgo.Notef(err, "can not commit entry")
+	}
+
+	return nil
+}
+
+func startEndFromQueries(r *http.Request) (time.Time, time.Time, error) {
+	timenow := time.Now()
+	startRaw := defquery(r, "start", time.Time{}.String())
+	endRaw := defquery(r, "end", timenow.String())
+
+	start, err := helper.DefaultOrRawTimestamp(time.Time{}, startRaw[0])
+	if err != nil {
+		return time.Time{}, time.Time{}, errgo.Notef(err, "can not get start time")
+	}
+
+	end, err := helper.DefaultOrRawTimestamp(timenow, endRaw[0])
+	if err != nil {
+		return time.Time{}, time.Time{}, errgo.Notef(err, "can not get end time")
+	}
+
+	return start, end, nil
 }
