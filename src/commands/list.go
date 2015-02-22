@@ -118,8 +118,17 @@ func runListParseTimeStamps(cmd *cobra.Command, args []string) {
 
 func runListDates(cmd *cobra.Command, args []string) {
 	l := logger.New("commands", "list", "dates")
-	l.Alert("not implemented")
-	os.Exit(1)
+
+	projects, err := data.ProjectsOrArgs(args, flagLablogDataDir)
+	errexit(l, err, "can not get projects")
+
+	sort.Sort(data.ProjectsByName(projects))
+
+	buffer := new(bytes.Buffer)
+	err = format.ProjectsDates(buffer, projects, flagListStart, flagListEnd)
+	errexit(l, err, "can not format projects")
+
+	fmt.Print(buffer.String())
 }
 
 func runListDurations(cmd *cobra.Command, args []string) {
