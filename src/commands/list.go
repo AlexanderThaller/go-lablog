@@ -216,6 +216,13 @@ func runListEntries(cmd *cobra.Command, args []string) {
 
 func runListLog(cmd *cobra.Command, args []string) {
 	l := logger.New("commands", "list", "log")
-	l.Alert("not implemented")
-	os.Exit(1)
+
+	projects, err := data.ProjectsOrArgs(args, flagLablogDataDir)
+	errexit(l, err, "can not get projects")
+
+	buffer := new(bytes.Buffer)
+	err = format.Log(buffer, projects, flagListStart, flagListEnd)
+	errexit(l, err, "can not format log")
+
+	fmt.Print(buffer.String())
 }

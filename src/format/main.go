@@ -155,3 +155,7 @@ func AsciiDoctor(reader io.Reader, writer io.Writer) error {
 
 	return nil
 }
+
+func Log(writer io.Writer, projects []data.Project, start, end time.Time) error {
+	return errgo.New("not implemented")
+}
