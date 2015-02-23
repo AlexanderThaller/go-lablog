@@ -113,6 +113,10 @@ func (project Project) Notes() ([]Note, error) {
 			continue
 		}
 
+		if csv[1] != "note" {
+			continue
+		}
+
 		note, err := ParseNote(project, csv)
 		if err != nil {
 			return nil, errgo.Notef(err, "can not parse note from csv")
@@ -147,12 +151,54 @@ func (project Project) Todos() ([]Todo, error) {
 			continue
 		}
 
+		if csv[1] != "todo" {
+			continue
+		}
+
 		todo, err := ParseTodo(project, csv)
 		if err != nil {
 			return nil, errgo.Notef(err, "can not parse todo from csv")
 		}
 
 		out = append(out, todo)
+	}
+
+	return out, nil
+}
+
+func (project Project) Tracks() ([]Track, error) {
+	file, err := project.File()
+	if err != nil {
+		return nil, errgo.Notef(err, "can not open project file")
+	}
+	defer file.Close()
+
+	parser := csv.NewReader(file)
+	parser.FieldsPerRecord = 3
+
+	var out []Track
+
+	for {
+		csv, err := parser.Read()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+
+			// an error would mean that the csv line is not a track so we can skip it
+			continue
+		}
+
+		if csv[1] != "track" {
+			continue
+		}
+
+		track, err := ParseTrack(project, csv)
+		if err != nil {
+			return nil, errgo.Notef(err, "can not parse todo from csv")
+		}
+
+		out = append(out, track)
 	}
 
 	return out, nil

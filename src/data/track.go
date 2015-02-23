@@ -4,6 +4,9 @@ import (
 	"io"
 	"strconv"
 	"time"
+
+	"github.com/jinzhu/now"
+	"github.com/juju/errgo"
 )
 
 type Track struct {
@@ -57,4 +60,56 @@ func (by TracksByTimeStamp) Swap(i, j int) {
 
 func (by TracksByTimeStamp) Less(i, j int) bool {
 	return by[i].TimeStamp.Before(by[j].TimeStamp)
+}
+
+func FilterTracksBeforeTimeStamp(tracks []Track, start time.Time) []Track {
+	var entries []Entry
+	for _, track := range tracks {
+		entries = append(entries, track)
+	}
+
+	entries = FilterEntriesBeforeTimeStamp(entries, start)
+
+	var out []Track
+	for _, entry := range entries {
+		out = append(out, entry.(Track))
+	}
+
+	return out
+}
+
+func FilterTracksAfterTimeStamp(tracks []Track, end time.Time) []Track {
+	var entries []Entry
+	for _, track := range tracks {
+		entries = append(entries, track)
+	}
+
+	entries = FilterEntriesAfterTimeStamp(entries, end)
+
+	var out []Track
+	for _, entry := range entries {
+		out = append(out, entry.(Track))
+	}
+
+	return out
+}
+
+func ParseTrack(project Project, values []string) (Track, error) {
+	timestamp, err := now.Parse(values[0])
+	if err != nil {
+		return Track{}, errgo.Notef(err, "can not parse timestamp")
+	}
+
+	active, err := strconv.ParseBool(values[2])
+	if err != nil {
+		return Track{}, errgo.Notef(err, "can not parse active status")
+	}
+
+	track := Track{
+		Project:   project,
+		Active:    active,
+		TimeStamp: timestamp,
+	}
+
+	return track, nil
 }

@@ -18,3 +18,31 @@ type Entry interface {
 	Type() string
 	GetTimeStamp() time.Time
 }
+
+func FilterEntriesBeforeTimeStamp(entries []Entry, start time.Time) []Entry {
+	var out []Entry
+
+	for _, entry := range entries {
+		if entry.GetTimeStamp().Before(start) {
+			continue
+		}
+
+		out = append(out, entry)
+	}
+
+	return out
+}
+
+func FilterEntriesAfterTimeStamp(entries []Entry, end time.Time) []Entry {
+	var out []Entry
+
+	for _, entry := range entries {
+		if entry.GetTimeStamp().After(end) {
+			continue
+		}
+
+		out = append(out, entry)
+	}
+
+	return out
+}

@@ -125,7 +125,7 @@ func ProjectsTracks(writer io.Writer, projects []data.Project, start, end time.T
 
 func ProjectsDates(writer io.Writer, projects []data.Project, start, end time.Time) error {
 	io.WriteString(writer, AsciiDocSettings+"\n\n")
-	io.WriteString(writer, "= Todos \n\n")
+	io.WriteString(writer, "= Dates \n\n")
 
 	dates, err := helper.ProjectsDates(projects, start, end)
 	if err != nil {

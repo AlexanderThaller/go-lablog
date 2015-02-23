@@ -96,5 +96,13 @@ func FilteredTodosByStartEnd(project data.Project, start, end time.Time) ([]data
 }
 
 func FilteredTracksByStartEnd(project data.Project, start, end time.Time) ([]data.Track, error) {
-	return nil, errgo.New("not implemented")
+	tracks, err := project.Tracks()
+	if err != nil {
+		return nil, errgo.Notef(err, "can not get tracks from project "+project.Name)
+	}
+
+	tracks = data.FilterTracksBeforeTimeStamp(tracks, start)
+	tracks = data.FilterTracksAfterTimeStamp(tracks, end)
+
+	return tracks, nil
 }
