@@ -37,11 +37,20 @@ func (note Note) GetTimeStamp() time.Time {
 }
 
 func (note Note) Format(writer io.Writer, indent uint) {
+	note.FormatTimeStamp(writer, indent+2)
+	note.FormatText(writer, indent+3)
+}
+
+func (note Note) FormatTimeStamp(writer io.Writer, indent uint) {
+	indentchar := strings.Repeat("=", int(indent))
+	io.WriteString(writer, indentchar+" "+note.TimeStamp.Format(EntryCSVTimeStampFormat)+"\n")
+}
+
+func (note Note) FormatText(writer io.Writer, indent uint) {
 	indentchar := strings.Repeat("=", int(indent))
 	reg, _ := regexp.Compile("(?m)^=")
 
-	io.WriteString(writer, indentchar+"== "+note.TimeStamp.Format(EntryCSVTimeStampFormat)+"\n")
-	io.WriteString(writer, reg.ReplaceAllString(note.Text, indentchar+"==="))
+	io.WriteString(writer, reg.ReplaceAllString(note.Text, indentchar))
 	io.WriteString(writer, "\n\n")
 }
 
