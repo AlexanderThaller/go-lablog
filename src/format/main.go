@@ -101,6 +101,10 @@ func ProjectsTodos(writer io.Writer, projects []data.Project, start, end time.Ti
 	return nil
 }
 
+func ProjectsTracks(writer io.Writer, projects []data.Project, start, end time.Time) error {
+	return errgo.New("not implemented")
+}
+
 func ProjectsDates(writer io.Writer, projects []data.Project, start, end time.Time) error {
 	io.WriteString(writer, AsciiDocSettings+"\n\n")
 	io.WriteString(writer, "= Todos \n\n")
