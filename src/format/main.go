@@ -102,7 +102,25 @@ func ProjectsTodos(writer io.Writer, projects []data.Project, start, end time.Ti
 }
 
 func ProjectsTracks(writer io.Writer, projects []data.Project, start, end time.Time) error {
-	return errgo.New("not implemented")
+	io.WriteString(writer, AsciiDocSettings+"\n\n")
+	io.WriteString(writer, "= Tracks \n\n")
+
+	for _, project := range projects {
+		tracks, err := helper.FilteredTracksByStartEnd(project, start, end)
+		if err != nil {
+			return errgo.Notef(err, "can not get filtered tracks")
+		}
+
+		if len(tracks) == 0 {
+			continue
+		}
+
+		project.Format(writer, 1)
+		Tracks(writer, tracks)
+		io.WriteString(writer, "\n")
+	}
+
+	return nil
 }
 
 func ProjectsDates(writer io.Writer, projects []data.Project, start, end time.Time) error {
@@ -140,6 +158,15 @@ func Notes(writer io.Writer, notes []data.Note) {
 	sort.Sort(data.NotesByTimeStamp(notes))
 	for _, note := range notes {
 		note.Format(writer, 2)
+	}
+}
+
+func Tracks(writer io.Writer, tracks []data.Track) {
+	io.WriteString(writer, "=== Tracks\n\n")
+
+	sort.Sort(data.TracksByTimeStamp(tracks))
+	for _, track := range tracks {
+		track.Format(writer, 2)
 	}
 }
 

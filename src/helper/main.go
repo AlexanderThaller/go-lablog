@@ -94,3 +94,7 @@ func FilteredTodosByStartEnd(project data.Project, start, end time.Time) ([]data
 
 	return todos, nil
 }
+
+func FilteredTracksByStartEnd(project data.Project, start, end time.Time) ([]data.Track, error) {
+	return nil, errgo.New("not implemented")
+}
