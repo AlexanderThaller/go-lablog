@@ -2,9 +2,13 @@ package commands
 
 import (
 	"os"
+	"time"
 
 	"github.com/AlexanderThaller/cobra"
+	"github.com/AlexanderThaller/lablog/src/data"
+	"github.com/AlexanderThaller/lablog/src/helper"
 	"github.com/AlexanderThaller/logger"
+	"github.com/juju/errgo"
 )
 
 var cmdTrack = &cobra.Command{
@@ -35,20 +39,62 @@ var cmdTrackToggle = &cobra.Command{
 	Run:   runTrackToggle,
 }
 
-func runTrackToggle(cmd *cobra.Command, args []string) {
-	l := logger.New("commands", "track", "toggle")
-	l.Alert("not implemented")
-	os.Exit(1)
+var flagTrackTimeStamp time.Time
+var flagTrackTimeStampRaw string
+
+func init() {
+	flagTrackTimeStamp = time.Now()
+
+	cmdTrack.PersistentFlags().StringVarP(&flagTrackTimeStampRaw, "timestamp", "t",
+		flagTrackTimeStamp.String(), "The timestamp for which to record the todo.")
 }
 
 func runTrackStart(cmd *cobra.Command, args []string) {
 	l := logger.New("commands", "track", "start")
-	l.Alert("not implemented")
-	os.Exit(1)
+
+	if len(args) < 1 {
+		errexit(l, errgo.New("need at least one argument to run"))
+	}
+
+	project := args[0]
+
+	timestamp, err := helper.DefaultOrRawTimestamp(flagTrackTimeStamp, flagTrackTimeStampRaw)
+	errexit(l, err, "can not get timestamp")
+
+	track := data.Track{
+		Active:    true,
+		Project:   data.Project{Name: project},
+		TimeStamp: timestamp,
+	}
+
+	l.Trace("Track: ", track)
+	recordAndCommit(l, flagLablogDataDir, track)
 }
 
 func runTrackStop(cmd *cobra.Command, args []string) {
 	l := logger.New("commands", "track", "stop")
+
+	if len(args) < 1 {
+		errexit(l, errgo.New("need at least one argument to run"))
+	}
+
+	project := args[0]
+
+	timestamp, err := helper.DefaultOrRawTimestamp(flagTrackTimeStamp, flagTrackTimeStampRaw)
+	errexit(l, err, "can not get timestamp")
+
+	track := data.Track{
+		Active:    false,
+		Project:   data.Project{Name: project},
+		TimeStamp: timestamp,
+	}
+
+	l.Trace("Track: ", track)
+	recordAndCommit(l, flagLablogDataDir, track)
+}
+
+func runTrackToggle(cmd *cobra.Command, args []string) {
+	l := logger.New("commands", "track", "toggle")
 	l.Alert("not implemented")
 	os.Exit(1)
 }

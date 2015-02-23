@@ -49,45 +49,6 @@ func init() {
 		flagTodoTimeStamp.String(), "The timestamp for which to record the todo.")
 }
 
-func runTodoToggle(cmd *cobra.Command, args []string) {
-	l := logger.New("commands", "todo", "toggle")
-
-	if len(args) < 2 {
-		errexit(l, errgo.New("need at least two arguments to run"))
-	}
-
-	project := data.Project{Name: args[0], Datadir: flagLablogDataDir}
-	text := strings.Join(args[1:], " ")
-
-	timestamp, err := helper.DefaultOrRawTimestamp(flagTodoTimeStamp, flagTodoTimeStampRaw)
-	errexit(l, err, "can not get timestamp")
-
-	todos, err := project.Todos()
-	errexit(l, err, "can not get project todos")
-
-	todos = data.FilterTodosByText(todos, text)
-	todos = data.FilterTodosLatest(todos)
-
-	if len(todos) > 1 {
-		errexit(l, errgo.New("got back more than one todo. something is wrong."))
-	}
-
-	isdone := !false
-	if len(todos) == 1 {
-		isdone = todos[0].Done
-	}
-
-	todo := data.Todo{
-		Done:      !isdone,
-		Project:   project,
-		Text:      text,
-		TimeStamp: timestamp,
-	}
-
-	l.Trace("Todo: ", todo)
-	recordAndCommit(l, flagLablogDataDir, todo)
-}
-
 func runTodoStart(cmd *cobra.Command, args []string) {
 	l := logger.New("commands", "todo", "start")
 
@@ -128,6 +89,45 @@ func runTodoDone(cmd *cobra.Command, args []string) {
 	todo := data.Todo{
 		Done:      true,
 		Project:   data.Project{Name: project},
+		Text:      text,
+		TimeStamp: timestamp,
+	}
+
+	l.Trace("Todo: ", todo)
+	recordAndCommit(l, flagLablogDataDir, todo)
+}
+
+func runTodoToggle(cmd *cobra.Command, args []string) {
+	l := logger.New("commands", "todo", "toggle")
+
+	if len(args) < 2 {
+		errexit(l, errgo.New("need at least two arguments to run"))
+	}
+
+	project := data.Project{Name: args[0], Datadir: flagLablogDataDir}
+	text := strings.Join(args[1:], " ")
+
+	timestamp, err := helper.DefaultOrRawTimestamp(flagTodoTimeStamp, flagTodoTimeStampRaw)
+	errexit(l, err, "can not get timestamp")
+
+	todos, err := project.Todos()
+	errexit(l, err, "can not get project todos")
+
+	todos = data.FilterTodosByText(todos, text)
+	todos = data.FilterTodosLatest(todos)
+
+	if len(todos) > 1 {
+		errexit(l, errgo.New("got back more than one todo. something is wrong."))
+	}
+
+	isdone := !false
+	if len(todos) == 1 {
+		isdone = todos[0].Done
+	}
+
+	todo := data.Todo{
+		Done:      !isdone,
+		Project:   project,
 		Text:      text,
 		TimeStamp: timestamp,
 	}
