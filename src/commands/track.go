@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"os"
+	"sort"
 	"time"
 
 	"github.com/AlexanderThaller/cobra"
@@ -95,6 +95,30 @@ func runTrackStop(cmd *cobra.Command, args []string) {
 
 func runTrackToggle(cmd *cobra.Command, args []string) {
 	l := logger.New("commands", "track", "toggle")
-	l.Alert("not implemented")
-	os.Exit(1)
+
+	if len(args) < 1 {
+		errexit(l, errgo.New("need at least one arguments to run"))
+	}
+
+	project := data.Project{Name: args[0], Datadir: flagLablogDataDir}
+
+	timestamp, err := helper.DefaultOrRawTimestamp(flagTodoTimeStamp, flagTodoTimeStampRaw)
+	errexit(l, err, "can not get timestamp")
+
+	tracks, _ := project.Tracks()
+
+	var active bool
+	if len(tracks) >= 1 {
+		sort.Sort(data.TracksByTimeStamp(tracks))
+		active = tracks[len(tracks)-1].Active
+	}
+
+	track := data.Track{
+		Active:    !active,
+		Project:   project,
+		TimeStamp: timestamp,
+	}
+
+	l.Trace("Track: ", track)
+	recordAndCommit(l, flagLablogDataDir, track)
 }
