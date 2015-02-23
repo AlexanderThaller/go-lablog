@@ -157,5 +157,29 @@ func AsciiDoctor(reader io.Reader, writer io.Writer) error {
 }
 
 func Log(writer io.Writer, projects []data.Project, start, end time.Time) error {
-	return errgo.New("not implemented")
+	var allnotes []data.Note
+
+	for _, project := range projects {
+		notes, err := helper.FilteredNotesByStartEnd(project, start, end)
+		if err != nil {
+			return errgo.Notef(err, "can not get filtered notes")
+		}
+
+		for _, note := range notes {
+			allnotes = append(allnotes, note)
+		}
+	}
+
+	allnotes = data.FilterNotesNotEmpty(allnotes)
+	sort.Sort(data.NotesByTimeStamp(allnotes))
+
+	io.WriteString(writer, AsciiDocSettings+"\n\n")
+	io.WriteString(writer, "= Log \n\n")
+	for _, note := range allnotes {
+		note.FormatTimeStamp(writer, 2)
+		note.Project.Format(writer, 2)
+		note.FormatText(writer, 4)
+	}
+
+	return nil
 }
