@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/juju/errgo"
@@ -244,4 +245,17 @@ func ProjectsOrArgs(args []string, datadir string) ([]Project, error) {
 	}
 
 	return projects, nil
+}
+
+func (project Project) IsActive() bool {
+	tracks, err := project.Tracks()
+	if err != nil {
+		return false
+	}
+
+	sort.Sort(TracksByTimeStamp(tracks))
+
+	active := tracks[len(tracks)-1].Active
+
+	return active
 }
