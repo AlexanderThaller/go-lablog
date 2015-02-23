@@ -34,6 +34,7 @@ func Execute() {
 
 	cmdList.AddCommand(cmdListDates)
 	cmdList.AddCommand(cmdListEntries)
+	cmdList.AddCommand(cmdListLog)
 	cmdList.AddCommand(cmdListNotes)
 	cmdList.AddCommand(cmdListProjects)
 	cmdList.AddCommand(cmdListTodos)

@@ -86,6 +86,14 @@ var cmdListEntries = &cobra.Command{
 	PreRun: runListParseTimeStamps,
 }
 
+var cmdListLog = &cobra.Command{
+	Use:    "log",
+	Short:  "List all entries (notes, todos, tracks) ordered by date.",
+	Long:   `List all entries (notes, todos, trackss) ordered by date.`,
+	Run:    runListLog,
+	PreRun: runListParseTimeStamps,
+}
+
 var flagListStart time.Time
 var flagListStartRaw string
 var flagListEnd time.Time
@@ -204,4 +212,10 @@ func runListEntries(cmd *cobra.Command, args []string) {
 	errexit(l, err, "can not format projects")
 
 	fmt.Print(buffer.String())
+}
+
+func runListLog(cmd *cobra.Command, args []string) {
+	l := logger.New("commands", "list", "log")
+	l.Alert("not implemented")
+	os.Exit(1)
 }
