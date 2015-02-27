@@ -70,6 +70,10 @@ func ProjectsNotes(writer io.Writer, projects []data.Project, start, end time.Ti
 			return errgo.Notef(err, "can not get filtered notes")
 		}
 
+		if len(notes) == 0 {
+			continue
+		}
+
 		project.Format(writer, 1)
 		Notes(writer, notes)
 	}
