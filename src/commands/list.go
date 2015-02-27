@@ -46,6 +46,14 @@ var cmdListProjects = &cobra.Command{
 	PreRun: runListParseTimeStamps,
 }
 
+var cmdListSubProjects = &cobra.Command{
+	Use:    "subprojects",
+	Short:  "List subprojects of projects",
+	Long:   `List subprojects of projects`,
+	Run:    runListSubProjects,
+	PreRun: runListParseTimeStamps,
+}
+
 var cmdListTodos = &cobra.Command{
 	Use:    "todos",
 	Short:  "List todos.",
@@ -163,6 +171,19 @@ func runListNotes(cmd *cobra.Command, args []string) {
 func runListProjects(cmd *cobra.Command, args []string) {
 	l := logger.New("commands", "list", "projects")
 	projects, err := data.Projects(flagLablogDataDir)
+	errexit(l, err, "can not get projects")
+
+	sort.Sort(data.ProjectsByName(projects))
+
+	for _, project := range projects {
+		fmt.Println(project.Name)
+	}
+}
+
+func runListSubProjects(cmd *cobra.Command, args []string) {
+	l := logger.New("commands", "list", "subprojects")
+
+	projects, err := data.ProjectsOrArgs(args, flagLablogDataDir)
 	errexit(l, err, "can not get projects")
 
 	sort.Sort(data.ProjectsByName(projects))

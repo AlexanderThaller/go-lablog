@@ -37,6 +37,7 @@ func Execute() {
 	cmdList.AddCommand(cmdListTimeline)
 	cmdList.AddCommand(cmdListNotes)
 	cmdList.AddCommand(cmdListProjects)
+	cmdList.AddCommand(cmdListSubProjects)
 	cmdList.AddCommand(cmdListTodos)
 	cmdList.AddCommand(cmdListTracks)
 	cmdList.AddCommand(cmdListTracksActive)
