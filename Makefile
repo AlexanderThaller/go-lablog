@@ -37,11 +37,9 @@ dependencies_get:
 	go get -u github.com/jteeuwen/go-bindata/...
 
 dependencies_save:
-	make dependencies_get
 	godep save ./...
 
 dependencies_restore:
-	make dependencies_get
 	godep restore ./...
 
 callgraph:
