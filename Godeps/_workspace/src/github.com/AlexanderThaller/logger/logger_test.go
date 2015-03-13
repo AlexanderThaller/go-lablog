@@ -38,29 +38,6 @@ func TestGetLevel(t *testing.T) {
 	n.Info(n, "Finished")
 }
 
-func TestLoggerGetLevel(t *testing.T) {
-	l := New("TestLoggetGetLevel")
-	l.SetLevel(Notice)
-
-	level := l.GetLevel()
-
-	if level != Notice {
-		t.Fail()
-	}
-}
-
-func TestLoggerSetNoColor(t *testing.T) {
-	l := New("TestLoggetSetNoColor")
-	l.SetLevel(Notice)
-
-	l.SetNoColor(true)
-
-	log := list.GetLogger(l)
-	if log.NoColor != true {
-		t.Fail()
-	}
-}
-
 func TestSetLevelFail(t *testing.T) {
 	l := New(namet + ".SetLevel.Fail")
 
@@ -277,8 +254,6 @@ func TestPrintColors(t *testing.T) {
 
 	//TODO: Compare strings instead of printing.
 
-	l.Log(Trace, "Trace")
-	l.Trace("Trace")
 	l.Debug("Debug")
 	l.Info("Info")
 	l.Notice("Notice")
@@ -289,8 +264,6 @@ func TestPrintColors(t *testing.T) {
 	l.Emergency("Emergency")
 
 	SetNoColor("logger.Test.PrintColors", true)
-	l.Log(Trace, "Trace")
-	l.Trace("Trace")
 	l.Debug("NoColorDebug")
 	l.Info("NoColorInfo")
 	l.Notice("NoColorNotice")
@@ -387,42 +360,6 @@ func TestGetPriorityFormat(t *testing.T) {
 			l.Critical("Wrong format for ", n, ", EXPECTED: ", c, ", GOT: ", b)
 			t.Fail()
 		}
-	}
-}
-
-func TestNamePriorityFail(t *testing.T) {
-	_, err := NamePriority(999)
-
-	if err.Error() != "priority does not exist" {
-		t.Fail()
-	}
-}
-
-func TestImportLoggers(t *testing.T) {
-	loggers := make(map[string]string)
-	loggers["."] = "Notice"
-
-	err := ImportLoggers(loggers)
-	if err != nil {
-		t.Fail()
-	}
-}
-
-func TestImportLoggersFail(t *testing.T) {
-	loggers := make(map[string]string)
-	loggers["."] = "FAIL"
-
-	err := ImportLoggers(loggers)
-	if err.Error() != "can not parse priority: do not recognize FAIL" {
-		t.Fail()
-	}
-}
-
-func TestImportLoggersNil(t *testing.T) {
-	err := ImportLoggers(nil)
-
-	if err.Error() != "the loglevel map is nil" {
-		t.Fail()
 	}
 }
 

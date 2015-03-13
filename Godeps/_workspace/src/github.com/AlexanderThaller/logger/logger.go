@@ -50,7 +50,7 @@ const (
 
 var (
 	format     = "[{{.Time}} {{.Priority}} {{.Logger}}] - {{.Message}}.\n"
-	timeformat = time.RFC3339Nano
+	timeformat = time.RFC3339
 
 	priorities     map[Priority]string
 	list           loggers
@@ -78,7 +78,7 @@ func init() {
 }
 
 // ImportLoggers sets the LogLevel for the given Loggers.
-func ImportLoggers(lo map[string]string) (err error) {
+func ImportLoggers(lo map[Logger]string) (err error) {
 	if lo == nil {
 		err = errors.New("the loglevel map is nil")
 		return
@@ -87,10 +87,11 @@ func ImportLoggers(lo map[string]string) (err error) {
 	for k, v := range lo {
 		p, e := ParsePriority(v)
 		if e != nil {
-			return e
+			err = errors.New("can not parse priority: " + e.Error())
+			return
 		}
 
-		SetLevel(Logger(k), p)
+		SetLevel(k, p)
 	}
 
 	return
