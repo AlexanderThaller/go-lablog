@@ -186,10 +186,19 @@ func runListSubProjects(cmd *cobra.Command, args []string) {
 	projects, err := data.ProjectsOrArgs(args, flagLablogDataDir)
 	errexit(l, err, "can not get projects")
 
+	allprojects, err := data.Projects(flagLablogDataDir)
+	errexit(l, err, "can not get projects")
+
 	sort.Sort(data.ProjectsByName(projects))
 
 	for _, project := range projects {
-		fmt.Println(project.Name)
+		subprojects := data.FilterProjectSubprojects(project, allprojects)
+
+		sort.Sort(data.ProjectsByName(subprojects))
+
+		for _, subproject := range subprojects {
+			fmt.Println(subproject.Name)
+		}
 	}
 }
 

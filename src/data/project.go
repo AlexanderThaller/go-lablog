@@ -259,3 +259,23 @@ func (project Project) IsActive() bool {
 
 	return active
 }
+
+func (project Project) IsSubproject(subproject Project) bool {
+	if project.Name == subproject.Name {
+		return false
+	}
+
+	return strings.HasPrefix(subproject.Name, project.Name)
+}
+
+func FilterProjectSubprojects(project Project, allprojects []Project) []Project {
+	var out []Project
+
+	for _, subproject := range allprojects {
+		if project.IsSubproject(subproject) {
+			out = append(out, subproject)
+		}
+	}
+
+	return out
+}
