@@ -9,6 +9,7 @@ import (
 
 	"github.com/AlexanderThaller/lablog/src/data"
 	"github.com/AlexanderThaller/lablog/src/helper"
+	"github.com/AlexanderThaller/logger"
 	"github.com/juju/errgo"
 )
 
@@ -61,13 +62,17 @@ func ProjectsEntries(writer io.Writer, projects []data.Project, start, end time.
 }
 
 func ProjectsNotes(writer io.Writer, projects []data.Project, start, end time.Time) error {
+	l := logger.New(Name, "ProjectsNotes")
+
 	io.WriteString(writer, AsciiDocSettings+"\n\n")
 	io.WriteString(writer, "= Notes \n\n")
 
 	for _, project := range projects {
 		notes, err := helper.FilteredNotesByStartEnd(project, start, end)
 		if err != nil {
-			return errgo.Notef(err, "can not get filtered notes")
+			l.Debug(err)
+			l.Trace(errgo.Details(errgo.Notef(err, "can not get filtered notes")))
+			continue
 		}
 
 		if len(notes) == 0 {
