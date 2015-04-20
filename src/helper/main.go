@@ -62,10 +62,18 @@ func FilteredEntriesByStartEnd(project data.Project, start, end time.Time) ([]da
 
 	todos, err := FilteredTodosByStartEnd(project, start, end)
 	if err != nil {
-		return nil, errgo.Notef(err, "can not get notes from project "+project.Name)
+		return nil, errgo.Notef(err, "can not get todos from project "+project.Name)
 	}
 	for _, todo := range todos {
 		out = append(out, todo)
+	}
+
+	tracks, err := FilteredTracksByStartEnd(project, start, end)
+	if err != nil {
+		return nil, errgo.Notef(err, "can not get tracks from project "+project.Name)
+	}
+	for _, track := range tracks {
+		out = append(out, track)
 	}
 
 	return out, nil
