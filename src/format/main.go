@@ -31,18 +31,26 @@ const AsciiDocSettings = `:toc: right
 :listing-caption: Listing`
 
 func ProjectsEntries(writer io.Writer, projects []data.Project, start, end time.Time) error {
+	l := logger.New(Name, "ProjectsEntries")
+
 	io.WriteString(writer, AsciiDocSettings+"\n\n")
 	io.WriteString(writer, "= Entries \n\n")
 
 	for _, project := range projects {
 		notes, err := helper.FilteredNotesByStartEnd(project, start, end)
 		if err != nil {
-			return errgo.Notef(err, "can not get filtered notes")
+			err := errgo.Notef(err, "can not get filtered notes")
+
+			l.Debug(err)
+			l.Trace(errgo.Details(err))
 		}
 
 		todos, err := helper.FilteredTodosByStartEnd(project, start, end)
 		if err != nil {
-			return errgo.Notef(err, "can not get filtered notes")
+			err := errgo.Notef(err, "can not get filtered todos")
+
+			l.Debug(err)
+			l.Trace(errgo.Details(err))
 		}
 		todos = data.FilterTodosLatest(todos)
 		todos = data.FilterTodosAreNotDone(todos)
