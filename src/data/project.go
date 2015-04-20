@@ -259,3 +259,49 @@ func (project Project) IsActive() bool {
 
 	return active
 }
+
+func (project Project) IsSubproject(subproject Project) bool {
+	if project.Name == subproject.Name {
+		return false
+	}
+
+	return strings.HasPrefix(subproject.Name, project.Name)
+}
+
+func FilterProjectsSubprojects(allprojects []Project, projects []Project) []Project {
+	out := projects
+
+	for _, project := range projects {
+		for _, subproject := range allprojects {
+			if project.IsSubproject(subproject) {
+				out = append(out, subproject)
+			}
+		}
+	}
+
+	return out
+}
+
+func Subprojects(args []string, datadir string, subprojects bool) ([]Project, error) {
+	if !subprojects {
+		projects, err := ProjectsOrArgs(args, datadir)
+		if err != nil {
+			return nil, errgo.Notef(err, "can not get projects")
+		}
+
+		return projects, nil
+	}
+
+	projects, err := ProjectsOrArgs(args, datadir)
+	if err != nil {
+		return nil, errgo.Notef(err, "can not get main projects")
+	}
+
+	allprojects, err := Projects(datadir)
+	if err != nil {
+		return nil, errgo.Notef(err, "can not get list of all projects")
+	}
+
+	projects = FilterProjectsSubprojects(allprojects, projects)
+	return projects, nil
+}

@@ -37,6 +37,7 @@ func Execute() {
 	cmdList.AddCommand(cmdListTimeline)
 	cmdList.AddCommand(cmdListNotes)
 	cmdList.AddCommand(cmdListProjects)
+	cmdList.AddCommand(cmdListSubProjects)
 	cmdList.AddCommand(cmdListTodos)
 	cmdList.AddCommand(cmdListTracks)
 	cmdList.AddCommand(cmdListTracksActive)
@@ -55,7 +56,7 @@ func Execute() {
 func errexit(l logger.Logger, err error, message ...string) {
 	if err != nil {
 		l.Alert(message, ": ", err)
-		l.Debug(message, ": ", errgo.Details(err))
+		l.Trace(message, ": ", errgo.Details(err))
 		os.Exit(1)
 	}
 }
