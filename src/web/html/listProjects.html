@@ -18,7 +18,7 @@
     <th>Todo</th>
     <th>Notes</th>
     <th>Todos</th>
-    <th>Log</th>
+    <th>Timeline</th>
   </thead>
   <tr>
     <td><a href="/list/entries">*</a></td>
@@ -26,7 +26,7 @@
     <td style="text-align:center"><a href="/todo">◇</a></td>
     <td style="text-align:center"><a href="/list/notes">◇</a></td>
     <td style="text-align:center"><a href="/list/todos">◇</a></td>
-    <td style="text-align:center"><a href="/list/log">◇</a></td>
+    <td style="text-align:center"><a href="/list/timeline">◇</a></td>
   {{ range $project := . }}
   <tr>
     <td><a href="/list/entries?project={{ $project.Name }}">{{ $project.Name }}</a></td>
@@ -34,7 +34,7 @@
     <td style="text-align:center"><a href="/todo?project={{ $project.Name }}">◇</a></td>
     <td style="text-align:center"><a href="/list/notes?project={{ $project.Name }}">◇</a></td>
     <td style="text-align:center"><a href="/list/todos?project={{ $project.Name }}">◇</a></td>
-    <td style="text-align:center"><a href="/list/log?project={{ $project.Name }}">◇</a></td>
+    <td style="text-align:center"><a href="/list/timeline?project={{ $project.Name }}">◇</a></td>
   </tr>
   {{ end }}
 </table>

@@ -146,8 +146,8 @@ func listEntries(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func listLog(w http.ResponseWriter, r *http.Request) {
-	l := logger.New(Name, "listLog")
+func listTimeline(w http.ResponseWriter, r *http.Request) {
+	l := logger.New(Name, "listTimeline")
 
 	args := defquery(r, "project")
 	projects, err := data.ProjectsOrArgs(args, _datadir)
@@ -163,7 +163,7 @@ func listLog(w http.ResponseWriter, r *http.Request) {
 	}
 
 	buffer := new(bytes.Buffer)
-	err = format.Log(buffer, projects, start, end)
+	err = format.Timeline(buffer, projects, start, end)
 	if err != nil {
 		printerr(l, w, errgo.Notef(err, "can not format log"))
 		return

@@ -191,7 +191,7 @@ func AsciiDoctor(reader io.Reader, writer io.Writer) error {
 	return nil
 }
 
-func Log(writer io.Writer, projects []data.Project, start, end time.Time) error {
+func Timeline(writer io.Writer, projects []data.Project, start, end time.Time) error {
 	var allnotes []data.Note
 
 	for _, project := range projects {
@@ -209,7 +209,7 @@ func Log(writer io.Writer, projects []data.Project, start, end time.Time) error 
 	sort.Sort(data.NotesByTimeStamp(allnotes))
 
 	io.WriteString(writer, AsciiDocSettings+"\n\n")
-	io.WriteString(writer, "= Log \n\n")
+	io.WriteString(writer, "= Timeline \n\n")
 	for _, note := range allnotes {
 		note.FormatTimeStamp(writer, 2)
 		note.Project.Format(writer, 2)

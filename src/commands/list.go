@@ -86,11 +86,11 @@ var cmdListEntries = &cobra.Command{
 	PreRun: runListParseTimeStamps,
 }
 
-var cmdListLog = &cobra.Command{
-	Use:    "log",
+var cmdListTimeline = &cobra.Command{
+	Use:    "timeline",
 	Short:  "List all entries (notes, todos, tracks) ordered by date.",
 	Long:   `List all entries (notes, todos, trackss) ordered by date.`,
-	Run:    runListLog,
+	Run:    runListTimeline,
 	PreRun: runListParseTimeStamps,
 }
 
@@ -223,14 +223,14 @@ func runListEntries(cmd *cobra.Command, args []string) {
 	fmt.Print(buffer.String())
 }
 
-func runListLog(cmd *cobra.Command, args []string) {
+func runListTimeline(cmd *cobra.Command, args []string) {
 	l := logger.New("commands", "list", "log")
 
 	projects, err := data.ProjectsOrArgs(args, flagLablogDataDir)
 	errexit(l, err, "can not get projects")
 
 	buffer := new(bytes.Buffer)
-	err = format.Log(buffer, projects, flagListStart, flagListEnd)
+	err = format.Timeline(buffer, projects, flagListStart, flagListEnd)
 	errexit(l, err, "can not format log")
 
 	fmt.Print(buffer.String())
