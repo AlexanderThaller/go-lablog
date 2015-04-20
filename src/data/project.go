@@ -303,5 +303,22 @@ func Subprojects(args []string, datadir string, subprojects bool) ([]Project, er
 	}
 
 	projects = FilterProjectsSubprojects(allprojects, projects)
+	projects = FilterDoubleProjects(projects)
+
 	return projects, nil
+}
+
+func FilterDoubleProjects(projects []Project) []Project {
+	filter := make(map[string]Project)
+
+	for _, project := range projects {
+		filter[project.Name] = project
+	}
+
+	var out []Project
+	for _, project := range filter {
+		out = append(out, project)
+	}
+
+	return out
 }
