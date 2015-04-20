@@ -106,6 +106,7 @@ var flagListStart time.Time
 var flagListStartRaw string
 var flagListEnd time.Time
 var flagListEndRaw string
+var flagListSubprojects bool
 
 func init() {
 	flagListStart = time.Time{}
@@ -118,6 +119,10 @@ func init() {
 	cmdList.PersistentFlags().StringVarP(&flagListEndRaw, "end", "e",
 		flagListEnd.String(),
 		"The timestamp before which entries have to be taken to be displayes.")
+
+	cmdList.PersistentFlags().BoolVarP(&flagListSubprojects, "subprojects", "u",
+		true,
+		"List project and subprojects of project in one command.")
 }
 
 func runListParseTimeStamps(cmd *cobra.Command, args []string) {
@@ -135,7 +140,7 @@ func runListParseTimeStamps(cmd *cobra.Command, args []string) {
 func runListDates(cmd *cobra.Command, args []string) {
 	l := logger.New("commands", "list", "dates")
 
-	projects, err := data.ProjectsOrArgs(args, flagLablogDataDir)
+	projects, err := data.Subprojects(args, flagLablogDataDir, flagListSubprojects)
 	errexit(l, err, "can not get projects")
 
 	sort.Sort(data.ProjectsByName(projects))
@@ -156,8 +161,8 @@ func runListDurations(cmd *cobra.Command, args []string) {
 func runListNotes(cmd *cobra.Command, args []string) {
 	l := logger.New("commands", "list", "notes")
 
-	projects, err := data.ProjectsOrArgs(args, flagLablogDataDir)
-	errexit(l, err, "can not get projects")
+	projects, err := data.Subprojects(args, flagLablogDataDir, flagListSubprojects)
+	errexit(l, err, "can not get subprojects")
 
 	sort.Sort(data.ProjectsByName(projects))
 
@@ -183,29 +188,20 @@ func runListProjects(cmd *cobra.Command, args []string) {
 func runListSubProjects(cmd *cobra.Command, args []string) {
 	l := logger.New("commands", "list", "subprojects")
 
-	projects, err := data.ProjectsOrArgs(args, flagLablogDataDir)
-	errexit(l, err, "can not get projects")
-
-	allprojects, err := data.Projects(flagLablogDataDir)
-	errexit(l, err, "can not get projects")
+	projects, err := data.Subprojects(args, flagLablogDataDir, flagListSubprojects)
+	errexit(l, err, "can not get subprojects")
 
 	sort.Sort(data.ProjectsByName(projects))
 
 	for _, project := range projects {
-		subprojects := data.FilterProjectSubprojects(project, allprojects)
-
-		sort.Sort(data.ProjectsByName(subprojects))
-
-		for _, subproject := range subprojects {
-			fmt.Println(subproject.Name)
-		}
+		fmt.Println(project.Name)
 	}
 }
 
 func runListTodos(cmd *cobra.Command, args []string) {
 	l := logger.New("commands", "list", "todos")
 
-	projects, err := data.ProjectsOrArgs(args, flagLablogDataDir)
+	projects, err := data.Subprojects(args, flagLablogDataDir, flagListSubprojects)
 	errexit(l, err, "can not get projects")
 
 	sort.Sort(data.ProjectsByName(projects))
@@ -220,7 +216,7 @@ func runListTodos(cmd *cobra.Command, args []string) {
 func runListTracks(cmd *cobra.Command, args []string) {
 	l := logger.New("commands", "list", "tracks")
 
-	projects, err := data.ProjectsOrArgs(args, flagLablogDataDir)
+	projects, err := data.Subprojects(args, flagLablogDataDir, flagListSubprojects)
 	errexit(l, err, "can not get projects")
 
 	sort.Sort(data.ProjectsByName(projects))
@@ -241,7 +237,7 @@ func runListTracksActive(cmd *cobra.Command, args []string) {
 func runListEntries(cmd *cobra.Command, args []string) {
 	l := logger.New("commands", "list", "entries")
 
-	projects, err := data.ProjectsOrArgs(args, flagLablogDataDir)
+	projects, err := data.Subprojects(args, flagLablogDataDir, flagListSubprojects)
 	errexit(l, err, "can not get projects")
 
 	sort.Sort(data.ProjectsByName(projects))
@@ -256,7 +252,7 @@ func runListEntries(cmd *cobra.Command, args []string) {
 func runListTimeline(cmd *cobra.Command, args []string) {
 	l := logger.New("commands", "list", "log")
 
-	projects, err := data.ProjectsOrArgs(args, flagLablogDataDir)
+	projects, err := data.Subprojects(args, flagLablogDataDir, flagListSubprojects)
 	errexit(l, err, "can not get projects")
 
 	buffer := new(bytes.Buffer)
