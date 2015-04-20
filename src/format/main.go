@@ -87,13 +87,17 @@ func ProjectsNotes(writer io.Writer, projects []data.Project, start, end time.Ti
 }
 
 func ProjectsTodos(writer io.Writer, projects []data.Project, start, end time.Time) error {
+	l := logger.New(Name, "ProjectTodos")
+
 	io.WriteString(writer, AsciiDocSettings+"\n\n")
 	io.WriteString(writer, "= Todos \n\n")
 
 	for _, project := range projects {
 		todos, err := helper.FilteredTodosByStartEnd(project, start, end)
 		if err != nil {
-			return errgo.Notef(err, "can not get filtered notes")
+			l.Debug(err)
+			l.Trace(errgo.Details(errgo.Notef(err, "can not get filtered todos")))
+			continue
 		}
 		todos = data.FilterTodosLatest(todos)
 		todos = data.FilterTodosAreNotDone(todos)
@@ -111,13 +115,17 @@ func ProjectsTodos(writer io.Writer, projects []data.Project, start, end time.Ti
 }
 
 func ProjectsTracks(writer io.Writer, projects []data.Project, start, end time.Time) error {
+	l := logger.New(Name, "ProjectTodos")
+
 	io.WriteString(writer, AsciiDocSettings+"\n\n")
 	io.WriteString(writer, "= Tracks \n\n")
 
 	for _, project := range projects {
 		tracks, err := helper.FilteredTracksByStartEnd(project, start, end)
 		if err != nil {
-			return errgo.Notef(err, "can not get filtered tracks")
+			l.Debug(err)
+			l.Trace(errgo.Details(errgo.Notef(err, "can not get filtered tracks")))
+			continue
 		}
 
 		if len(tracks) == 0 {
