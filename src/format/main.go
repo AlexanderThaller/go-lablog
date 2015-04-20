@@ -78,8 +78,10 @@ func ProjectsNotes(writer io.Writer, projects []data.Project, start, end time.Ti
 	for _, project := range projects {
 		notes, err := helper.FilteredNotesByStartEnd(project, start, end)
 		if err != nil {
+			err := errgo.Notef(err, "can not get filtered notes")
+
 			l.Debug(err)
-			l.Trace(errgo.Details(errgo.Notef(err, "can not get filtered notes")))
+			l.Trace(errgo.Details(err))
 			continue
 		}
 
@@ -103,8 +105,10 @@ func ProjectsTodos(writer io.Writer, projects []data.Project, start, end time.Ti
 	for _, project := range projects {
 		todos, err := helper.FilteredTodosByStartEnd(project, start, end)
 		if err != nil {
+			err := errgo.Notef(err, "can not get filtered todos")
+
 			l.Debug(err)
-			l.Trace(errgo.Details(errgo.Notef(err, "can not get filtered todos")))
+			l.Trace(errgo.Details(err))
 			continue
 		}
 		todos = data.FilterTodosLatest(todos)
@@ -131,8 +135,10 @@ func ProjectsTracks(writer io.Writer, projects []data.Project, start, end time.T
 	for _, project := range projects {
 		tracks, err := helper.FilteredTracksByStartEnd(project, start, end)
 		if err != nil {
+			err := errgo.Notef(err, "can not get filtered tracks")
+
 			l.Debug(err)
-			l.Trace(errgo.Details(errgo.Notef(err, "can not get filtered tracks")))
+			l.Trace(errgo.Details(err))
 			continue
 		}
 
@@ -142,6 +148,34 @@ func ProjectsTracks(writer io.Writer, projects []data.Project, start, end time.T
 
 		project.Format(writer, 1)
 		Tracks(writer, tracks)
+		io.WriteString(writer, "\n")
+	}
+
+	return nil
+}
+
+func ProjectsDurations(writer io.Writer, projects []data.Project, start, end time.Time) error {
+	l := logger.New(Name, "ProjectsDurations")
+
+	io.WriteString(writer, AsciiDocSettings+"\n\n")
+	io.WriteString(writer, "= Durations \n\n")
+
+	for _, project := range projects {
+		tracks, err := helper.FilteredTracksByStartEnd(project, start, end)
+		if err != nil {
+			err := errgo.Notef(err, "can not get filtered tracks")
+
+			l.Debug(err)
+			l.Trace(errgo.Details(err))
+			continue
+		}
+
+		if len(tracks) == 0 {
+			continue
+		}
+
+		project.Format(writer, 1)
+		Duration(writer, tracks)
 		io.WriteString(writer, "\n")
 	}
 
@@ -193,6 +227,14 @@ func Tracks(writer io.Writer, tracks []data.Track) {
 	for _, track := range tracks {
 		track.Format(writer, 2)
 	}
+}
+
+func Duration(writer io.Writer, tracks []data.Track) {
+	io.WriteString(writer, "=== Duration\n\n")
+
+	sort.Sort(data.TracksByTimeStamp(tracks))
+	duration := helper.TracksDuration(tracks)
+	io.WriteString(writer, duration.String()+"\n")
 }
 
 func AsciiDoctor(reader io.Reader, writer io.Writer) error {

@@ -154,8 +154,17 @@ func runListDates(cmd *cobra.Command, args []string) {
 
 func runListDurations(cmd *cobra.Command, args []string) {
 	l := logger.New("commands", "list", "durations")
-	l.Alert("not implemented")
-	os.Exit(1)
+
+	projects, err := data.Subprojects(args, flagLablogDataDir, flagListSubprojects)
+	errexit(l, err, "can not get projects")
+
+	sort.Sort(data.ProjectsByName(projects))
+
+	buffer := new(bytes.Buffer)
+	err = format.ProjectsDurations(buffer, projects, flagListStart, flagListEnd)
+	errexit(l, err, "can not format projects")
+
+	fmt.Print(buffer.String())
 }
 
 func runListNotes(cmd *cobra.Command, args []string) {

@@ -4,8 +4,13 @@ import (
 	"time"
 
 	"github.com/AlexanderThaller/lablog/src/data"
+	"github.com/AlexanderThaller/logger"
 	"github.com/jinzhu/now"
 	"github.com/juju/errgo"
+)
+
+const (
+	Name = "helper"
 )
 
 func DefaultOrRawTimestamp(timestamp time.Time, raw string) (time.Time, error) {
@@ -113,4 +118,40 @@ func FilteredTracksByStartEnd(project data.Project, start, end time.Time) ([]dat
 	tracks = data.FilterTracksAfterTimeStamp(tracks, end)
 
 	return tracks, nil
+}
+
+func TracksDuration(tracks []data.Track) time.Duration {
+	l := logger.New(Name, "TracksDuration")
+
+	var active bool
+	var lastTrack data.Track
+	var durations []time.Duration
+
+	for _, track := range tracks {
+		if track.Active {
+			if active {
+				l.Trace("Skip: ", track)
+				continue
+			}
+			l.Trace("Active: ", track)
+
+			active = true
+			lastTrack = track
+			continue
+		}
+
+		active = false
+		l.Trace("Not Active: ", track)
+		duration := track.TimeStamp.Sub(lastTrack.TimeStamp)
+		durations = append(durations, duration)
+	}
+
+	l.Trace("Durations: ", durations)
+
+	var total time.Duration
+	for _, duration := range durations {
+		total += duration
+	}
+
+	return total
 }
