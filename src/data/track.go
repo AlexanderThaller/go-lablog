@@ -140,24 +140,29 @@ func MergeTracks(tracks []Track) []Track {
 
 func TracksDuration(tracks []Track) time.Duration {
 	l := logger.New(Name, "TracksDuration")
-	l.SetLevel(logger.Error)
 
 	tracks = MergeTracks(tracks)
 
 	l.Trace("Tracks: ", tracks)
 
-	var lastTrack Track
-	var durations []time.Duration
-
-	for _, track := range tracks {
-		duration := track.TimeStamp.Sub(lastTrack.TimeStamp)
-		durations = append(durations, duration)
-		lastTrack = track
+	// Calculate duration until now if project tracking is still active.
+	if tracks[len(tracks)-1].Active {
+		tracks = append(tracks, Track{Active: false, TimeStamp: time.Now()})
 	}
 
+	var lastTrack Track
 	var total time.Duration
-	for _, duration := range durations {
-		total += duration
+
+	for _, track := range tracks {
+		if track.Active {
+			lastTrack = track
+			continue
+		}
+
+		l.Trace("LastTrack: ", lastTrack)
+		l.Trace("Track: ", track)
+
+		total += track.TimeStamp.Sub(lastTrack.TimeStamp)
 	}
 
 	return total

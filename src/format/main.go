@@ -147,8 +147,6 @@ func ProjectsTracks(writer io.Writer, projects []data.Project, start, end time.T
 		}
 
 		project.Format(writer, 1)
-		Tracks(writer, tracks)
-
 		tracks = data.MergeTracks(tracks)
 		Tracks(writer, tracks)
 		io.WriteString(writer, "\n")
@@ -236,7 +234,7 @@ func Duration(writer io.Writer, tracks []data.Track) {
 	io.WriteString(writer, "=== Duration\n\n")
 
 	sort.Sort(data.TracksByTimeStamp(tracks))
-	duration := helper.TracksDuration(tracks)
+	duration := data.TracksDuration(tracks)
 	io.WriteString(writer, duration.String()+"\n")
 }
 
