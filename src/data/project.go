@@ -5,6 +5,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"path"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -36,6 +37,19 @@ func Projects(datadir string) ([]Project, error) {
 type Project struct {
 	Name    string
 	Datadir string
+}
+
+func (proj Project) IsEmpty() bool {
+	filepath := proj.FilePath()
+	if _, err := os.Stat(filepath); os.IsNotExist(err) {
+		return true
+	}
+
+	return false
+}
+
+func (proj Project) FilePath() string {
+	return path.Join(proj.Datadir, proj.Name+".csv")
 }
 
 // ProjectsByName allows sorting project slices by name.
@@ -269,7 +283,7 @@ func (project Project) IsSubproject(subproject Project) bool {
 }
 
 func FilterProjectsSubprojects(allprojects []Project, projects []Project) []Project {
-	out := projects
+	out := FilterEmptyProjects(projects)
 
 	for _, project := range projects {
 		for _, subproject := range allprojects {
@@ -317,6 +331,20 @@ func FilterDoubleProjects(projects []Project) []Project {
 
 	var out []Project
 	for _, project := range filter {
+		out = append(out, project)
+	}
+
+	return out
+}
+
+func FilterEmptyProjects(projects []Project) []Project {
+	var out []Project
+
+	for _, project := range projects {
+		if project.IsEmpty() {
+			continue
+		}
+
 		out = append(out, project)
 	}
 
