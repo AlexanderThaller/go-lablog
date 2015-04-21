@@ -224,9 +224,14 @@ func Notes(writer io.Writer, notes []data.Note) {
 func Tracks(writer io.Writer, tracks []data.Track) {
 	io.WriteString(writer, "=== Tracks\n\n")
 
-	sort.Sort(data.TracksByTimeStamp(tracks))
-	for _, track := range tracks {
+	for i, track := range tracks {
 		track.Format(writer, 2)
+		if !track.Active {
+			duration := data.TracksDuration(tracks[i-1 : i+1])
+			io.WriteString(writer, " ["+duration.String()+"]")
+		}
+
+		io.WriteString(writer, "\n")
 	}
 }
 

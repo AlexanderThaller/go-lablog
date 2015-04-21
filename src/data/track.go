@@ -46,8 +46,6 @@ func (track Track) Format(writer io.Writer, indent uint) {
 	} else {
 		io.WriteString(writer, " (-)")
 	}
-
-	io.WriteString(writer, "\n")
 }
 
 type TracksByTimeStamp []Track
