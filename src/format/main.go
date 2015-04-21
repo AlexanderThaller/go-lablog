@@ -148,6 +148,9 @@ func ProjectsTracks(writer io.Writer, projects []data.Project, start, end time.T
 
 		project.Format(writer, 1)
 		Tracks(writer, tracks)
+
+		tracks = data.MergeTracks(tracks)
+		Tracks(writer, tracks)
 		io.WriteString(writer, "\n")
 	}
 

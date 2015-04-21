@@ -2,9 +2,11 @@ package data
 
 import (
 	"io"
+	"sort"
 	"strconv"
 	"time"
 
+	"github.com/AlexanderThaller/logger"
 	"github.com/jinzhu/now"
 	"github.com/juju/errgo"
 )
@@ -112,4 +114,51 @@ func ParseTrack(project Project, values []string) (Track, error) {
 	}
 
 	return track, nil
+}
+
+func MergeTracks(tracks []Track) []Track {
+	l := logger.New(Name, "MergeTracks")
+
+	var out []Track
+	var active bool
+
+	sort.Sort(TracksByTimeStamp(tracks))
+
+	for _, track := range tracks {
+		if track.Active == active {
+			continue
+		}
+
+		active = track.Active
+		out = append(out, track)
+	}
+
+	l.Trace("Out: ", out)
+
+	return out
+}
+
+func TracksDuration(tracks []Track) time.Duration {
+	l := logger.New(Name, "TracksDuration")
+	l.SetLevel(logger.Error)
+
+	tracks = MergeTracks(tracks)
+
+	l.Trace("Tracks: ", tracks)
+
+	var lastTrack Track
+	var durations []time.Duration
+
+	for _, track := range tracks {
+		duration := track.TimeStamp.Sub(lastTrack.TimeStamp)
+		durations = append(durations, duration)
+		lastTrack = track
+	}
+
+	var total time.Duration
+	for _, duration := range durations {
+		total += duration
+	}
+
+	return total
 }
