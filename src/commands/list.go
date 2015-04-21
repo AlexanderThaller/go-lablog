@@ -18,7 +18,7 @@ var cmdList = &cobra.Command{
 	Use:    "list (command)",
 	Short:  "List projects, notes, todos, dates, tracks, etc., see help for all options.",
 	Long:   "List projects, notes, todos, dates, tracks, etc., see help for all options.",
-	Run:    runListProjects,
+	Run:    runListSubProjects,
 	PreRun: runListParseTimeStamps,
 }
 
@@ -42,14 +42,6 @@ var cmdListProjects = &cobra.Command{
 	Use:    "projects",
 	Short:  "List projects.",
 	Long:   `List projects.`,
-	Run:    runListProjects,
-	PreRun: runListParseTimeStamps,
-}
-
-var cmdListSubProjects = &cobra.Command{
-	Use:    "subprojects",
-	Short:  "List subprojects of projects",
-	Long:   `List subprojects of projects`,
 	Run:    runListSubProjects,
 	PreRun: runListParseTimeStamps,
 }
