@@ -231,6 +231,13 @@ func Tracks(writer io.Writer, tracks []data.Track) {
 			io.WriteString(writer, " ["+duration.String()+"]")
 		}
 
+		if track.Active {
+			if i == len(tracks)-1 {
+				duration := time.Since(track.TimeStamp)
+				io.WriteString(writer, " ["+duration.String()+"]")
+			}
+		}
+
 		io.WriteString(writer, "\n")
 	}
 }

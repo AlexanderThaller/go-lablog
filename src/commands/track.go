@@ -46,7 +46,7 @@ func init() {
 	flagTrackTimeStamp = time.Now()
 
 	cmdTrack.PersistentFlags().StringVarP(&flagTrackTimeStampRaw, "timestamp", "t",
-		flagTrackTimeStamp.String(), "The timestamp for which to record the todo.")
+		flagTrackTimeStamp.String(), "The timestamp for which to record the track.")
 }
 
 func runTrackStart(cmd *cobra.Command, args []string) {
@@ -102,7 +102,7 @@ func runTrackToggle(cmd *cobra.Command, args []string) {
 
 	project := data.Project{Name: args[0], Datadir: flagLablogDataDir}
 
-	timestamp, err := helper.DefaultOrRawTimestamp(flagTodoTimeStamp, flagTodoTimeStampRaw)
+	timestamp, err := helper.DefaultOrRawTimestamp(flagTrackTimeStamp, flagTrackTimeStampRaw)
 	errexit(l, err, "can not get timestamp")
 
 	tracks, _ := project.Tracks()
