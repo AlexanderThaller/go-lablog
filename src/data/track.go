@@ -2,9 +2,11 @@ package data
 
 import (
 	"io"
+	"sort"
 	"strconv"
 	"time"
 
+	"github.com/AlexanderThaller/logger"
 	"github.com/jinzhu/now"
 	"github.com/juju/errgo"
 )
@@ -44,8 +46,6 @@ func (track Track) Format(writer io.Writer, indent uint) {
 	} else {
 		io.WriteString(writer, " (-)")
 	}
-
-	io.WriteString(writer, "\n")
 }
 
 type TracksByTimeStamp []Track
@@ -112,4 +112,56 @@ func ParseTrack(project Project, values []string) (Track, error) {
 	}
 
 	return track, nil
+}
+
+func MergeTracks(tracks []Track) []Track {
+	l := logger.New(Name, "MergeTracks")
+
+	var out []Track
+	var active bool
+
+	sort.Sort(TracksByTimeStamp(tracks))
+
+	for _, track := range tracks {
+		if track.Active == active {
+			continue
+		}
+
+		active = track.Active
+		out = append(out, track)
+	}
+
+	l.Trace("Out: ", out)
+
+	return out
+}
+
+func TracksDuration(tracks []Track) time.Duration {
+	l := logger.New(Name, "TracksDuration")
+
+	tracks = MergeTracks(tracks)
+
+	l.Trace("Tracks: ", tracks)
+
+	// Calculate duration until now if project tracking is still active.
+	if tracks[len(tracks)-1].Active {
+		tracks = append(tracks, Track{Active: false, TimeStamp: time.Now()})
+	}
+
+	var lastTrack Track
+	var total time.Duration
+
+	for _, track := range tracks {
+		if track.Active {
+			lastTrack = track
+			continue
+		}
+
+		l.Trace("LastTrack: ", lastTrack)
+		l.Trace("Track: ", track)
+
+		total += track.TimeStamp.Sub(lastTrack.TimeStamp)
+	}
+
+	return total
 }
