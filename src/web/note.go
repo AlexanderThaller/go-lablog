@@ -44,7 +44,7 @@ func (note Note) ToData() (data.Note, error) {
 func noteForm(w http.ResponseWriter, r *http.Request) {
 	l := logger.New(Name, "noteForm")
 
-	rawtmpl, err := html_entry_form_html_bytes()
+	rawtmpl, err := htmlEntry_formHtmlBytes()
 	if err != nil {
 		printerr(l, w, errgo.Notef(err, "can not read note html"))
 		return

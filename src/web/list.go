@@ -22,7 +22,7 @@ func listProjects(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rawtmpl, err := html_listprojects_html_bytes()
+	rawtmpl, err := htmlListprojectsHtmlBytes()
 	if err != nil {
 		printerr(l, w, errgo.Notef(err, "can not get projects html template"))
 		return
