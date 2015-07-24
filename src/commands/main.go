@@ -5,7 +5,7 @@ import (
 
 	"github.com/AlexanderThaller/cobra"
 	"github.com/AlexanderThaller/lablog/src/data"
-	"github.com/AlexanderThaller/lablog/src/scm"
+	"github.com/AlexanderThaller/lablog/src/store"
 	"github.com/AlexanderThaller/logger"
 	"github.com/juju/errgo"
 )
@@ -75,9 +75,7 @@ func finished(cmd *cobra.Command, args []string) {
 }
 
 func recordAndCommit(l logger.Logger, datadir string, entry data.Entry) {
-	err := data.Record(datadir, entry)
+	store := store.NewFlatFile(datadir)
+	err := store.Write(entry)
 	errexit(l, err, "can not record note")
-
-	err = scm.Commit(datadir, entry)
-	errexit(l, err, "can not commit entry")
 }

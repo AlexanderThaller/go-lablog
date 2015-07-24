@@ -8,7 +8,7 @@ import (
 
 	"github.com/AlexanderThaller/lablog/src/data"
 	"github.com/AlexanderThaller/lablog/src/helper"
-	"github.com/AlexanderThaller/lablog/src/scm"
+	"github.com/AlexanderThaller/lablog/src/store"
 	"github.com/AlexanderThaller/logger"
 	"github.com/gorilla/mux"
 	"github.com/juju/errgo"
@@ -74,14 +74,10 @@ func defquery(r *http.Request, key string, defvalue ...string) []string {
 }
 
 func recordAndCommit(datadir string, entry data.Entry) error {
-	err := data.Record(datadir, entry)
+	store := store.NewFlatFile(datadir)
+	err := store.Write(entry)
 	if err != nil {
-		return errgo.Notef(err, "can not record note")
-	}
-
-	err = scm.Commit(datadir, entry)
-	if err != nil {
-		return errgo.Notef(err, "can not commit entry")
+		return errgo.Notef(err, "can not write entry to store")
 	}
 
 	return nil
