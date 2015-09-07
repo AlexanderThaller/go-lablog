@@ -27,6 +27,7 @@ func Execute() {
 	lablogCmd.AddCommand(cmdMerge)
 	lablogCmd.AddCommand(cmdNote)
 	lablogCmd.AddCommand(cmdRename)
+	lablogCmd.AddCommand(cmdSearch)
 	lablogCmd.AddCommand(cmdTodo)
 	lablogCmd.AddCommand(cmdTrack)
 	lablogCmd.AddCommand(cmdVersion)

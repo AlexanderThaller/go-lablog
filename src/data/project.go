@@ -1,6 +1,8 @@
 package data
 
 import (
+	"bufio"
+	"bytes"
 	"encoding/csv"
 	"io"
 	"io/ioutil"
@@ -14,7 +16,7 @@ import (
 )
 
 // Projects returns all projects which can be read from the given datadir.
-func Projects(datadir string) ([]Project, error) {
+func GetProjects(datadir string) ([]Project, error) {
 	names, err := projectNames(datadir)
 	if err != nil {
 		return nil, errgo.Notef(err, "can not get project files")
@@ -238,12 +240,12 @@ func (project Project) Format(writer io.Writer, indent uint) {
 	io.WriteString(writer, indentchar+"= "+project.Name+"\n")
 }
 
-func ProjectsOrArgs(args []string, datadir string) ([]Project, error) {
+func ProjectsOrArgs(args []string, datadir string) (Projects, error) {
 	var projects []Project
 
 	if len(args) == 0 {
 		var err error
-		projects, err = Projects(datadir)
+		projects, err = GetProjects(datadir)
 		if err != nil {
 			return nil, errgo.Notef(err, "can not get projects")
 		}
@@ -258,7 +260,7 @@ func ProjectsOrArgs(args []string, datadir string) ([]Project, error) {
 		}
 	}
 
-	return projects, nil
+	return Projects(projects), nil
 }
 
 func (project Project) IsActive() bool {
@@ -311,7 +313,7 @@ func Subprojects(args []string, datadir string, subprojects bool) ([]Project, er
 		return nil, errgo.Notef(err, "can not get main projects")
 	}
 
-	allprojects, err := Projects(datadir)
+	allprojects, err := GetProjects(datadir)
 	if err != nil {
 		return nil, errgo.Notef(err, "can not get list of all projects")
 	}
@@ -349,4 +351,28 @@ func FilterEmptyProjects(projects []Project) []Project {
 	}
 
 	return out
+}
+
+type Projects []Project
+
+func (project Project) Search(searchstr string) ([]string, error) {
+	var out []string
+	notes, err := project.Notes()
+	if err != nil {
+		return nil, errgo.Notef(err, "can not get notes for project "+project.Name)
+	}
+
+	for _, note := range notes {
+		buff := bytes.NewBuffer([]byte(note.Text))
+
+		scanner := bufio.NewScanner(buff)
+		for scanner.Scan() {
+			text := scanner.Text()
+			if strings.Contains(text, searchstr) {
+				out = append(out, text)
+			}
+		}
+	}
+
+	return out, nil
 }

@@ -16,7 +16,7 @@ import (
 func listProjects(w http.ResponseWriter, r *http.Request) {
 	l := logger.New(Name, "listProjects")
 
-	projects, err := data.Projects(_datadir)
+	projects, err := data.GetProjects(_datadir)
 	if err != nil {
 		printerr(l, w, errgo.Notef(err, "can not get projects"))
 		return

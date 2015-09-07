@@ -176,7 +176,7 @@ func runListNotes(cmd *cobra.Command, args []string) {
 
 func runListProjects(cmd *cobra.Command, args []string) {
 	l := logger.New("commands", "list", "projects")
-	projects, err := data.Projects(flagLablogDataDir)
+	projects, err := data.GetProjects(flagLablogDataDir)
 	errexit(l, err, "can not get projects")
 
 	sort.Sort(data.ProjectsByName(projects))
