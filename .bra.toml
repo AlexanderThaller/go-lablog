@@ -2,7 +2,7 @@
 init_cmds = [
 	["go", "build"],
 	["./lablog"],
-	["./lablog", "version"]
+	["./lablog", "show", "projects"]
 ]									# Commands run in start
 watch_all = true					# Watch all sub-directories
 watch_dirs = ["src"]						# Directories to watch
@@ -14,7 +14,7 @@ interrupt_timout = 15				# Time to wait until force kill
 cmds = [
 	["go", "build"],
 	["./lablog"],
-	["./lablog", "version"]
+	["./lablog", "show", "projects"]
 ]									# Commands to run
 
 [sync]
