@@ -1,8 +1,10 @@
 [run]
 init_cmds = [
+  ["sleep", "0.1"],
 	["go", "build"],
 	["./lablog"],
-	["./lablog", "show", "projects"]
+	["./lablog", "add", "note", "fuckfuck", "-d", "/tmp/.lablog"],
+	["./lablog", "show", "projects", "-d", "/tmp/.lablog"]
 ]									# Commands run in start
 watch_all = true					# Watch all sub-directories
 watch_dirs = ["src"]						# Directories to watch
@@ -12,9 +14,11 @@ ignore_files = []					# Regexps for ignoring specific notifies
 build_delay = 1500					# Minimal interval to Trigger build event
 interrupt_timout = 15				# Time to wait until force kill
 cmds = [
+  ["sleep", "0.1"],
 	["go", "build"],
 	["./lablog"],
-	["./lablog", "show", "projects"]
+	["./lablog", "add", "note", "fuckfuck", "-d", "/tmp/.lablog"],
+	["./lablog", "show", "projects", "-d", "/tmp/.lablog"]
 ]									# Commands to run
 
 [sync]
