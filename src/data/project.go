@@ -9,6 +9,17 @@ type Project struct {
 	Name ProjectName
 }
 
+func (project Project) Notes() []Note {
+	var out []Note
+	for _, entry := range project.Entries {
+		if entry.Type() == EntryTypeNote {
+			out = append(out, entry.(Note))
+		}
+	}
+
+	return out
+}
+
 type ProjectName []string
 
 const ProjectNameSepperator = "."

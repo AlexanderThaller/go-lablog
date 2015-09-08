@@ -14,9 +14,9 @@ type FolderStore struct {
 	datadir string
 }
 
-func (store FolderStore) AddEntry(project data.ProjectName, entry data.Entry) error {
+func (store FolderStore) AddEntry(name data.ProjectName, entry data.Entry) error {
 	db := store.db()
-	err := db.Put(entry.Values(), project.Values()...)
+	err := db.Put(entry.Values(), name.Values()...)
 	if err != nil {
 		return errgo.Notef(err, "can not put entry into the database")
 	}
@@ -29,7 +29,23 @@ func (store FolderStore) GetProjects() (data.Projects, error) {
 }
 
 func (store FolderStore) GetProject(name data.ProjectName) (data.Project, error) {
-	return data.Project{}, errgo.New("not implemented")
+	db := store.db()
+	values, err := db.Get(name.Values()...)
+	if err != nil {
+		return data.Project{}, errgo.Notef(err, "can not put entry into the database")
+	}
+
+	var entries []data.Entry
+	for _, value := range values {
+		entry, err := data.ParseEntry(value)
+		if err != nil {
+			return data.Project{}, errgo.Notef(err, "can not parse entry from value")
+		}
+
+		entries = append(entries, entry)
+	}
+
+	return data.Project{Name: name, Entries: entries}, nil
 }
 
 func (store FolderStore) ListProjects() ([]data.ProjectName, error) {

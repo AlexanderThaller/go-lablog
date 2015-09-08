@@ -11,20 +11,6 @@ import (
 	"github.com/AlexanderThaller/cobra"
 )
 
-var cmdAdd = &cobra.Command{
-	Use:   "add [command]",
-	Short: "Add a new entry to the log",
-	Long:  `Add a new entry like a note or a todo to the log. You have to specify a project for which we want to record the log for.`,
-	Run:   runCmdAdd,
-}
-
-var cmdAddNote = &cobra.Command{
-	Use:   "note",
-	Short: "Add current projects.",
-	Long:  `Add all projects which currently have any type of entry.`,
-	Run:   runCmdAddNote,
-}
-
 var flagAddTimeStamp time.Time
 var flagAddTimeStampRaw string
 
@@ -35,7 +21,21 @@ func init() {
 		flagAddTimeStamp.String(), "The timestamp for which to record the note.")
 }
 
+var cmdAdd = &cobra.Command{
+	Use:   "add [command]",
+	Short: "Add a new entry to the log",
+	Long:  `Add a new entry like a note or a todo to the log. You have to specify a project for which we want to record the log for.`,
+	Run:   runCmdAdd,
+}
+
 func runCmdAdd(cmd *cobra.Command, args []string) {
+}
+
+var cmdAddNote = &cobra.Command{
+	Use:   "note",
+	Short: "Add current projects.",
+	Long:  `Add all projects which currently have any type of entry.`,
+	Run:   runCmdAddNote,
 }
 
 func runCmdAddNote(cmd *cobra.Command, args []string) {

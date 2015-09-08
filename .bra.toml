@@ -3,8 +3,9 @@ init_cmds = [
   ["sleep", "0.1"],
 	["go", "build"],
 	["./lablog"],
-	["./lablog", "add", "note", "fuckfuck", "-d", "/tmp/.lablog"],
-	["./lablog", "show", "projects", "-d", "/tmp/.lablog"]
+	["./lablog", "add", "note", "fuck", "fuckfuck", "-d", "/tmp/.lablog"],
+	["./lablog", "show", "projects", "-d", "/tmp/.lablog"],
+	["./lablog", "show", "notes", "fuck", "-d", "/tmp/.lablog"]
 ]									# Commands run in start
 watch_all = true					# Watch all sub-directories
 watch_dirs = ["src"]						# Directories to watch
@@ -17,8 +18,9 @@ cmds = [
   ["sleep", "0.1"],
 	["go", "build"],
 	["./lablog"],
-	["./lablog", "add", "note", "fuckfuck", "-d", "/tmp/.lablog"],
-	["./lablog", "show", "projects", "-d", "/tmp/.lablog"]
+	["./lablog", "add", "note", "fuck", "fuckfuck", "-d", "/tmp/.lablog"],
+	["./lablog", "show", "projects", "-d", "/tmp/.lablog"],
+	["./lablog", "show", "notes", "fuck", "-d", "/tmp/.lablog"]
 ]									# Commands to run
 
 [sync]
