@@ -20,6 +20,17 @@ func (project Project) Notes() []Note {
 	return out
 }
 
+func (project Project) Todos() []Todo {
+	var out []Todo
+	for _, entry := range project.Entries {
+		if entry.Type() == EntryTypeTodo {
+			out = append(out, entry.(Todo))
+		}
+	}
+
+	return out
+}
+
 type ProjectName []string
 
 const ProjectNameSepperator = "."

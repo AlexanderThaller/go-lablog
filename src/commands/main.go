@@ -38,10 +38,16 @@ func Run() {
 	cmdMain.AddCommand(cmdShow)
 	cmdShow.AddCommand(cmdShowProjects)
 	cmdShow.AddCommand(cmdShowNotes)
+	cmdShow.AddCommand(cmdShowTodos)
 
 	// add
 	cmdMain.AddCommand(cmdAdd)
 	cmdAdd.AddCommand(cmdAddNote)
+	cmdAdd.AddCommand(cmdAddTodo)
+
+	// todo
+	cmdAddTodo.AddCommand(cmdAddTodoActive)
+	cmdAddTodo.AddCommand(cmdAddTodoInActive)
 
 	cmdMain.Execute()
 }

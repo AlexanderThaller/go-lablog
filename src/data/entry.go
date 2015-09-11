@@ -19,6 +19,7 @@ type EntryType int
 
 const (
 	EntryTypeNote EntryType = iota
+	EntryTypeTodo
 	EntryTypeUnkown
 )
 
@@ -26,6 +27,8 @@ func (etype EntryType) String() string {
 	switch etype {
 	case EntryTypeNote:
 		return "note"
+	case EntryTypeTodo:
+		return "todo"
 	default:
 		return "unkown"
 	}
@@ -35,6 +38,8 @@ func ParseEntryType(value string) (EntryType, error) {
 	switch value {
 	case "note":
 		return EntryTypeNote, nil
+	case "todo":
+		return EntryTypeTodo, nil
 	default:
 		return EntryTypeUnkown, errgo.New("the entry type " + value + " is not known")
 	}
@@ -53,6 +58,8 @@ func ParseEntry(values []string) (Entry, error) {
 	switch etype {
 	case EntryTypeNote:
 		return ParseNote(values)
+	case EntryTypeTodo:
+		return ParseTodo(values)
 	default:
 		return nil, errgo.New("do not know how to parse this entry type")
 	}

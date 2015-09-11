@@ -2,11 +2,12 @@ package commands
 
 import (
 	"fmt"
+	"os"
 	"sort"
 
 	"github.com/AlexanderThaller/lablog/src/data"
+	"github.com/AlexanderThaller/lablog/src/formatting"
 	"github.com/AlexanderThaller/lablog/src/helper"
-	"github.com/AlexanderThaller/lablog/src/store"
 	"github.com/juju/errgo"
 
 	"github.com/AlexanderThaller/cobra"
@@ -30,7 +31,7 @@ var cmdShowProjects = &cobra.Command{
 }
 
 func runCmdShowProjects(cmd *cobra.Command, args []string) {
-	store, err := store.NewFolderStore(flagDataDir)
+	store, err := helper.DefaultStore(flagDataDir)
 	helper.ErrExit(errgo.Notef(err, "can not get data store"))
 
 	projects, err := store.ListProjects()
@@ -51,34 +52,36 @@ var cmdShowNotes = &cobra.Command{
 }
 
 func runCmdShowNotes(cmd *cobra.Command, args []string) {
-	store, err := store.NewFolderStore(flagDataDir)
+	store, err := helper.DefaultStore(flagDataDir)
 	helper.ErrExit(errgo.Notef(err, "can not get data store"))
 
-	var names []data.ProjectName
-
-	if len(args) == 0 {
-		names, err = store.ListProjects()
-		helper.ErrExit(errgo.Notef(err, "can not get list of projects"))
-	} else {
-		for _, arg := range args {
-			project, err := data.ParseProjectName(arg)
-			helper.ErrExit(errgo.Notef(err, "can not parse project name"))
-
-			names = append(names, project)
-		}
-	}
-
+	names, err := helper.ProjectNamesFromArgs(store, args)
 	sort.Strings(data.ProjectNamesToString(names))
 
 	for _, name := range names {
 		project, err := store.GetProject(name)
-		helper.ErrExit(errgo.Notef(err, "can not get list of projects"))
+		helper.ErrExit(errgo.Notef(err, "can not get project from store"))
+		formatting.ProjectNotes(os.Stdout, 0, project)
+	}
+}
 
-		fmt.Println("=", name.String())
+var cmdShowTodos = &cobra.Command{
+	Use:   "todos",
+	Short: "Show todos",
+	Long:  `Show all todos`,
+	Run:   runCmdShowTodos,
+}
 
-		for _, note := range project.Notes() {
-			fmt.Println("==", note.TimeStamp.String())
-			fmt.Println(note.Value)
-		}
+func runCmdShowTodos(cmd *cobra.Command, args []string) {
+	store, err := helper.DefaultStore(flagDataDir)
+	helper.ErrExit(errgo.Notef(err, "can not get data store"))
+
+	names, err := helper.ProjectNamesFromArgs(store, args)
+	sort.Strings(data.ProjectNamesToString(names))
+
+	for _, name := range names {
+		project, err := store.GetProject(name)
+		helper.ErrExit(errgo.Notef(err, "can not get project from store"))
+		formatting.ProjectTodos(os.Stdout, 0, project)
 	}
 }
