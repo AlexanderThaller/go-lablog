@@ -28,6 +28,7 @@ var cmdAdd = &cobra.Command{
 }
 
 func runCmdAdd(cmd *cobra.Command, args []string) {
+	cmd.Help()
 }
 
 var cmdAddNote = &cobra.Command{
@@ -58,6 +59,7 @@ var cmdAddTodo = &cobra.Command{
 }
 
 func runCmdAddTodo(cmd *cobra.Command, args []string) {
+	cmd.Help()
 }
 
 var cmdAddTodoActive = &cobra.Command{
