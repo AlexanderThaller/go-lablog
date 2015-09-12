@@ -13,7 +13,7 @@ format:
 	find . -name "*.go" -not -path './Godeps/*' -type f -exec goimports -w=true {} \;
 
 test:
-	go test
+	go test -v ./...
 
 build:
 	go build -ldflags "-X main.buildTime `date +%s` -X main.buildVersion `git describe --always`" -o "$(NAME)"

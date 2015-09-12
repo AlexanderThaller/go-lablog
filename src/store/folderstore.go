@@ -28,6 +28,17 @@ func (store FolderStore) GetProjects() (data.Projects, error) {
 	return nil, errgo.New("not implemented")
 }
 
+func (store FolderStore) PutProject(project data.Project) error {
+	for _, entry := range project.Entries {
+		err := store.AddEntry(project.Name, entry)
+		if err != nil {
+			return errgo.Notef(err, "can not add entry for project "+project.Name.String())
+		}
+	}
+
+	return nil
+}
+
 func (store FolderStore) GetProject(name data.ProjectName) (data.Project, error) {
 	db := store.db()
 	values, err := db.Get(name.Values()...)

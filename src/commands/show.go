@@ -21,6 +21,7 @@ var cmdShow = &cobra.Command{
 }
 
 func runCmdShow(cmd *cobra.Command, args []string) {
+	cmd.Help()
 }
 
 var cmdShowProjects = &cobra.Command{

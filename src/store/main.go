@@ -7,4 +7,5 @@ type Store interface {
 	GetProject(data.ProjectName) (data.Project, error)
 	GetProjects() (data.Projects, error)
 	ListProjects() ([]data.ProjectName, error)
+	PutProject(data.Project) error
 }
