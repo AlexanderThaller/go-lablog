@@ -23,6 +23,10 @@ func (note Note) Values() []string {
 	}
 }
 
+func (note Note) GetTimeStamp() time.Time {
+	return note.TimeStamp
+}
+
 func ParseNote(values []string) (Note, error) {
 	if len(values) != 3 {
 		return Note{}, errgo.New("entry with the type note needs exactly three fields")

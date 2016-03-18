@@ -12,12 +12,15 @@ import (
 
 var flagAddTimeStamp time.Time
 var flagAddTimeStampRaw string
+var flagAddAutoCommit bool
 
 func init() {
 	flagAddTimeStamp = time.Now()
 
 	cmdAdd.PersistentFlags().StringVarP(&flagAddTimeStampRaw, "timestamp", "t",
 		flagAddTimeStamp.String(), "The timestamp for which to record the note.")
+	cmdAdd.PersistentFlags().BoolVarP(&flagAddAutoCommit, "commit", "c",
+		true, "If true entries will be autocommited to the repository entries are in.")
 }
 
 var cmdAdd = &cobra.Command{
@@ -47,7 +50,7 @@ func runCmdAddNote(cmd *cobra.Command, args []string) {
 		TimeStamp: timestamp,
 	}
 
-	err = helper.RecordEntry(flagDataDir, project, note)
+	err = helper.RecordEntry(flagDataDir, project, note, flagAddAutoCommit)
 	helper.ErrExit(errgo.Notef(err, "can not record note to store"))
 }
 
@@ -75,7 +78,7 @@ func runCmdAddTodoActive(cmd *cobra.Command, args []string) {
 
 	todo.Active = true
 
-	err = helper.RecordEntry(flagDataDir, project, todo)
+	err = helper.RecordEntry(flagDataDir, project, todo, flagAddAutoCommit)
 	helper.ErrExit(errgo.Notef(err, "can not record todo to store"))
 }
 
@@ -92,6 +95,6 @@ func runCmdAddTodoInActive(cmd *cobra.Command, args []string) {
 
 	todo.Active = false
 
-	err = helper.RecordEntry(flagDataDir, project, todo)
+	err = helper.RecordEntry(flagDataDir, project, todo, flagAddAutoCommit)
 	helper.ErrExit(errgo.Notef(err, "can not record todo to store"))
 }

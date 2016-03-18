@@ -6,6 +6,7 @@ import (
 
 	"github.com/AlexanderThaller/lablog/src/data"
 	"github.com/AlexanderThaller/lablog/src/store"
+	"github.com/AlexanderThaller/lablog/src/vcs"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/jinzhu/now"
@@ -61,7 +62,7 @@ func DefaultOrRawTimestamp(timestamp time.Time, raw string) (time.Time, error) {
 // RecordEntry will record the given entry for the given project using the
 // specified datadir. This is mostly a helper function which will inizialize the
 // store and then record the entry to the store.
-func RecordEntry(datadir string, project data.ProjectName, entry data.Entry) error {
+func RecordEntry(datadir string, project data.ProjectName, entry data.Entry, commit bool) error {
 	store, err := DefaultStore(datadir)
 	if err != nil {
 		return errgo.Notef(err, "can not get data store")
@@ -70,6 +71,13 @@ func RecordEntry(datadir string, project data.ProjectName, entry data.Entry) err
 	err = store.AddEntry(project, entry)
 	if err != nil {
 		return errgo.Notef(err, "can not write note to data store")
+	}
+
+	if commit {
+		err := vcs.Commit(datadir, project, entry)
+		if err != nil {
+			return errgo.Notef(err, "can not commit entry to repository")
+		}
 	}
 
 	return nil

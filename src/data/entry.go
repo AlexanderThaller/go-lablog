@@ -11,6 +11,7 @@ type Entries []Entry
 type Entry interface {
 	Type() EntryType
 	Values() []string
+	GetTimeStamp() time.Time
 }
 
 const TimeStampFormat = time.RFC3339Nano

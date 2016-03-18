@@ -26,6 +26,10 @@ func (todo Todo) Values() []string {
 	}
 }
 
+func (todo Todo) GetTimeStamp() time.Time {
+	return todo.TimeStamp
+}
+
 func ParseTodo(values []string) (Todo, error) {
 	if len(values) != 4 {
 		return Todo{}, errgo.New("entry with the type todo needs exactly four fields")
