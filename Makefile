@@ -1,22 +1,20 @@
 NAME = lablog
 
 all:
-	make generate
 	make format
-	make test
 	make build
 
 generate:
 	cd src/web/; go-bindata -pkg="web" html/
 
 format:
-	find . -name "*.go" -not -path './Godeps/*' -type f -exec goimports -w=true {} \;
+	find . -name "*.go" -not -path './vendor/*' -type f -exec goimports -w=true {} \;
 
 test:
 	go test -v ./...
 
 build:
-	go build -ldflags "-X main.buildTime `date +%s` -X main.buildVersion `git describe --always`" -o "$(NAME)"
+	go build -ldflags "-X github.com/AlexanderThaller/lablog/src/commands.buildTime=`date +%s` -X github.com/AlexanderThaller/lablog/src/commands.buildVersion=`git describe --always`" -o "$(NAME)"
 
 install:
 	cp "$(NAME)" /usr/local/bin

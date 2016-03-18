@@ -13,6 +13,11 @@ var cmdVersion = &cobra.Command{
 	Run:   runVersion,
 }
 
+var (
+	buildTime    string
+	buildVersion string
+)
+
 func runVersion(cmd *cobra.Command, args []string) {
-	fmt.Println("lablog v0.0.1")
+	fmt.Printf("lablog v%v-b%v\n", buildVersion, buildTime)
 }
