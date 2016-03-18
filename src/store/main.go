@@ -8,4 +8,5 @@ type Store interface {
 	GetProjects() (data.Projects, error)
 	ListProjects(bool) (data.Projects, error)
 	PutProject(data.Project) error
+	PopulateProjects(*data.Projects) error
 }

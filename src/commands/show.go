@@ -40,7 +40,7 @@ func runCmdShowProjects(cmd *cobra.Command, args []string) {
 	store, err := helper.DefaultStore(flagDataDir)
 	helper.ErrExit(errgo.Notef(err, "can not get data store"))
 
-	projects, err := store.ListProjects(flagShowArchive)
+	projects, err := helper.ProjectNamesFromArgs(store, args, flagShowArchive)
 	helper.ErrExit(errgo.Notef(err, "can not get list of projects"))
 
 	for _, project := range projects.List() {
@@ -60,11 +60,12 @@ func runCmdShowNotes(cmd *cobra.Command, args []string) {
 	helper.ErrExit(errgo.Notef(err, "can not get data store"))
 
 	projects, err := helper.ProjectNamesFromArgs(store, args, flagShowArchive)
-	for _, project := range projects.List() {
-		project, err := store.GetProject(project.Name)
-		helper.ErrExit(errgo.Notef(err, "can not get project from store"))
-		formatting.ProjectNotes(os.Stdout, 0, project)
-	}
+	helper.ErrExit(errgo.Notef(err, "can not get list of projects"))
+
+	err = store.PopulateProjects(&projects)
+	helper.ErrExit(errgo.Notef(err, "can not populate projects with entries"))
+
+	formatting.ProjectsNotes(os.Stdout, "Notes", 0, &projects)
 }
 
 var cmdShowTodos = &cobra.Command{
@@ -79,9 +80,10 @@ func runCmdShowTodos(cmd *cobra.Command, args []string) {
 	helper.ErrExit(errgo.Notef(err, "can not get data store"))
 
 	projects, err := helper.ProjectNamesFromArgs(store, args, flagShowArchive)
-	for _, project := range projects.List() {
-		project, err := store.GetProject(project.Name)
-		helper.ErrExit(errgo.Notef(err, "can not get project from store"))
-		formatting.ProjectTodos(os.Stdout, 0, project)
-	}
+	helper.ErrExit(errgo.Notef(err, "can not get list of projects"))
+
+	err = store.PopulateProjects(&projects)
+	helper.ErrExit(errgo.Notef(err, "can not populate projects with entries"))
+
+	formatting.ProjectsTodos(os.Stdout, "Todos", 0, &projects)
 }

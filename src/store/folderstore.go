@@ -87,6 +87,19 @@ func (store FolderStore) ListProjects(showarchive bool) (data.Projects, error) {
 	return out, nil
 }
 
+func (store FolderStore) PopulateProjects(projects *data.Projects) error {
+	for _, project := range projects.List() {
+		filled, err := store.GetProject(project.Name)
+		if err != nil {
+			return errgo.Notef(err, "can not get project: "+project.Name.String())
+		}
+
+		projects.Set(filled)
+	}
+
+	return nil
+}
+
 func (store FolderStore) db() *dbfiles.DBFiles {
 	db := dbfiles.New()
 	db.BaseDir = store.datadir

@@ -75,28 +75,31 @@ func RecordEntry(datadir string, project data.ProjectName, entry data.Entry) err
 	return nil
 }
 
-// ProjectNamesFromArgs will return the list of all project names if the args
-// are empty or return the parses args as a project name list.
+// ProjectNamesFromArgs will return all projects or all projects with
+// subprojects if the length of the args is not 0.
 func ProjectNamesFromArgs(store store.Store, args []string, showarchive bool) (data.Projects, error) {
-	// If there where no projects specified in args we will just use the whole
-	// list of projects.
-	if len(args) == 0 {
-		names, err := store.ListProjects(showarchive)
-		if err != nil {
-			return data.Projects{}, errgo.Notef(err, "can not get list of projects")
-		}
-
-		return names, nil
+	projects, err := store.ListProjects(showarchive)
+	if err != nil {
+		return data.Projects{}, errgo.Notef(err, "can not get list of projects")
 	}
 
-	var out data.Projects
-	for _, arg := range args {
-		name, err := data.ParseProjectName(arg)
-		if err != nil {
-			return data.Projects{}, errgo.Notef(err, "can not parse project name")
-		}
+	log.Debug("Args: ", args)
 
-		out.Add(data.Project{Name: name})
+	out := data.NewProjects()
+	if len(args) == 0 {
+		out = projects
+	} else {
+		for _, arg := range args {
+			name, err := data.ParseProjectName(arg)
+			if err != nil {
+				return data.Projects{}, errgo.Notef(err, "can not parse project name")
+			}
+
+			items := projects.List(data.Project{Name: name})
+			for _, item := range items {
+				out.Add(item)
+			}
+		}
 	}
 
 	return out, nil

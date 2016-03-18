@@ -3,6 +3,7 @@ package data
 import (
 	"strings"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/armon/go-radix"
 )
 
@@ -22,9 +23,14 @@ func (proj Projects) Add(project Project) {
 	proj.tree.Insert(project.Name.String(), project)
 }
 
+func (proj Projects) Set(project Project) {
+	proj.tree.Insert(project.Name.String(), project)
+}
+
 func (proj Projects) List(projects ...Project) []Project {
 	var out []Project
 	walkFn := func(prefix string, item interface{}) bool {
+		log.Debug("Appending ", prefix, " to out")
 		out = append(out, item.(Project))
 		return false
 	}
@@ -33,7 +39,7 @@ func (proj Projects) List(projects ...Project) []Project {
 		proj.tree.Walk(walkFn)
 	} else {
 		for _, project := range projects {
-			proj.tree.WalkPath(project.Name.String(), walkFn)
+			proj.tree.WalkPrefix(project.Name.String(), walkFn)
 		}
 	}
 
@@ -41,8 +47,8 @@ func (proj Projects) List(projects ...Project) []Project {
 }
 
 type Project struct {
-	Entries
-	Name ProjectName
+	Entries Entries
+	Name    ProjectName
 }
 
 func (project Project) Notes() []Note {
@@ -56,6 +62,10 @@ func (project Project) Notes() []Note {
 	return out
 }
 
+func (project *Project) AddNote(note Note) {
+	project.Entries = append(project.Entries, note)
+}
+
 func (project Project) Todos() []Todo {
 	var out []Todo
 	for _, entry := range project.Entries {
@@ -65,6 +75,10 @@ func (project Project) Todos() []Todo {
 	}
 
 	return out
+}
+
+func (project *Project) AddTodo(todo Todo) {
+	project.Entries = append(project.Entries, todo)
 }
 
 type ProjectName []string

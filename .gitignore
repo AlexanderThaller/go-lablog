@@ -30,3 +30,7 @@ coverage.out
 benchmarks
 
 *bindata.go*
+
+bin/convert/convert
+bin/convert/.lablog
+bin/convert/output
