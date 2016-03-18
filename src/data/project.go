@@ -1,8 +1,44 @@
 package data
 
-import "strings"
+import (
+	"strings"
 
-type Projects []Project
+	"github.com/armon/go-radix"
+)
+
+type Projects struct {
+	tree *radix.Tree
+}
+
+func NewProjects() Projects {
+	projects := Projects{
+		tree: radix.New(),
+	}
+
+	return projects
+}
+
+func (proj Projects) Add(project Project) {
+	proj.tree.Insert(project.Name.String(), project)
+}
+
+func (proj Projects) List(projects ...Project) []Project {
+	var out []Project
+	walkFn := func(prefix string, item interface{}) bool {
+		out = append(out, item.(Project))
+		return false
+	}
+
+	if len(projects) == 0 {
+		proj.tree.Walk(walkFn)
+	} else {
+		for _, project := range projects {
+			proj.tree.WalkPath(project.Name.String(), walkFn)
+		}
+	}
+
+	return out
+}
 
 type Project struct {
 	Entries

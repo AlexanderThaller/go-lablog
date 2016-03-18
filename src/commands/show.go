@@ -3,9 +3,7 @@ package commands
 import (
 	"fmt"
 	"os"
-	"sort"
 
-	"github.com/AlexanderThaller/lablog/src/data"
 	"github.com/AlexanderThaller/lablog/src/formatting"
 	"github.com/AlexanderThaller/lablog/src/helper"
 	"github.com/juju/errgo"
@@ -45,10 +43,8 @@ func runCmdShowProjects(cmd *cobra.Command, args []string) {
 	projects, err := store.ListProjects(flagShowArchive)
 	helper.ErrExit(errgo.Notef(err, "can not get list of projects"))
 
-	sort.Strings(data.ProjectNamesToString(projects))
-
-	for _, project := range projects {
-		fmt.Println(project.String())
+	for _, project := range projects.List() {
+		fmt.Println(project.Name)
 	}
 }
 
@@ -63,11 +59,9 @@ func runCmdShowNotes(cmd *cobra.Command, args []string) {
 	store, err := helper.DefaultStore(flagDataDir)
 	helper.ErrExit(errgo.Notef(err, "can not get data store"))
 
-	names, err := helper.ProjectNamesFromArgs(store, args, flagShowArchive)
-	sort.Strings(data.ProjectNamesToString(names))
-
-	for _, name := range names {
-		project, err := store.GetProject(name)
+	projects, err := helper.ProjectNamesFromArgs(store, args, flagShowArchive)
+	for _, project := range projects.List() {
+		project, err := store.GetProject(project.Name)
 		helper.ErrExit(errgo.Notef(err, "can not get project from store"))
 		formatting.ProjectNotes(os.Stdout, 0, project)
 	}
@@ -84,11 +78,9 @@ func runCmdShowTodos(cmd *cobra.Command, args []string) {
 	store, err := helper.DefaultStore(flagDataDir)
 	helper.ErrExit(errgo.Notef(err, "can not get data store"))
 
-	names, err := helper.ProjectNamesFromArgs(store, args, flagShowArchive)
-	sort.Strings(data.ProjectNamesToString(names))
-
-	for _, name := range names {
-		project, err := store.GetProject(name)
+	projects, err := helper.ProjectNamesFromArgs(store, args, flagShowArchive)
+	for _, project := range projects.List() {
+		project, err := store.GetProject(project.Name)
 		helper.ErrExit(errgo.Notef(err, "can not get project from store"))
 		formatting.ProjectTodos(os.Stdout, 0, project)
 	}

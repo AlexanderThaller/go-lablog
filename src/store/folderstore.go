@@ -26,7 +26,7 @@ func (store FolderStore) AddEntry(name data.ProjectName, entry data.Entry) error
 }
 
 func (store FolderStore) GetProjects() (data.Projects, error) {
-	return nil, errgo.New("not implemented")
+	return data.Projects{}, errgo.New("not implemented")
 }
 
 func (store FolderStore) PutProject(project data.Project) error {
@@ -60,14 +60,14 @@ func (store FolderStore) GetProject(name data.ProjectName) (data.Project, error)
 	return data.Project{Name: name, Entries: entries}, nil
 }
 
-func (store FolderStore) ListProjects(showarchive bool) ([]data.ProjectName, error) {
+func (store FolderStore) ListProjects(showarchive bool) (data.Projects, error) {
 	db := store.db()
 	keys, err := db.Keys()
 	if err != nil {
-		return nil, errgo.Notef(err, "can not get keys from database")
+		return data.Projects{}, errgo.Notef(err, "can not get keys from database")
 	}
 
-	var out []data.ProjectName
+	out := data.NewProjects()
 	for _, key := range keys {
 		if !showarchive {
 			// Skipping archived projects
@@ -81,7 +81,7 @@ func (store FolderStore) ListProjects(showarchive bool) ([]data.ProjectName, err
 		}
 
 		name := data.ProjectName(key)
-		out = append(out, name)
+		out.Add(data.Project{Name: name})
 	}
 
 	return out, nil
