@@ -1,0 +1,22 @@
+hash: 2573b6d35a282429ac9d61d54b30d0f2e6197c00b993488f164cb204686dd165
+updated: 2016-03-18T18:01:30.96772119+01:00
+imports:
+- name: github.com/AlexanderThaller/cobra
+  version: caba65771b7c9902dda609c79369424b67335e93
+- name: github.com/AlexanderThaller/dbfiles
+  version: 044299bedb0f6ebea2297ae90ffc962f5f37abf1
+- name: github.com/jinzhu/now
+  version: 812bf1cf8080fdd4e72e94708310afbe722d86b0
+- name: github.com/juju/errgo
+  version: 08cceb5d0b5331634b9826762a8fd53b29b86ad8
+- name: github.com/mitchellh/go-homedir
+  version: 1f6da4a72e57d4e7edd4a7295a585e0a3999a2d4
+- name: github.com/sergi/go-diff
+  version: ec7fdbb58eb3e300c8595ad5ac74a5aa50019cc7
+  subpackages:
+  - diffmatchpatch
+- name: github.com/Sirupsen/logrus
+  version: 82c8de1af23b25ba5a468d801f29077f4f483bce
+- name: github.com/spf13/pflag
+  version: 41e9136667ee4f9ffd03da380e24629d7eccace4
+devImports: []
