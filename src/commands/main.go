@@ -41,6 +41,7 @@ func Run() {
 	// show
 	cmdMain.AddCommand(cmdShow)
 	cmdShow.AddCommand(cmdShowProjects)
+	cmdShow.AddCommand(cmdShowEntries)
 	cmdShow.AddCommand(cmdShowNotes)
 	cmdShow.AddCommand(cmdShowTodos)
 

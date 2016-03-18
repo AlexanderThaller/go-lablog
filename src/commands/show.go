@@ -48,6 +48,26 @@ func runCmdShowProjects(cmd *cobra.Command, args []string) {
 	}
 }
 
+var cmdShowEntries = &cobra.Command{
+	Use:   "entries",
+	Short: "Show entries",
+	Long:  `Show all entries`,
+	Run:   runCmdShowEntries,
+}
+
+func runCmdShowEntries(cmd *cobra.Command, args []string) {
+	store, err := helper.DefaultStore(flagDataDir)
+	helper.ErrExit(errgo.Notef(err, "can not get data store"))
+
+	projects, err := helper.ProjectNamesFromArgs(store, args, flagShowArchive)
+	helper.ErrExit(errgo.Notef(err, "can not get list of projects"))
+
+	err = store.PopulateProjects(&projects)
+	helper.ErrExit(errgo.Notef(err, "can not populate projects with entries"))
+
+	formatting.Projects(os.Stdout, "Entries", 0, &projects)
+}
+
 var cmdShowNotes = &cobra.Command{
 	Use:   "notes",
 	Short: "Show notes",
