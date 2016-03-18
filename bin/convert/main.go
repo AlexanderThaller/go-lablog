@@ -17,7 +17,6 @@ var flagDataDir string
 var flagOutDir string
 
 func init() {
-	log.SetLevel(log.DebugLevel)
 	now.TimeFormats = append(now.TimeFormats, time.RFC3339Nano)
 }
 
@@ -39,8 +38,6 @@ func main() {
 		log.Fatal(errgo.Notef(err, "can not get keys from datadir"))
 	}
 
-	log.Debug("Keys: ", readKeys)
-
 	store, err := store.NewFolderStore(flagOutDir)
 	if err != nil {
 		log.Fatal(errgo.Notef(err, "can not create new store"))
@@ -55,13 +52,13 @@ func main() {
 			continue
 		}
 
+		log.Debug("Project: ", project)
+
 		values, err := dbread.Get(key...)
 		if err != nil {
 			log.Warning(errgo.Notef(err, "can not get values for key '"+strings.Join(key, ".")+"'"))
 			continue
 		}
-
-		return
 
 		log.Debug("Values: ", values)
 
@@ -88,7 +85,7 @@ func convertValues(store store.Store, project data.ProjectName, values [][]strin
 
 		switch value[1] {
 		case "note":
-			log.Info("Saving note")
+			log.Debug("Saving note")
 			note := data.Note{
 				Value:     value[2],
 				TimeStamp: timestamp,
@@ -100,7 +97,7 @@ func convertValues(store store.Store, project data.ProjectName, values [][]strin
 			}
 
 		case "todo":
-			log.Info("Saving todo")
+			log.Debug("Saving todo")
 		default:
 			log.Info("Do not know what to do with ", value[1])
 		}
