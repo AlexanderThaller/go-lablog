@@ -10,16 +10,11 @@ import (
 	"github.com/AlexanderThaller/lablog/src/data"
 	"github.com/AlexanderThaller/lablog/src/store"
 	log "github.com/Sirupsen/logrus"
-	"github.com/jinzhu/now"
 	"github.com/juju/errgo"
 )
 
 var flagDataDir string
 var flagOutDir string
-
-func init() {
-	now.TimeFormats = append(now.TimeFormats, time.RFC3339Nano)
-}
 
 func main() {
 	flag.StringVar(&flagDataDir, "datadir", ".lablog", "the path to the datadir to use as the source of files.")
@@ -79,10 +74,12 @@ func convertValues(store store.Store, project data.ProjectName, values [][]strin
 			return errgo.New("value length must be at least 2")
 		}
 
-		timestamp, err := now.Parse(value[0])
+		timestamp, err := time.Parse(time.RFC3339Nano, value[0])
 		if err != nil {
 			return errgo.Notef(err, "can not parse timestamp of value")
 		}
+
+		log.Info("Timestamp: ", timestamp)
 
 		switch value[1] {
 		case "note":
