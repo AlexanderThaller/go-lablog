@@ -20,6 +20,8 @@ func init() {
 	helper.ErrExit(errgo.Notef(err, "can not get homepath"))
 
 	datadir := path.Join(homepath, ".lablog")
+
+	// cmdMain
 	cmdMain.PersistentFlags().StringVarP(&flagDataDir, "datadir", "d",
 		datadir, "The path to the datadir for retreiving and storing the data.")
 	cmdMain.PersistentFlags().StringVarP(&flagLogLevel, "loglevel", "l",

@@ -3,6 +3,7 @@ package store
 import (
 	"github.com/AlexanderThaller/dbfiles"
 	"github.com/AlexanderThaller/lablog/src/data"
+	log "github.com/Sirupsen/logrus"
 	"github.com/juju/errgo"
 )
 
@@ -59,7 +60,7 @@ func (store FolderStore) GetProject(name data.ProjectName) (data.Project, error)
 	return data.Project{Name: name, Entries: entries}, nil
 }
 
-func (store FolderStore) ListProjects() ([]data.ProjectName, error) {
+func (store FolderStore) ListProjects(showarchive bool) ([]data.ProjectName, error) {
 	db := store.db()
 	keys, err := db.Keys()
 	if err != nil {
@@ -68,6 +69,17 @@ func (store FolderStore) ListProjects() ([]data.ProjectName, error) {
 
 	var out []data.ProjectName
 	for _, key := range keys {
+		if !showarchive {
+			// Skipping archived projects
+			if len(key) > 0 {
+				log.Debug("Key: ", key[0])
+
+				if key[0] == ".archive" {
+					continue
+				}
+			}
+		}
+
 		name := data.ProjectName(key)
 		out = append(out, name)
 	}

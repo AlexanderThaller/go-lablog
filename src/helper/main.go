@@ -77,11 +77,11 @@ func RecordEntry(datadir string, project data.ProjectName, entry data.Entry) err
 
 // ProjectNamesFromArgs will return the list of all project names if the args
 // are empty or return the parses args as a project name list.
-func ProjectNamesFromArgs(store store.Store, args []string) ([]data.ProjectName, error) {
+func ProjectNamesFromArgs(store store.Store, args []string, showarchive bool) ([]data.ProjectName, error) {
 	// If there where no projects specified in args we will just use the whole
 	// list of projects.
 	if len(args) == 0 {
-		names, err := store.ListProjects()
+		names, err := store.ListProjects(showarchive)
 		if err != nil {
 			return nil, errgo.Notef(err, "can not get list of projects")
 		}

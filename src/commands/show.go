@@ -13,6 +13,13 @@ import (
 	"github.com/AlexanderThaller/cobra"
 )
 
+var flagShowArchive bool
+
+func init() {
+	cmdShow.PersistentFlags().BoolVarP(&flagShowArchive, "archive", "a",
+		false, "Determines if entries from the archive will be shown. (default is false)")
+}
+
 var cmdShow = &cobra.Command{
 	Use:   "show [command]",
 	Short: "Show current projects and entries.",
@@ -35,7 +42,7 @@ func runCmdShowProjects(cmd *cobra.Command, args []string) {
 	store, err := helper.DefaultStore(flagDataDir)
 	helper.ErrExit(errgo.Notef(err, "can not get data store"))
 
-	projects, err := store.ListProjects()
+	projects, err := store.ListProjects(flagShowArchive)
 	helper.ErrExit(errgo.Notef(err, "can not get list of projects"))
 
 	sort.Strings(data.ProjectNamesToString(projects))
@@ -56,7 +63,7 @@ func runCmdShowNotes(cmd *cobra.Command, args []string) {
 	store, err := helper.DefaultStore(flagDataDir)
 	helper.ErrExit(errgo.Notef(err, "can not get data store"))
 
-	names, err := helper.ProjectNamesFromArgs(store, args)
+	names, err := helper.ProjectNamesFromArgs(store, args, flagShowArchive)
 	sort.Strings(data.ProjectNamesToString(names))
 
 	for _, name := range names {
@@ -77,7 +84,7 @@ func runCmdShowTodos(cmd *cobra.Command, args []string) {
 	store, err := helper.DefaultStore(flagDataDir)
 	helper.ErrExit(errgo.Notef(err, "can not get data store"))
 
-	names, err := helper.ProjectNamesFromArgs(store, args)
+	names, err := helper.ProjectNamesFromArgs(store, args, flagShowArchive)
 	sort.Strings(data.ProjectNamesToString(names))
 
 	for _, name := range names {
