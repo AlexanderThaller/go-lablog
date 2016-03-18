@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"strconv"
 	"strings"
 	"time"
 
@@ -98,8 +99,23 @@ func convertValues(store store.Store, project data.ProjectName, values [][]strin
 
 		case "todo":
 			log.Debug("Saving todo")
+			done, err := strconv.ParseBool(value[3])
+			if err != nil {
+				return errgo.Notef(err, "can not parse bool from value")
+			}
+
+			todo := data.Todo{
+				Value:     value[2],
+				TimeStamp: timestamp,
+				Active:    !done,
+			}
+
+			err = store.AddEntry(project, todo)
+			if err != nil {
+				return errgo.Notef(err, "can not save note to store")
+			}
 		default:
-			log.Info("Do not know what to do with ", value[1])
+			return errgo.New("do not know what to do with this type of value: " + value[1])
 		}
 	}
 
