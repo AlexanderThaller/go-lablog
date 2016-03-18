@@ -3,7 +3,6 @@ package formatting
 import (
 	"io"
 	"regexp"
-	"strings"
 
 	"github.com/AlexanderThaller/lablog/src/data"
 )
@@ -19,7 +18,7 @@ func Notes(writer io.Writer, indent int, notes []data.Note) {
 }
 
 func NotesValue(writer io.Writer, value string, indent int) {
-	indentchar := strings.Repeat("=", int(indent))
+	indentchar := HeaderIndent(indent)
 	indentreg, _ := regexp.Compile("(?m)^=")
 	value = indentreg.ReplaceAllString(value, indentchar)
 

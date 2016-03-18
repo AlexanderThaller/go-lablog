@@ -2,6 +2,7 @@ package formatting
 
 import (
 	"io"
+	"strings"
 
 	"github.com/AlexanderThaller/lablog/src/data"
 	log "github.com/Sirupsen/logrus"
@@ -9,12 +10,11 @@ import (
 
 func HeaderIndent(indent int) string {
 	log.Debug("Indent: ", indent)
-
-	var out string
-
-	for i := 0; i < indent; i++ {
-		out += "="
+	if indent < 1 {
+		return ""
 	}
+
+	out := strings.Repeat("=", indent)
 
 	return out
 }
