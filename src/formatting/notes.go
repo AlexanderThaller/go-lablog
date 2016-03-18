@@ -23,10 +23,6 @@ func NotesValue(writer io.Writer, value string, indent int) {
 	indentreg, _ := regexp.Compile("(?m)^=")
 	value = indentreg.ReplaceAllString(value, indentchar)
 
-	leadinghashchar := `\#`
-	leadinghashreg, _ := regexp.Compile("(?m)^#")
-	value = leadinghashreg.ReplaceAllString(value, leadinghashchar)
-
 	io.WriteString(writer, value)
 	io.WriteString(writer, "\n")
 }
