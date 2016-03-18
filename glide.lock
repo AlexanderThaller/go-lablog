@@ -1,22 +1,26 @@
-hash: 2573b6d35a282429ac9d61d54b30d0f2e6197c00b993488f164cb204686dd165
-updated: 2016-03-18T18:01:30.96772119+01:00
+hash: 42c48fd60aab464dfd2aed02195e6069490670d17e442dcec44875ddc0dfb50a
+updated: 2016-03-18T19:43:43.057596255+01:00
 imports:
 - name: github.com/AlexanderThaller/cobra
   version: caba65771b7c9902dda609c79369424b67335e93
 - name: github.com/AlexanderThaller/dbfiles
-  version: 044299bedb0f6ebea2297ae90ffc962f5f37abf1
+  version: aed7786242699641af0e2444cab486fe600f116d
 - name: github.com/jinzhu/now
-  version: 812bf1cf8080fdd4e72e94708310afbe722d86b0
+  version: ce80572eb55aa0ac839330041ca9db1afa5f1f6c
 - name: github.com/juju/errgo
   version: 08cceb5d0b5331634b9826762a8fd53b29b86ad8
 - name: github.com/mitchellh/go-homedir
-  version: 1f6da4a72e57d4e7edd4a7295a585e0a3999a2d4
+  version: 981ab348d865cf048eb7d17e78ac7192632d8415
 - name: github.com/sergi/go-diff
   version: ec7fdbb58eb3e300c8595ad5ac74a5aa50019cc7
   subpackages:
   - diffmatchpatch
 - name: github.com/Sirupsen/logrus
-  version: 82c8de1af23b25ba5a468d801f29077f4f483bce
+  version: 4b6ea7319e214d98c938f12692336f7ca9348d6b
 - name: github.com/spf13/pflag
-  version: 41e9136667ee4f9ffd03da380e24629d7eccace4
+  version: 7f60f83a2c81bc3c3c0d5297f61ddfa68da9d3b7
+- name: golang.org/x/sys
+  version: 9d4e42a20653790449273b3c85e67d6d8bae6e2e
+  subpackages:
+  - unix
 devImports: []

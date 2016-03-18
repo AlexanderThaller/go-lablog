@@ -1,19 +1,11 @@
 package: github.com/AlexanderThaller/lablog
 import:
 - package: github.com/AlexanderThaller/cobra
-  version: caba65771b7c9902dda609c79369424b67335e93
 - package: github.com/AlexanderThaller/dbfiles
-  version: 044299bedb0f6ebea2297ae90ffc962f5f37abf1
 - package: github.com/Sirupsen/logrus
-  version: 82c8de1af23b25ba5a468d801f29077f4f483bce
 - package: github.com/jinzhu/now
-  version: 812bf1cf8080fdd4e72e94708310afbe722d86b0
 - package: github.com/juju/errgo
-  version: 08cceb5d0b5331634b9826762a8fd53b29b86ad8
 - package: github.com/mitchellh/go-homedir
-  version: 1f6da4a72e57d4e7edd4a7295a585e0a3999a2d4
-- package: github.com/spf13/pflag
-  version: 41e9136667ee4f9ffd03da380e24629d7eccace4
 - package: github.com/sergi/go-diff
   subpackages:
   - diffmatchpatch
