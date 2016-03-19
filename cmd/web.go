@@ -18,10 +18,38 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package main
+package cmd
 
-import "github.com/AlexanderThaller/lablog/cmd"
+import (
+	"github.com/AlexanderThaller/lablog/src/web"
+	"github.com/juju/errgo"
+	"github.com/spf13/cobra"
+)
 
-func main() {
-	cmd.Execute()
+var (
+	flagWebBinding string
+)
+
+func init() {
+	webCmd.PersistentFlags().StringVarP(&flagWebBinding, "binding", "b",
+		":18080", "The address and port to bind the webserver to.")
+	webCmd.PersistentFlags().BoolVarP(&flagAddAutoCommit, "commit", "c",
+		true, "If true entries will be autocommited to the repository entries are in.")
+
+	RootCmd.AddCommand(webCmd)
+}
+
+var webCmd = &cobra.Command{
+	Use:   "web",
+	Short: "Run an http webserver and serve http rendered version of the entries",
+	RunE:  runWeb,
+}
+
+func runWeb(cmd *cobra.Command, args []string) error {
+	err := web.Listen(flagDataDir, flagWebBinding)
+	if err != nil {
+		return errgo.Notef(err, "can not start web listener")
+	}
+
+	return nil
 }

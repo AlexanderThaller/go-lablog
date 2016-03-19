@@ -18,10 +18,30 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package main
+package cmd
 
-import "github.com/AlexanderThaller/lablog/cmd"
+import (
+	"fmt"
 
-func main() {
-	cmd.Execute()
+	"github.com/spf13/cobra"
+)
+
+var (
+	buildTime    string
+	buildVersion string
+)
+
+func init() {
+	RootCmd.AddCommand(cmdVersion)
+}
+
+var cmdVersion = &cobra.Command{
+	Use:   "version",
+	Short: "Print the version number of the application",
+	Long:  `All software has versions. This is the version of lablog.`,
+	Run:   runVersion,
+}
+
+func runVersion(cmd *cobra.Command, args []string) {
+	fmt.Printf("lablog v%v-b%v\n", buildVersion, buildTime)
 }
