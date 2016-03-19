@@ -20,26 +20,44 @@
 
 package cmd
 
-import "github.com/spf13/cobra"
+import (
+	"os"
 
-var flagShowArchive bool
+	"github.com/AlexanderThaller/lablog/src/formatting"
+	"github.com/AlexanderThaller/lablog/src/helper"
+	"github.com/juju/errgo"
+
+	"github.com/spf13/cobra"
+)
 
 func init() {
-	cmdShow.PersistentFlags().BoolVarP(&flagShowArchive, "archive", "a",
-		false, "Determines if entries from the archive will be shown. (default is false)")
-
-	cmdShow.AddCommand(cmdShowTodos)
-
-	RootCmd.AddCommand(cmdShow)
+	cmdShow.AddCommand(cmdShowNotes)
 }
 
-var cmdShow = &cobra.Command{
-	Use:   "show [command]",
-	Short: "Show current projects and entries",
-	Long:  `Show a list of currently available projects or their entries like notes, todos, tracks, etc., see help for all options.`,
-	Run:   runCmdShow,
+var cmdShowNotes = &cobra.Command{
+	Use:   "notes",
+	Short: "Show notes",
+	Long:  `Show all notes`,
+	RunE:  runCmdShowNotes,
 }
 
-func runCmdShow(cmd *cobra.Command, args []string) {
-	cmd.Help()
+func runCmdShowNotes(cmd *cobra.Command, args []string) error {
+	store, err := helper.DefaultStore(flagDataDir)
+	if err != nil {
+		return errgo.Notef(err, "can not get data store")
+	}
+
+	projects, err := helper.ProjectNamesFromArgs(store, args, flagShowArchive)
+	if err != nil {
+		return errgo.Notef(err, "can not get list of projects")
+	}
+
+	err = store.PopulateProjects(&projects)
+	if err != nil {
+		return errgo.Notef(err, "can not populate projects with entries")
+	}
+
+	formatting.ProjectsNotes(os.Stdout, "Notes", 0, &projects)
+
+	return nil
 }

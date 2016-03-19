@@ -20,26 +20,40 @@
 
 package cmd
 
-import "github.com/spf13/cobra"
+import (
+	"fmt"
 
-var flagShowArchive bool
+	"github.com/AlexanderThaller/lablog/src/helper"
+	"github.com/juju/errgo"
+
+	"github.com/spf13/cobra"
+)
 
 func init() {
-	cmdShow.PersistentFlags().BoolVarP(&flagShowArchive, "archive", "a",
-		false, "Determines if entries from the archive will be shown. (default is false)")
-
-	cmdShow.AddCommand(cmdShowTodos)
-
-	RootCmd.AddCommand(cmdShow)
+	cmdShow.AddCommand(cmdShowProjects)
 }
 
-var cmdShow = &cobra.Command{
-	Use:   "show [command]",
-	Short: "Show current projects and entries",
-	Long:  `Show a list of currently available projects or their entries like notes, todos, tracks, etc., see help for all options.`,
-	Run:   runCmdShow,
+var cmdShowProjects = &cobra.Command{
+	Use:   "projects",
+	Short: "Show current projects",
+	Long:  `Show all projects which currently have any type of entry.`,
+	RunE:  runCmdShowProjects,
 }
 
-func runCmdShow(cmd *cobra.Command, args []string) {
-	cmd.Help()
+func runCmdShowProjects(cmd *cobra.Command, args []string) error {
+	store, err := helper.DefaultStore(flagDataDir)
+	if err != nil {
+		return errgo.Notef(err, "can not get data store")
+	}
+
+	projects, err := helper.ProjectNamesFromArgs(store, args, flagShowArchive)
+	if err != nil {
+		return errgo.Notef(err, "can not get list of projects")
+	}
+
+	for _, project := range projects.List() {
+		fmt.Println(project.Name)
+	}
+
+	return nil
 }
