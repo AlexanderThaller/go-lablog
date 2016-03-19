@@ -29,13 +29,14 @@ func Test_PutProject(t *testing.T) {
 		t.Fatal("can not get tmp folderstore: ", err)
 	}
 
-	err = store.PutProject(testhelper.TestProject)
+	project := testhelper.GetTestProject("A", 1, 1)
+	err = store.PutProject(project)
 	if err != nil {
 		t.Fatal("can not put test project into store", err)
 	}
 
-	got, err := store.GetProject(testhelper.TestProject.Name)
-	testhelper.CompareGotExpected(t, err, got, testhelper.TestProject)
+	got, err := store.GetProject(project.Name)
+	testhelper.CompareGotExpected(t, err, got, project)
 }
 
 func Test_AddEntry(t *testing.T) {
@@ -44,15 +45,16 @@ func Test_AddEntry(t *testing.T) {
 		t.Fatal("can not get tmp folderstore: ", err)
 	}
 
-	for _, entry := range testhelper.TestProject.Entries {
-		err = store.AddEntry(testhelper.TestProject.Name, entry)
+	project := testhelper.GetTestProject("A", 1, 1)
+	for _, entry := range project.Entries {
+		err = store.AddEntry(project.Name, entry)
 		if err != nil {
 			t.Fatal("can not put test project into store", err)
 		}
 	}
 
-	got, err := store.GetProject(testhelper.TestProject.Name)
-	testhelper.CompareGotExpected(t, err, got, testhelper.TestProject)
+	got, err := store.GetProject(project.Name)
+	testhelper.CompareGotExpected(t, err, got, project)
 }
 
 func Test_ListProjects(t *testing.T) {
@@ -61,12 +63,16 @@ func Test_ListProjects(t *testing.T) {
 		t.Fatal("can not get tmp folderstore: ", err)
 	}
 
-	err = store.PutProject(testhelper.TestProject)
+	project := testhelper.GetTestProject("A", 1, 1)
+	err = store.PutProject(project)
 	if err != nil {
 		t.Fatal("can not put test project into store", err)
 	}
 
-	expected := []data.ProjectName{testhelper.TestProject.Name}
-	got, err := store.ListProjects()
-	testhelper.CompareGotExpected(t, err, got, expected)
+	projects := data.NewProjects()
+	projects.Add(project)
+
+	expected := []data.Project{data.Project{Name: project.Name}}
+	got, err := store.ListProjects(false)
+	testhelper.CompareGotExpected(t, err, got.List(), expected)
 }

@@ -2,6 +2,7 @@ NAME = lablog
 
 all:
 	make format
+	make test
 	make build
 
 generate:
@@ -11,7 +12,9 @@ format:
 	find . -name "*.go" -not -path './vendor/*' -type f -exec goimports -w=true {} \;
 
 test:
+	rm -rf vendor/
 	go test -v ./...
+	git checkout -- vendor/
 
 build:
 	go build -ldflags "-X github.com/AlexanderThaller/lablog/src/commands.buildTime=`date +%s` -X github.com/AlexanderThaller/lablog/src/commands.buildVersion=`git describe --always`" -o "$(NAME)"
@@ -27,19 +30,6 @@ clean:
 	rm *.pprof
 	rm *.pdf
 
-dependencies_get:
-	go get golang.org/x/tools/cmd/goimports
-	go get github.com/tools/godep
-	go get github.com/alecthomas/gometalinter
-	gometalinter --install
-	go get -u github.com/jteeuwen/go-bindata/...
-
-dependencies_save:
-	godep save ./...
-
-dependencies_restore:
-	godep restore ./...
-
 callgraph:
 	go tool pprof --pdf "$(NAME)" cpu.pprof > callgraph.pdf
 
@@ -47,15 +37,19 @@ memograph:
 	go tool pprof --pdf "$(NAME)" mem.pprof > memograph.pdf
 
 bench:
+	rm -rf vendor/
 	mkdir -p benchmarks/`git describe --always`/
 	go test -test.benchmem=true -test.bench . 2> /dev/null | tee benchmarks/`git describe --always`/`date +%s`
+	git checkout -- vendor/
 
 coverage:
+	rm -rf vendor/
 	rm -f coverage.out
 	go test -coverprofile=coverage.out
 	go tool cover -func=coverage.out
 	go tool cover -html=coverage.out -o=/tmp/coverage.html
+	git checkout -- vendor/
 
 lint:
-	rm -rf Godeps/
-	gometalinter ./...; git checkout -- Godeps/
+	rm -rf vendor/
+	gometalinter ./...; git checkout -- vendor/
