@@ -10,7 +10,7 @@ dependencies:
 	go get -u github.com/jteeuwen/go-bindata/...
 
 generate:
-	cd src/web/; go-bindata -pkg="web" template/
+	cd src/web/; go-bindata -pkg="web" templates/
 
 format:
 	find . -name "*.go" -not -path './vendor/*' -type f -exec goimports -w=true {} \;

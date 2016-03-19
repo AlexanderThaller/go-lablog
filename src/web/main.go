@@ -1,17 +1,28 @@
 package web
 
 import (
-	"time"
+	"html/template"
+	"net/http"
 
 	"github.com/AlexanderThaller/httphelper"
+	"github.com/AlexanderThaller/lablog/src/helper"
+	"github.com/AlexanderThaller/lablog/src/store"
 	log "github.com/Sirupsen/logrus"
-	"github.com/codegangsta/negroni"
+	"github.com/juju/errgo"
 	"github.com/julienschmidt/httprouter"
-	"github.com/phyber/negroni-gzip/gzip"
-	"gopkg.in/tylerb/graceful.v1"
+)
+
+var (
+	dataStore store.Store
 )
 
 func Listen(datadir, binding string, loglevel log.Level) error {
+	var err error
+	dataStore, err = helper.DefaultStore(datadir)
+	if err != nil {
+		return errgo.Notef(err, "can not get data store")
+	}
+
 	router := httprouter.New()
 
 	// Router handler
@@ -22,17 +33,25 @@ func Listen(datadir, binding string, loglevel log.Level) error {
 	router.GET("/", httphelper.HandlerLoggerRouter(pageRoot))
 	router.GET("/favicon.ico", httphelper.HandlerLoggerRouter(httphelper.PageMinimalFavicon))
 
-	server := negroni.New()
-	server.UseHandler(router)
-
-	// Recovery
-	server.Use(negroni.NewRecovery())
-
-	// GZIP
-	server.Use(gzip.Gzip(gzip.DefaultCompression))
-
 	log.Info("Listening on ", binding)
-	graceful.Run(binding, 10*time.Second, server)
+	err = http.ListenAndServe(binding, router)
+	if err != nil {
+		return errgo.Notef(err, "can not listen to binding")
+	}
 
 	return nil
+}
+
+func getAssetTemplate(asset string) (*template.Template, error) {
+	rawtmpl, err := Asset(asset)
+	if err != nil {
+		return nil, errgo.Notef(err, "can not get asset: "+asset)
+	}
+
+	tmpl, err := template.New(asset).Parse(string(rawtmpl))
+	if err != nil {
+		return nil, errgo.Notef(err, "can not parse template for asset: "+asset)
+	}
+
+	return tmpl, nil
 }
