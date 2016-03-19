@@ -1,12 +1,19 @@
 package: github.com/AlexanderThaller/lablog
 import:
-- package: github.com/AlexanderThaller/cobra
 - package: github.com/AlexanderThaller/dbfiles
+- package: github.com/AlexanderThaller/httphelper
 - package: github.com/Sirupsen/logrus
 - package: github.com/armon/go-radix
+- package: github.com/codegangsta/negroni
 - package: github.com/jinzhu/now
 - package: github.com/juju/errgo
+- package: github.com/julienschmidt/httprouter
 - package: github.com/mitchellh/go-homedir
+- package: github.com/phyber/negroni-gzip
+  subpackages:
+  - gzip
 - package: github.com/sergi/go-diff
   subpackages:
   - diffmatchpatch
+- package: github.com/spf13/cobra
+- package: gopkg.in/tylerb/graceful.v1

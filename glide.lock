@@ -1,28 +1,46 @@
-hash: 9f3a0279a3d53643dd24a0437b2ed3a32df753608f8aea06d0993ea2fac80b08
-updated: 2016-03-19T01:10:25.183919755+01:00
+hash: eef8e8a261d452130d86253ffc297bdcfe515736c8204bf76b2d7be05ec5446f
+updated: 2016-03-19T04:00:51.171070781+01:00
 imports:
-- name: github.com/AlexanderThaller/cobra
-  version: caba65771b7c9902dda609c79369424b67335e93
 - name: github.com/AlexanderThaller/dbfiles
   version: 8544876a0e4489e6e1cab38e96e2b6c4add824ae
+- name: github.com/AlexanderThaller/httphelper
+  version: 0cdf2af2a6a921014650274e17aaff2b06ef44fe
 - name: github.com/armon/go-radix
   version: 4239b77079c7b5d1243b7b4736304ce8ddb6f0f2
+- name: github.com/codegangsta/negroni
+  version: c7477ad8e330bef55bf1ebe300cf8aa67c492d1b
+- name: github.com/inconshreveable/mousetrap
+  version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
 - name: github.com/jinzhu/now
   version: ce80572eb55aa0ac839330041ca9db1afa5f1f6c
 - name: github.com/juju/errgo
   version: 08cceb5d0b5331634b9826762a8fd53b29b86ad8
+- name: github.com/julienschmidt/httprouter
+  version: 77366a47451a56bb3ba682481eed85b64fea14e8
 - name: github.com/mitchellh/go-homedir
   version: 981ab348d865cf048eb7d17e78ac7192632d8415
+- name: github.com/phyber/negroni-gzip
+  version: 1211b7a0892223f5b3f1af8629ea6c3d9f984028
+  subpackages:
+  - gzip
 - name: github.com/sergi/go-diff
   version: ec7fdbb58eb3e300c8595ad5ac74a5aa50019cc7
   subpackages:
   - diffmatchpatch
 - name: github.com/Sirupsen/logrus
   version: 4b6ea7319e214d98c938f12692336f7ca9348d6b
+- name: github.com/spf13/cobra
+  version: 1bacefc9a216c93293e670067bd159a64b4d72c3
 - name: github.com/spf13/pflag
   version: 7f60f83a2c81bc3c3c0d5297f61ddfa68da9d3b7
+- name: golang.org/x/net
+  version: 35b06af0720201bc2f326773a80767387544f8c4
+  subpackages:
+  - netutil
 - name: golang.org/x/sys
   version: 9d4e42a20653790449273b3c85e67d6d8bae6e2e
   subpackages:
   - unix
+- name: gopkg.in/tylerb/graceful.v1
+  version: 119c58e176bce26fd40698146d9a106c8f1723a5
 devImports: []
