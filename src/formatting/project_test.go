@@ -24,6 +24,44 @@ note note note` + "\n\n"
 	testhelper.CompareGotExpected(t, nil, got.String(), expected)
 }
 
+func Test_ProjectNoNotesNoTodos(t *testing.T) {
+	expected := ``
+
+	got := new(bytes.Buffer)
+
+	project := testhelper.GetTestProject("A", 0, 0)
+	Project(got, 0, &project)
+
+	testhelper.CompareGotExpected(t, nil, got.String(), expected)
+}
+
+func Test_ProjectNoNotes(t *testing.T) {
+	expected := `= Test.Project.A
+== Todos
+* todo todo todo` + "\n\n"
+
+	got := new(bytes.Buffer)
+
+	project := testhelper.GetTestProject("A", 0, 1)
+	Project(got, 0, &project)
+
+	testhelper.CompareGotExpected(t, nil, got.String(), expected)
+}
+
+func Test_ProjectNoTodos(t *testing.T) {
+	expected := `= Test.Project.A
+== Notes
+=== 2010-11-10 23:00:00 +0000 UTC
+note note note` + "\n\n"
+
+	got := new(bytes.Buffer)
+
+	project := testhelper.GetTestProject("A", 1, 0)
+	Project(got, 0, &project)
+
+	testhelper.CompareGotExpected(t, nil, got.String(), expected)
+}
+
 func Test_ProjectMultiple(t *testing.T) {
 	expected := `:toc: right
 :toclevels: 2

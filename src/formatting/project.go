@@ -7,12 +7,24 @@ import (
 )
 
 func Project(writer io.Writer, indent int, project *data.Project) {
-	HeaderProject(writer, indent+1, project)
-	HeaderTodos(writer, indent+2)
-	Todos(writer, project.Todos())
+	todos := project.Todos()
+	notes := project.Notes()
 
-	HeaderNotes(writer, indent+2)
-	Notes(writer, indent+3, project.Notes())
+	if len(todos) == 0 && len(notes) == 0 {
+		return
+	}
+
+	HeaderProject(writer, indent+1, project)
+
+	if len(todos) != 0 {
+		HeaderTodos(writer, indent+2)
+		Todos(writer, todos)
+	}
+
+	if len(notes) != 0 {
+		HeaderNotes(writer, indent+2)
+		Notes(writer, indent+3, notes)
+	}
 }
 
 func Projects(writer io.Writer, command string, indent int, projects *data.Projects) {
