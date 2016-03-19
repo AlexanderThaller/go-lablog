@@ -1,0 +1,97 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "mR8K+BVOMAYkiK+Z96yu12n4On0=",
+			"path": "github.com/AlexanderThaller/dbfiles",
+			"revision": "8544876a0e4489e6e1cab38e96e2b6c4add824ae",
+			"revisionTime": "2016-03-18T19:45:03+01:00"
+		},
+		{
+			"checksumSHA1": "8+l9HVAOrt7hVrF9lFlyU7hbAfI=",
+			"path": "github.com/AlexanderThaller/httphelper",
+			"revision": "0cdf2af2a6a921014650274e17aaff2b06ef44fe",
+			"revisionTime": "2016-03-19T03:57:43+01:00"
+		},
+		{
+			"checksumSHA1": "DWPL08pD/SQ2GzLfoR7ZXnjj7Sw=",
+			"path": "github.com/Sirupsen/logrus",
+			"revision": "4b6ea7319e214d98c938f12692336f7ca9348d6b",
+			"revisionTime": "2016-03-17T14:11:10Z"
+		},
+		{
+			"checksumSHA1": "gNO0JNpLzYOdInGeq7HqMZUzx9M=",
+			"path": "github.com/armon/go-radix",
+			"revision": "4239b77079c7b5d1243b7b4736304ce8ddb6f0f2",
+			"revisionTime": "2016-01-15T15:47:25-08:00"
+		},
+		{
+			"checksumSHA1": "dnj6px0tS6k2tKIqK4wCW+4bXjk=",
+			"path": "github.com/codegangsta/negroni",
+			"revision": "c7477ad8e330bef55bf1ebe300cf8aa67c492d1b",
+			"revisionTime": "2015-03-19T10:13:04-07:00"
+		},
+		{
+			"checksumSHA1": "zfyMbr3iYjsHsnOR49KW0EQ4ZS0=",
+			"path": "github.com/jinzhu/now",
+			"revision": "ce80572eb55aa0ac839330041ca9db1afa5f1f6c",
+			"revisionTime": "2015-10-01T22:15:11+08:00"
+		},
+		{
+			"checksumSHA1": "8S4DTF5nyldGBZ3FIJ9I0SrU9JM=",
+			"path": "github.com/juju/errgo",
+			"revision": "08cceb5d0b5331634b9826762a8fd53b29b86ad8",
+			"revisionTime": "2014-09-25T14:02:37+04:00"
+		},
+		{
+			"checksumSHA1": "mZK+4q1Xr8z0AwkCAgO+7Rb8xk8=",
+			"path": "github.com/julienschmidt/httprouter",
+			"revision": "77366a47451a56bb3ba682481eed85b64fea14e8",
+			"revisionTime": "2016-02-19T16:40:26+01:00"
+		},
+		{
+			"checksumSHA1": "Lnv1MZJu56aDzs5/EebdCuq3OFI=",
+			"path": "github.com/mitchellh/go-homedir",
+			"revision": "981ab348d865cf048eb7d17e78ac7192632d8415",
+			"revisionTime": "2016-03-01T10:31:30-08:00"
+		},
+		{
+			"checksumSHA1": "k7MvfktWS0rsyfuD8oZyLJUolNQ=",
+			"path": "github.com/phyber/negroni-gzip/gzip",
+			"revision": "1211b7a0892223f5b3f1af8629ea6c3d9f984028",
+			"revisionTime": "2015-09-11T17:11:11+01:00"
+		},
+		{
+			"checksumSHA1": "5SsK4Rr15FZgGP4zDjmKWHyKwp8=",
+			"path": "github.com/sergi/go-diff/diffmatchpatch",
+			"revision": "ec7fdbb58eb3e300c8595ad5ac74a5aa50019cc7",
+			"revisionTime": "2015-10-21T21:14:53+02:00"
+		},
+		{
+			"checksumSHA1": "6q2a9wCqTTEOQE+WTfhzZqcJvFM=",
+			"path": "github.com/spf13/cobra",
+			"revision": "1bacefc9a216c93293e670067bd159a64b4d72c3",
+			"revisionTime": "2016-03-15T16:50:08-05:00"
+		},
+		{
+			"checksumSHA1": "MrBzoMkuXdrGKo09/ka+JCC2Mlk=",
+			"path": "github.com/spf13/pflag",
+			"revision": "7f60f83a2c81bc3c3c0d5297f61ddfa68da9d3b7",
+			"revisionTime": "2015-10-24T12:54:09+02:00"
+		},
+		{
+			"checksumSHA1": "7WASrg0PEueWDDRHkFhEEN6Qrms=",
+			"path": "golang.org/x/net/netutil",
+			"revision": "35b06af0720201bc2f326773a80767387544f8c4",
+			"revisionTime": "2016-03-15T14:00:09+11:00"
+		},
+		{
+			"checksumSHA1": "Ykx7I6wyw+8B+eutBtwek7sPDr4=",
+			"path": "gopkg.in/tylerb/graceful.v1",
+			"revision": "119c58e176bce26fd40698146d9a106c8f1723a5",
+			"revisionTime": "2016-01-11T10:42:23-07:00"
+		}
+	],
+	"rootPath": "github.com/AlexanderThaller/lablog"
+}
