@@ -1,18 +1,22 @@
 NAME = lablog
 
 all:
+	make dependencies
 	make format
 	make test
 	make build
 
+dependencies:
+	go get -u github.com/jteeuwen/go-bindata/...
+
 generate:
-	cd src/web/; go-bindata -pkg="web" html/
+	cd src/web/; go-bindata -pkg="web" template/
 
 format:
 	find . -name "*.go" -not -path './vendor/*' -type f -exec goimports -w=true {} \;
 
 test:
-	go test -v ./...
+	GO15VENDOREXPERIMENT=1 go test `GO15VENDOREXPERIMENT=1 go list ./... | grep -v '/vendor/'`
 
 build:
 	go build -ldflags "-X github.com/AlexanderThaller/lablog/src/commands.buildTime=`date +%s` -X github.com/AlexanderThaller/lablog/src/commands.buildVersion=`git describe --always`" -o "$(NAME)"
@@ -45,4 +49,4 @@ coverage:
 	go tool cover -html=coverage.out -o=/tmp/coverage.html
 
 lint:
-	gometalinter ./...
+	GO15VENDOREXPERIMENT=1 gometalinter `GO15VENDOREXPERIMENT=1 go list ./... | grep -v '/vendor/'`
