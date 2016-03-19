@@ -1,8 +1,11 @@
 package web
 
 import (
+	"bytes"
 	"html/template"
+	"io"
 	"net/http"
+	"os/exec"
 
 	"github.com/AlexanderThaller/httphelper"
 	"github.com/AlexanderThaller/lablog/src/helper"
@@ -33,6 +36,10 @@ func Listen(datadir, binding string, loglevel log.Level) error {
 	router.GET("/", httphelper.HandlerLoggerRouter(pageRoot))
 	router.GET("/favicon.ico", httphelper.HandlerLoggerRouter(httphelper.PageMinimalFavicon))
 
+	// Show
+	router.GET("/show/:type/", httphelper.HandlerLoggerRouter(pageShow))
+	router.GET("/show/:type/:project", httphelper.HandlerLoggerRouter(pageShow))
+
 	log.Info("Listening on ", binding)
 	err = http.ListenAndServe(binding, router)
 	if err != nil {
@@ -54,4 +61,21 @@ func getAssetTemplate(asset string) (*template.Template, error) {
 	}
 
 	return tmpl, nil
+}
+
+func asciiDoctor(reader io.Reader, writer io.Writer) error {
+	stderr := new(bytes.Buffer)
+
+	command := exec.Command("asciidoctor", "-")
+	command.Stdin = reader
+	command.Stdout = writer
+	command.Stderr = stderr
+
+	err := command.Run()
+	if err != nil {
+		return errgo.Notef(errgo.Notef(err, "can not run asciidoctor"),
+			stderr.String())
+	}
+
+	return nil
 }
