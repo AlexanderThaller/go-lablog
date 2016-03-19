@@ -3,6 +3,7 @@ import:
 - package: github.com/AlexanderThaller/cobra
 - package: github.com/AlexanderThaller/dbfiles
 - package: github.com/Sirupsen/logrus
+- package: github.com/armon/go-radix
 - package: github.com/jinzhu/now
 - package: github.com/juju/errgo
 - package: github.com/mitchellh/go-homedir
