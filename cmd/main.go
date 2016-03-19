@@ -45,7 +45,7 @@ func init() {
 	RootCmd.PersistentFlags().StringVarP(&flagDataDir, "datadir", "d",
 		datadir, "The path to the datadir for retreiving and storing the data.")
 	RootCmd.PersistentFlags().StringVarP(&flagLogLevel, "loglevel", "l",
-		"warn", "The loglevel for which to run in. Default is warn. There are panic, fatal, error, warn info and debug as levels.")
+		"info", "The loglevel for which to run in. Default is warn. There are panic, fatal, error, warn info and debug as levels.")
 }
 
 // This represents the base command when called without any subcommands

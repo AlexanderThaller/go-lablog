@@ -22,6 +22,7 @@ package cmd
 
 import (
 	"github.com/AlexanderThaller/lablog/src/web"
+	log "github.com/Sirupsen/logrus"
 	"github.com/juju/errgo"
 	"github.com/spf13/cobra"
 )
@@ -46,7 +47,12 @@ var webCmd = &cobra.Command{
 }
 
 func runWeb(cmd *cobra.Command, args []string) error {
-	err := web.Listen(flagDataDir, flagWebBinding)
+	level, err := log.ParseLevel(flagLogLevel)
+	if err != nil {
+		return errgo.Notef(err, "can not parse loglevel from flag")
+	}
+
+	err = web.Listen(flagDataDir, flagWebBinding, level)
 	if err != nil {
 		return errgo.Notef(err, "can not start web listener")
 	}
