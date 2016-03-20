@@ -9,6 +9,10 @@ import (
 
 func Notes(writer io.Writer, indent int, notes []data.Note) {
 	for _, note := range notes {
+		if note.Value == "" {
+			continue
+		}
+
 		io.WriteString(writer, HeaderIndent(indent)+" ")
 		io.WriteString(writer, note.TimeStamp.String()+"\n")
 
