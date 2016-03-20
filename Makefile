@@ -19,7 +19,7 @@ test:
 	GO15VENDOREXPERIMENT=1 go test `GO15VENDOREXPERIMENT=1 go list ./... | grep -v '/vendor/'`
 
 build:
-	go build -ldflags "-X github.com/AlexanderThaller/lablog/src/commands.buildTime=`date +%s` -X github.com/AlexanderThaller/lablog/src/commands.buildVersion=`git describe --always`" -o "$(NAME)"
+	go build -ldflags "-X github.com/AlexanderThaller/lablog/cmd.buildTime=`date +%s` -X github.com/AlexanderThaller/lablog/cmd.buildVersion=`git describe --always`" -o "$(NAME)"
 
 install:
 	cp "$(NAME)" /usr/local/bin
