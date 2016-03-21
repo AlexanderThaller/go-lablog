@@ -53,6 +53,7 @@ var RootCmd = &cobra.Command{
 	Use:               "lablog [command]",
 	Short:             "lablog makes taking notes and todos easy",
 	Long:              `lablog orders notes and todos into projects and subprojects without dictating a specific format.`,
+	RunE:              runCmdShowProjects,
 	PersistentPreRunE: setLogLevel,
 }
 
