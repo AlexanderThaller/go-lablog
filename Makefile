@@ -16,6 +16,23 @@ generate:
 format:
 	find . -name "*.go" -not -path './vendor/*' -type f -exec goimports -w=true {} \;
 
+crossbuild:
+	make dependencies
+	make generate
+	make format
+	make test
+
+	# linux - amd64
+	mkdir -p "bin/linux/amd64"
+	env GOOS=linux GOARCH=amd64 go build -ldflags "-X github.com/AlexanderThaller/lablog/cmd.buildTime=`date +%s` -X github.com/AlexanderThaller/lablog/cmd.buildVersion=`git describe --always`" -o "bin/linux/amd64/$(NAME)"
+
+	# linux - arm
+	mkdir -p "bin/linux/arm"
+	env GOOS=linux GOARCH=arm go build -ldflags "-X github.com/AlexanderThaller/lablog/cmd.buildTime=`date +%s` -X github.com/AlexanderThaller/lablog/cmd.buildVersion=`git describe --always`" -o "bin/linux/arm/$(NAME)"
+	# freebsd - amd64
+	mkdir -p "bin/freebsd/amd64"
+	env GOOS=freebsd GOARCH=amd64 go build -ldflags "-X github.com/AlexanderThaller/lablog/cmd.buildTime=`date +%s` -X github.com/AlexanderThaller/lablog/cmd.buildVersion=`git describe --always`" -o "bin/freebsd/amd64/$(NAME)"
+
 test:
 	GO15VENDOREXPERIMENT=1 go test `GO15VENDOREXPERIMENT=1 go list ./... | grep -v '/vendor/'`
 
