@@ -25,22 +25,22 @@ crossbuild:
 	rm -rf "bin"
 
 	# linux - amd64
-	env GOOS=linux GOARCH=amd64 go build -ldflags "-X github.com/AlexanderThaller/lablog/cmd.buildTime=`date +%s` -X github.com/AlexanderThaller/lablog/cmd.buildVersion=`git describe --always`" -o "bin/$(NAME)_linux_adm64"
+	env GOOS=linux GOARCH=amd64 go build -ldflags "-X github.com/AlexanderThaller/lablog/cmd.buildTime=`date +%s` -X github.com/AlexanderThaller/lablog/cmd.buildVersion=`git describe --tag --always`" -o "bin/$(NAME)_linux_adm64"
 	xz --best --extreme "bin/$(NAME)_linux_adm64"
 
 	# linux - arm
-	env GOOS=linux GOARCH=arm go build -ldflags "-X github.com/AlexanderThaller/lablog/cmd.buildTime=`date +%s` -X github.com/AlexanderThaller/lablog/cmd.buildVersion=`git describe --always`" -o "bin/$(NAME)_linux_arm"
+	env GOOS=linux GOARCH=arm go build -ldflags "-X github.com/AlexanderThaller/lablog/cmd.buildTime=`date +%s` -X github.com/AlexanderThaller/lablog/cmd.buildVersion=`git describe --tag --always`" -o "bin/$(NAME)_linux_arm"
 	xz --best --extreme "bin/$(NAME)_linux_arm"
 
 	# freebsd - amd64
-	env GOOS=freebsd GOARCH=amd64 go build -ldflags "-X github.com/AlexanderThaller/lablog/cmd.buildTime=`date +%s` -X github.com/AlexanderThaller/lablog/cmd.buildVersion=`git describe --always`" -o "bin/$(NAME)_freebsd_amd64"
+	env GOOS=freebsd GOARCH=amd64 go build -ldflags "-X github.com/AlexanderThaller/lablog/cmd.buildTime=`date +%s` -X github.com/AlexanderThaller/lablog/cmd.buildVersion=`git describe --tag --always`" -o "bin/$(NAME)_freebsd_amd64"
 	xz --best --extreme "bin/$(NAME)_freebsd_amd64"
 
 test:
 	GO15VENDOREXPERIMENT=1 go test `GO15VENDOREXPERIMENT=1 go list ./... | grep -v '/vendor/'`
 
 build:
-	go build -ldflags "-X github.com/AlexanderThaller/lablog/cmd.buildTime=`date +%s` -X github.com/AlexanderThaller/lablog/cmd.buildVersion=`git describe --always`" -o "$(NAME)"
+	go build -ldflags "-X github.com/AlexanderThaller/lablog/cmd.buildTime=`date +%s` -X github.com/AlexanderThaller/lablog/cmd.buildVersion=`git describe --tag --always`" -o "$(NAME)"
 
 install:
 	cp "$(NAME)" /usr/local/bin
