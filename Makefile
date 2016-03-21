@@ -2,6 +2,7 @@ NAME = lablog
 
 all:
 	make dependencies
+	make generate
 	make format
 	make test
 	make build
