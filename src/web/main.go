@@ -34,7 +34,7 @@ func Listen(datadir, binding string, loglevel log.Level) error {
 
 	// Root and Favicon
 	router.GET("/", httphelper.HandlerLoggerRouter(pageRoot))
-	router.GET("/favicon.ico", httphelper.HandlerLoggerRouter(httphelper.PageMinimalFavicon))
+	router.GET("/favicon.ico", httphelper.HandlerLoggerRouter(pageFavicon))
 
 	// Show
 	router.GET("/show/:type/", httphelper.HandlerLoggerRouter(pageShow))

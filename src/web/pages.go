@@ -60,3 +60,17 @@ func pageShow(w http.ResponseWriter, r *http.Request, p httprouter.Params) *http
 
 	return nil
 }
+
+func pageFavicon(w http.ResponseWriter, r *http.Request, p httprouter.Params) *httphelper.HandlerError {
+	raw, err := Asset("templates/trivago-folder.ico")
+	if err != nil {
+		return httphelper.NewHandlerErrorDef(errgo.Notef(err, "can not read raw page"))
+	}
+
+	_, err = w.Write(raw)
+	if err != nil {
+		return httphelper.NewHandlerErrorDef(errgo.Notef(err, "can not write raw data to responsewriter"))
+	}
+
+	return nil
+}
