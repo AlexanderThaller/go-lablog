@@ -13,7 +13,7 @@ func Test_Project(t *testing.T) {
 * todo todo todo
 
 == Notes
-=== 2010-11-10 23:00:00 +0000 UTC
+=== 2010-11-10 23:00:00
 note note note` + "\n\n"
 
 	got := new(bytes.Buffer)
@@ -51,7 +51,7 @@ func Test_ProjectNoNotes(t *testing.T) {
 func Test_ProjectNoTodos(t *testing.T) {
 	expected := `= Test.Project.A
 == Notes
-=== 2010-11-10 23:00:00 +0000 UTC
+=== 2010-11-10 23:00:00
 note note note` + "\n\n"
 
 	got := new(bytes.Buffer)
@@ -83,7 +83,7 @@ func Test_ProjectMultiple(t *testing.T) {
 * todo todo todo
 
 === Notes
-==== 2010-11-10 23:00:00 +0000 UTC
+==== 2010-11-10 23:00:00
 note note note` + "\n\n"
 
 	expected += `== Test.Project.B
@@ -91,7 +91,7 @@ note note note` + "\n\n"
 * todo todo todo
 
 === Notes
-==== 2010-11-10 23:00:00 +0000 UTC
+==== 2010-11-10 23:00:00
 note note note` + "\n\n"
 
 	expected += `== Test.Project.C
@@ -99,7 +99,7 @@ note note note` + "\n\n"
 * todo todo todo
 
 === Notes
-==== 2010-11-10 23:00:00 +0000 UTC
+==== 2010-11-10 23:00:00
 note note note` + "\n\n"
 
 	expected += `== Test.Project.D
@@ -107,7 +107,7 @@ note note note` + "\n\n"
 * todo todo todo
 
 === Notes
-==== 2010-11-10 23:00:00 +0000 UTC
+==== 2010-11-10 23:00:00
 note note note` + "\n\n"
 
 	got := new(bytes.Buffer)

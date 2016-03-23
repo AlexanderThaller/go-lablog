@@ -8,7 +8,7 @@ import (
 )
 
 func Test_Notes(t *testing.T) {
-	expected := `== 2010-11-10 23:00:00 +0000 UTC
+	expected := `== 2010-11-10 23:00:00
 note note note` + "\n\n"
 
 	got := new(bytes.Buffer)
@@ -18,7 +18,7 @@ note note note` + "\n\n"
 }
 
 func Test_NotesValue(t *testing.T) {
-	expected := `== 2010-11-10 23:00:00 +0000 UTC
+	expected := `== 2010-11-10 23:00:00
 === Header In Note Value
 note note note
 
@@ -42,19 +42,19 @@ note note note`
 }
 
 func Test_NotesMultiple5(t *testing.T) {
-	expected := `== 2010-11-10 23:00:00 +0000 UTC
+	expected := `== 2010-11-10 23:00:00
 note note note` + "\n\n"
 
-	expected += `== 2011-11-10 23:00:00 +0000 UTC
+	expected += `== 2011-11-10 23:00:00
 note note note` + "\n\n"
 
-	expected += `== 2012-11-10 23:00:00 +0000 UTC
+	expected += `== 2012-11-10 23:00:00
 note note note` + "\n\n"
 
-	expected += `== 2013-11-10 23:00:00 +0000 UTC
+	expected += `== 2013-11-10 23:00:00
 note note note` + "\n\n"
 
-	expected += `== 2014-11-10 23:00:00 +0000 UTC
+	expected += `== 2014-11-10 23:00:00
 note note note` + "\n\n"
 
 	got := new(bytes.Buffer)
@@ -65,7 +65,7 @@ note note note` + "\n\n"
 
 func Test_ProjectNotes(t *testing.T) {
 	expected := `= Test.Project.A
-== 2010-11-10 23:00:00 +0000 UTC
+== 2010-11-10 23:00:00
 note note note` + "\n\n"
 
 	got := new(bytes.Buffer)
@@ -77,19 +77,19 @@ note note note` + "\n\n"
 
 func Test_ProjectNotesMultiple5(t *testing.T) {
 	expected := `= Test.Project.A
-== 2010-11-10 23:00:00 +0000 UTC
+== 2010-11-10 23:00:00
 note note note` + "\n\n"
 
-	expected += `== 2011-11-10 23:00:00 +0000 UTC
+	expected += `== 2011-11-10 23:00:00
 note note note` + "\n\n"
 
-	expected += `== 2012-11-10 23:00:00 +0000 UTC
+	expected += `== 2012-11-10 23:00:00
 note note note` + "\n\n"
 
-	expected += `== 2013-11-10 23:00:00 +0000 UTC
+	expected += `== 2013-11-10 23:00:00
 note note note` + "\n\n"
 
-	expected += `== 2014-11-10 23:00:00 +0000 UTC
+	expected += `== 2014-11-10 23:00:00
 note note note` + "\n\n"
 
 	got := new(bytes.Buffer)
@@ -101,19 +101,19 @@ note note note` + "\n\n"
 
 func Test_ProjectsNotes(t *testing.T) {
 	expected := `= Test.Project.A
-== 2010-11-10 23:00:00 +0000 UTC
+== 2010-11-10 23:00:00
 note note note` + "\n\n"
 
 	expected += `= Test.Project.B
-== 2010-11-10 23:00:00 +0000 UTC
+== 2010-11-10 23:00:00
 note note note` + "\n\n"
 
 	expected += `= Test.Project.C
-== 2010-11-10 23:00:00 +0000 UTC
+== 2010-11-10 23:00:00
 note note note` + "\n\n"
 
 	expected += `= Test.Project.D
-== 2010-11-10 23:00:00 +0000 UTC
+== 2010-11-10 23:00:00
 note note note` + "\n\n"
 
 	got := new(bytes.Buffer)

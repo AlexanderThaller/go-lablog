@@ -7,6 +7,10 @@ import (
 	"github.com/AlexanderThaller/lablog/src/data"
 )
 
+const (
+	HeaderTimeFormat = "2006-01-02 15:04:05"
+)
+
 func Notes(writer io.Writer, indent int, notes []data.Note) {
 	for _, note := range notes {
 		if note.Value == "" {
@@ -14,7 +18,7 @@ func Notes(writer io.Writer, indent int, notes []data.Note) {
 		}
 
 		io.WriteString(writer, HeaderIndent(indent)+" ")
-		io.WriteString(writer, note.TimeStamp.String()+"\n")
+		io.WriteString(writer, note.TimeStamp.Format(HeaderTimeFormat)+"\n")
 
 		NotesValue(writer, note.Value, indent+1)
 		io.WriteString(writer, "\n")
