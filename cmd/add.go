@@ -21,6 +21,9 @@
 package cmd
 
 import (
+	"bytes"
+	"io"
+	"os"
 	"time"
 
 	"github.com/AlexanderThaller/lablog/src/data"
@@ -77,8 +80,22 @@ func runCmdAddNote(cmd *cobra.Command, args []string) error {
 		return errgo.Notef(err, "can not convert args to entry usable values")
 	}
 
+	buffer := new(bytes.Buffer)
+
+	if value != "-" {
+		buffer.WriteString(value)
+	}
+
+	// If there is something piped in over stdin append it to the already set
+	// value
+
+	stat, _ := os.Stdin.Stat()
+	if (stat.Mode() & os.ModeCharDevice) == 0 {
+		io.Copy(buffer, os.Stdin)
+	}
+
 	note := data.Note{
-		Value:     value,
+		Value:     buffer.String(),
 		TimeStamp: timestamp,
 	}
 

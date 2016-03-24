@@ -32,3 +32,6 @@ benchmarks
 bin/convert/convert
 bin/convert/.lablog
 bin/convert/output
+
+bin
+vendor/github.com/AlexanderThaller/httphelper/bindata.go

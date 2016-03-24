@@ -36,6 +36,10 @@ crossbuild:
 	env GOOS=freebsd GOARCH=amd64 go build -ldflags "-X github.com/AlexanderThaller/lablog/cmd.buildTime=`date +%s` -X github.com/AlexanderThaller/lablog/cmd.buildVersion=`git describe --tag --always`" -o "bin/$(NAME)_freebsd_amd64"
 	xz --best --extreme "bin/$(NAME)_freebsd_amd64"
 
+	# darwin - amd64
+	env GOOS=darwin GOARCH=amd64 go build -ldflags "-X github.com/AlexanderThaller/lablog/cmd.buildTime=`date +%s` -X github.com/AlexanderThaller/lablog/cmd.buildVersion=`git describe --tag --always`" -o "bin/$(NAME)_darwin_amd64"
+	xz --best --extreme "bin/$(NAME)_darwin_amd64"
+
 test:
 	GO15VENDOREXPERIMENT=1 go test `GO15VENDOREXPERIMENT=1 go list ./... | grep -v '/vendor/'`
 
