@@ -21,7 +21,7 @@ func HeaderIndent(indent int) string {
 
 func HeaderSettings(writer io.Writer) {
 	settings := `:toc: right
-:toclevels: 2
+:toclevels: 4
 :sectanchors:
 :sectlink:
 :icons: font
