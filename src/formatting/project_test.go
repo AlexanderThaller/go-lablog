@@ -64,7 +64,7 @@ note note note` + "\n\n"
 
 func Test_ProjectMultiple(t *testing.T) {
 	expected := `:toc: right
-:toclevels: 2
+:toclevels: 4
 :sectanchors:
 :sectlink:
 :icons: font
