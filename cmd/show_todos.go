@@ -57,7 +57,7 @@ func runCmdShowTodos(cmd *cobra.Command, args []string) error {
 		return errgo.Notef(err, "can not populate projects with entries")
 	}
 
-	formatting.ProjectsTodos(os.Stdout, "Todos", 0, &projects)
+	formatting.AsciidocProjectsTodos(os.Stdout, "Todos", 0, &projects)
 
 	return nil
 }

@@ -19,7 +19,7 @@ func Test_HeaderIndent(t *testing.T) {
 	}
 
 	for input, expected := range tests {
-		got := HeaderIndent(input)
+		got := HeaderIndent("=", input)
 		testhelper.CompareGotExpected(t, nil, got, expected)
 	}
 }

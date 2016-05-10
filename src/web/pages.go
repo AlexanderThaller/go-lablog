@@ -51,7 +51,7 @@ func pageShow(w http.ResponseWriter, r *http.Request, p httprouter.Params) *http
 	}
 
 	buffer := new(bytes.Buffer)
-	formatting.Projects(buffer, "Entries", 0, &projects)
+	formatting.AsciidocProjects(buffer, "Entries", 0, &projects)
 
 	err = asciiDoctor(buffer, w)
 	if err != nil {

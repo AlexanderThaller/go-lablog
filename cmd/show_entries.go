@@ -57,7 +57,7 @@ func runCmdShowEntries(cmd *cobra.Command, args []string) error {
 		return errgo.Notef(err, "can not populate projects with entries")
 	}
 
-	formatting.Projects(os.Stdout, "Entries", 0, &projects)
+	formatting.AsciidocProjects(os.Stdout, "Entries", 0, &projects)
 
 	return nil
 }
